@@ -15,35 +15,104 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
     <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #495057;
+            --hover-primary-color: #343a40;
+            --background-gradient-start: #f9f9f9;
+            --background-gradient-end: #e9e9e9;
+            --box-shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* General Styles */
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(to bottom, #f9f9f9, #e9e9e9);
+            font-family: 'Poppins', Arial, sans-serif; /* Added fallback font */
+            background: linear-gradient(to bottom, var(--background-gradient-start), var(--background-gradient-end));
+            line-height: 1.6; /* Improve readability */
+        }
+
+        /* Utility Classes */
+        .smooth-transition {
+            transition: all 0.3s;
+        }
+
+        /* Navbar Styles */
+        .navbar .nav-link {
+            transition: color var(--smooth-transition); /* Utilizing utility class */
         }
 
         .navbar .nav-link:hover {
-            text-decoration: underline;
+            color: #f8f9fa;
+            text-decoration: none;
         }
 
+        /* Skill Card Styles */
         .skill-card {
             border: 1px solid #e5e5e5;
             border-radius: 15px;
             padding: 20px;
-            transition: transform 0.3s;
+            transition: transform var(--smooth-transition), box-shadow var(--smooth-transition);
         }
 
         .skill-card:hover {
             transform: translateY(-10px);
+            box-shadow: 0 4px 15px var(--box-shadow-color);
         }
 
+        /* Icon Styles */
         i {
             font-size: 4em;
+            color: var(--primary-color);
+        }
+
+        /* Project Card Styles */
+        .project-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            transition: transform var(--smooth-transition);
+            box-shadow: 0 4px 15px var(--box-shadow-color);
+        }
+
+        .project-card img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Form Styles */
+        button.btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            transition: background-color var(--smooth-transition);
+        }
+
+        button.btn-primary:hover {
+            background-color: var(--hover-primary-color);
+        }
+
+        /* Footer Styles */
+        footer {
+            background: var(--hover-primary-color);
+        }
+
+        /* LinkedIn Icon Styles */
+        footer a:hover {
+            color: #0e76a8;
+            text-decoration: none;
+        }
+
+        footer i.fab {
+            margin-top: 10px;
         }
     </style>
 </head>
 
-<body>
+
+    <body>
     <!-- Navbar -->
     <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
         <div class="container-fluid">
@@ -65,19 +134,20 @@
     </nav>
 
     <!-- Main Content Section -->
-    <section class="container mt-5 mb-5">
-        <h1>Welcome to Anton Smedberg's Portfolio</h1>
-        <p>Discover my latest projects, learn more about my journey in SwiftUI and Kotlin, and explore my reading log as I share insights and knowledge from the books I've devoured over the years.</p>
+    <section class="container mt-5 mb-5 text-center">
+        <h1>Welcome to My Portfolio</h1>
+        <p>Discover the latest projects, delve into my journey in SwiftUI and Kotlin, and explore insights from the books that have shaped my understanding.</p>
+
 
         <div class="row justify-content-center mt-5">
             <div class="col-lg-4 mb-lg-4">
                 <!-- Make sure you have an image named "anton_image.jpg" or change the name to match your image. -->
-                <img src="anton_image.jpg" class="img-fluid rounded" alt="Anton Smedberg" srcset="">
+               <img src="anton_image.jpg" class="img-fluid rounded" alt="Portrait of Anton Smedberg">
             </div>
-            <div class="col-lg-7">
-                <h2 class="text-center">Hi, I'm Anton Smedberg</h2>
+      <div class="col-lg-7">
+                <h2>About Me</h2>
                 <p>
-                    As a dedicated mobile app developer, I have carved a niche in creating intuitive and innovative apps for both iOS and Android platforms. My journey in SwiftUI and Kotlin has made me appreciate the finesse and power of mobile apps. My vision is always to bridge the gap between the application's intent and the user's experience. My commitment to quality and usability drives me to constantly learn and refine my skills to deliver top-notch apps.
+                    As a dedicated mobile app developer, I've specialized in creating intuitive apps for iOS and Android. My experience with SwiftUI and Kotlin has deepened my appreciation for the art of mobile development. Striving for excellence, I continually refine my skills to bridge the gap between app intent and user experience.
                 </p>
             </div>
         </div>
@@ -117,10 +187,68 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="mt-5 py-4 bg-dark text-white text-center">
-        <p>&copy; 2023 Anton Smedberg. All Rights Reserved.</p>
-    </footer>
+    <!-- Projects Section -->
+        <div class="my-4">
+            <h2>Highlighted Projects</h2>
+            <div class="row g-4 mt-4">
+                <div class="col-md-4 project-card">
+                    <a href="#projectLink1">
+                        <img src="project1_image.jpg" alt="Project 1 Title">
+                    </a>
+                </div>
+                <div class="col-md-4 project-card">
+                    <a href="#projectLink2">
+                        <img src="project2_image.jpg" alt="Project 2 Title">
+                    </a>
+                </div>
+                <div class="col-md-4 project-card">
+                    <a href="#projectLink3">
+                        <img src="project3_image.jpg" alt="Project 3 Title">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+<!-- Contact Form -->
+<div class="my-4">
+    <h2>Contact Me</h2>
+    <form action="#yourBackendLink" method="post">
+        <fieldset>
+            <legend>Fill out the form to contact me:</legend>
+
+            <!-- Name Field -->
+            <div class="mb-3">
+                <label for="userName" class="form-label">Your Name</label>
+                <input type="text" id="userName" name="userName" class="form-control" placeholder="John Doe" required>
+            </div>
+
+            <!-- Email Field -->
+            <div class="mb-3">
+                <label for="userEmail" class="form-label">Your Email</label>
+                <input type="email" id="userEmail" name="userEmail" class="form-control" placeholder="john.doe@example.com" required>
+            </div>
+
+            <!-- Message Field -->
+            <div class="mb-3">
+                <label for="userMessage" class="form-label">Your Message</label>
+                <textarea id="userMessage" name="userMessage" class="form-control" rows="5" placeholder="Write your message here..." required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </fieldset>
+    </form>
+</div>
+
+    
+<!-- Footer -->
+<footer class="mt-5 py-4 bg-dark text-white text-center">
+    <p>&copy; 2023 Anton Smedberg. All Rights Reserved.</p>
+    <a href="https://www.linkedin.com/in/your-linkedin-username/" target="_blank" class="text-white">
+        <i class="fab fa-linkedin fa-2x"></i>
+    </a>
+</footer>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
