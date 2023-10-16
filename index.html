@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,17 +10,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <!-- Devicon CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+    <style>
+        /* Adjusting the icon size */
+        i {
+            font-size: 4em;
+        }
+    </style>
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
         <div class="container-fluid">
-            <div class="mx-4">
-                <a class="navbar-brand" href="#">Anton Smedberg</a>
-            </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false"
-                aria-label="Toggle navigation">
+            <a class="navbar-brand mx-4" href="#">Anton Smedberg</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
@@ -36,12 +40,61 @@
     </nav>
 
     <!-- Main Content Section -->
-    <section class="container mt-5">
+    <section class="container mt-5 mb-5">
         <h1>Welcome to Anton Smedberg's Portfolio</h1>
         <p>Discover my latest projects, learn more about my journey in SwiftUI and Kotlin, and explore my reading log as I share insights and knowledge from the books I've devoured over the years.</p>
+
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-4 mb-lg-4">
+                <!-- Make sure you have an image named "anton_image.jpg" or change the name to match your image. -->
+                <img src="anton_image.jpg" class="img-fluid rounded" alt="Anton Smedberg" srcset="">
+            </div>
+            <div class="col-lg-7">
+                <h2 class="text-center">Hi, I'm Anton Smedberg</h2>
+                <p>
+                    As a dedicated mobile app developer, I have carved a niche in creating intuitive and innovative apps for both iOS and Android platforms. My journey in SwiftUI and Kotlin has made me appreciate the finesse and power of mobile apps. My vision is always to bridge the gap between the application's intent and the user's experience. My commitment to quality and usability drives me to constantly learn and refine my skills to deliver top-notch apps.
+                </p>
+            </div>
+        </div>
+
+        <!-- Skills section -->
+        <div class="my-4">
+            <div class="text-center mb-4">
+                <h2>My Expertise</h2>
+            </div>
+            <div class="row">
+                <!-- Skills -->
+                <div class="col">
+                    <div class="text-center">
+                        <h4>SwiftUI</h4>
+                        <i class="devicon-swift-plain"></i>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-center">
+                        <h4>Kotlin</h4>
+                        <i class="devicon-kotlin-plain"></i>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-center">
+                        <h4>iOS Development</h4>
+                        <i class="devicon-apple-original"></i>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-center">
+                        <h4>GitHub</h4>
+                        <i class="devicon-github-original"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 </body>
+
 </html>
+
