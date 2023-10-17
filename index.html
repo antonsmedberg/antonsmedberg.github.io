@@ -37,6 +37,7 @@ body {
     font-family: 'Poppins', Arial, sans-serif;
     background: linear-gradient(to bottom, var(--background-gradient-start), var(--background-gradient-end));
     line-height: 1.6;
+    padding-top: 80px; /* Adjust based on the height of your navbar */
 }
 
 
@@ -49,6 +50,11 @@ body {
 /* == Navbar Styles == */
 .navbar {
     transition: opacity 0.3s ease;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    backdrop-filter: saturate(180%) blur(10px); /* This will blur the background content behind the navbar, giving it a frosted glass effect */
 }
 
 .navbar .navbar-brand {
@@ -170,9 +176,8 @@ i {
 
     </style>
 </head>
-    <body>  
-
-        
+    
+    <body>         
 <!-- Navbar -->
 <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
     <div class="container-fluid">
