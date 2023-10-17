@@ -297,23 +297,109 @@ button.btn-primary:active, button.btn-primary:focus {
     <h2>Highlighted Projects</h2>
     <div class="row g-4 mt-4">
         <div class="col-md-4 project-card">
-            <a href="#projectLink1">
-                <img src="project1_image.jpg" alt="Project 1 Title">
+            <a href="#projectLink1" class="project-link">
+                <div class="project-image" style="background-image: url('project1_image.jpg')"></div>
+                <div class="project-details">
+                    <h3>Project 1 Title</h3>
+                    <p>Short description about project 1.</p>
+                </div>
             </a>
         </div>
         <div class="col-md-4 project-card">
-            <a href="#projectLink2">
-                <img src="project2_image.jpg" alt="Project 2 Title">
+            <a href="#projectLink2" class="project-link">
+                <div class="project-image" style="background-image: url('project2_image.jpg')"></div>
+                <div class="project-details">
+                    <h3>Project 2 Title</h3>
+                    <p>Short description about project 2.</p>
+                </div>
             </a>
         </div>
         <div class="col-md-4 project-card">
-            <a href="#projectLink3">
-                <img src="project3_image.jpg" alt="Project 3 Title">
+            <a href="#projectLink3" class="project-link">
+                <div class="project-image" style="background-image: url('project3_image.jpg')"></div>
+                <div class="project-details">
+                    <h3>Project 3 Title</h3>
+                    <p>Short description about project 3.</p>
+                </div>
             </a>
         </div>
     </div>
 </div>
 
+  
+
+ /* Improved CSS */
+<style>
+    
+.project-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* soft shadow for depth */
+    overflow: hidden; /* to contain the children with rounded borders */
+    transition: transform 0.3s; /* subtle lift effect */
+}
+
+.project-link:hover {
+    transform: translateY(-5px);
+}
+
+.project-image {
+    width: 100%;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    transition: opacity 0.3s;
+}
+
+.project-image::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.project-link:hover .project-image {
+    opacity: 0.8;
+}
+
+.project-link:hover .project-image::before {
+    opacity: 1;
+}
+
+.project-details {
+    padding: 10px;
+    font-size: 16px;
+    line-height: 1.5; /* improves readability */
+}
+
+.project-details h3 {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
+
+.container h1, .container h2 {
+    letter-spacing: 1px; /* enhances typography */
+    font-weight: bold;
+}
+
+.container p {
+    letter-spacing: 0.5px; /* enhances typography */
+    font-size: 18px;
+}
+
+.img-fluid.rounded {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+    
+</style>
         
 
 <!-- Contact Form -->
