@@ -110,12 +110,18 @@
         footer i.fab {
             margin-top: 10px;
         }
+
+          /* Navbar Transition */
+    .navbar {
+        transition: opacity 0.3s ease;
+    }
+    
     </style>
 </head>
-    <body>
-        
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
+    <body>  
+  
+        <!-- Navbar -->
+   <nav class="navbar navbar-dark navbar-expand-lg bg-dark custom-navbar">
         <div class="container-fluid">
             <a class="navbar-brand mx-4" href="#">Anton Smedberg</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,6 +143,27 @@
         </div>
     </nav>
 
+
+<script>
+    // Grab the navbar
+    const navbar = document.querySelector('.custom-navbar');
+    
+    // Add an event listener for the scroll event
+    window.addEventListener('scroll', () => {
+        // Get the scrolled amount
+        let scrolled = window.scrollY;
+        
+        // Set the opacity of the navbar based on how much we've scrolled
+        if(scrolled > 100) {
+            navbar.style.opacity = 1 - scrolled / 1000;
+        } else {
+            navbar.style.opacity = 1;
+        }
+    });
+</script>
+
+
+        
     <!-- Main Content Section -->
     <section class="container mt-5 mb-5 text-center">
         <h1>Welcome to My Portfolio</h1>
