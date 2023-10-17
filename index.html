@@ -110,9 +110,8 @@
         }
     </style>
 </head>
-
-
     <body>
+        
     <!-- Navbar -->
     <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
         <div class="container-fluid">
@@ -121,14 +120,17 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Reading Log</a>
-                    </li>
-                </ul>
+         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="#">Projects</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Reading Log</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#contactSection">Contact</a>
+            </li>
+        </ul>
             </div>
         </div>
     </nav>
@@ -152,8 +154,63 @@
             </div>
         </div>
 
-        <!-- Skills section -->
+    
+    <!-- Projects Section -->
         <div class="my-4">
+            <h2>Highlighted Projects</h2>
+            <div class="row g-4 mt-4">
+                <div class="col-md-4 project-card">
+                    <a href="#projectLink1">
+                        <img src="project1_image.jpg" alt="Project 1 Title">
+                    </a>
+                </div>
+                <div class="col-md-4 project-card">
+                    <a href="#projectLink2">
+                        <img src="project2_image.jpg" alt="Project 2 Title">
+                    </a>
+                </div>
+                <div class="col-md-4 project-card">
+                    <a href="#projectLink3">
+                        <img src="project3_image.jpg" alt="Project 3 Title">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+<!-- Contact Form -->
+<div class="my-4" id="contactSection">
+    <h2>Contact Me</h2>
+    <form action="#yourBackendLink" method="post">
+        <fieldset>
+            <legend>Fill out the form to contact me:</legend>
+
+            <!-- Name Field -->
+            <div class="mb-3">
+                <label for="userName" class="form-label">Your Name</label>
+                <input type="text" id="userName" name="userName" class="form-control" placeholder="John Doe" required>
+            </div>
+
+            <!-- Email Field -->
+            <div class="mb-3">
+                <label for="userEmail" class="form-label">Your Email</label>
+                <input type="email" id="userEmail" name="userEmail" class="form-control" placeholder="john.doe@example.com" required>
+            </div>
+
+            <!-- Message Field -->
+            <div class="mb-3">
+                <label for="userMessage" class="form-label">Your Message</label>
+                <textarea id="userMessage" name="userMessage" class="form-control" rows="5" placeholder="Write your message here..." required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </fieldset>
+    </form>
+</div>
+
+
+    <!-- Skills section -->
+       <div class="container my-4">
             <div class="text-center mb-4">
                 <h2>My Expertise</h2>
             </div>
@@ -187,60 +244,8 @@
         </div>
     </section>
 
-    <!-- Projects Section -->
-        <div class="my-4">
-            <h2>Highlighted Projects</h2>
-            <div class="row g-4 mt-4">
-                <div class="col-md-4 project-card">
-                    <a href="#projectLink1">
-                        <img src="project1_image.jpg" alt="Project 1 Title">
-                    </a>
-                </div>
-                <div class="col-md-4 project-card">
-                    <a href="#projectLink2">
-                        <img src="project2_image.jpg" alt="Project 2 Title">
-                    </a>
-                </div>
-                <div class="col-md-4 project-card">
-                    <a href="#projectLink3">
-                        <img src="project3_image.jpg" alt="Project 3 Title">
-                    </a>
-                </div>
-            </div>
-        </div>
 
-<!-- Contact Form -->
-<div class="my-4">
-    <h2>Contact Me</h2>
-    <form action="#yourBackendLink" method="post">
-        <fieldset>
-            <legend>Fill out the form to contact me:</legend>
-
-            <!-- Name Field -->
-            <div class="mb-3">
-                <label for="userName" class="form-label">Your Name</label>
-                <input type="text" id="userName" name="userName" class="form-control" placeholder="John Doe" required>
-            </div>
-
-            <!-- Email Field -->
-            <div class="mb-3">
-                <label for="userEmail" class="form-label">Your Email</label>
-                <input type="email" id="userEmail" name="userEmail" class="form-control" placeholder="john.doe@example.com" required>
-            </div>
-
-            <!-- Message Field -->
-            <div class="mb-3">
-                <label for="userMessage" class="form-label">Your Message</label>
-                <textarea id="userMessage" name="userMessage" class="form-control" rows="5" placeholder="Write your message here..." required></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">Send Message</button>
-        </fieldset>
-    </form>
-</div>
-
-    
+        
 <!-- Footer -->
 <footer class="mt-5 py-4 bg-dark text-white text-center">
     <p>&copy; 2023 Anton Smedberg. All Rights Reserved.</p>
