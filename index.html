@@ -30,49 +30,73 @@
             --box-shadow-color: rgba(0, 0, 0, 0.1);
         }
 
-        /* General Styles */
-        body {
-            font-family: 'Poppins', Arial, sans-serif; /* Added fallback font */
-            background: linear-gradient(to bottom, var(--background-gradient-start), var(--background-gradient-end));
-            line-height: 1.6; /* Improve readability */
-        }
+     
+  
+/* == General Styles == */
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: linear-gradient(to bottom, var(--background-gradient-start), var(--background-gradient-end));
+    line-height: 1.6;
+}
 
-        /* Utility Classes */
-        .smooth-transition {
-            transition: all 0.3s;
-        }
 
-        /* Navbar Styles */
-        .navbar .nav-link {
-             padding: 0.5rem 1rem;  /* Added padding */
-                transition: color var(--smooth-transition); /* Utilizing utility class */
-        }
+/* == Utility Classes == */
+.smooth-transition {
+    transition: all 0.3s;
+}
 
-        .navbar .nav-link:hover {
-            color: #f8f9fa;
-            text-decoration: none;
-        }
 
-        /* Skill Card Styles */
-        .skill-card {
-            border: 1px solid #e5e5e5;
-            border-radius: 15px;
-            padding: 20px;
-            transition: transform var(--smooth-transition), box-shadow var(--smooth-transition);
-        }
+/* == Navbar Styles == */
+.navbar {
+    transition: opacity 0.3s ease;
+}
 
-        .skill-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 4px 15px var(--box-shadow-color);
-        }
+.navbar .navbar-brand, .navbar .nav-link {
+    transition: color 0.3s ease-in-out;
+}
 
-        /* Icon Styles */
-        i {
-            font-size: 4em;
-            color: var(--primary-color);
-        }
+.navbar .nav-link {
+    padding: 0.5rem 1rem;
+    transition: color var(--smooth-transition);
+}
 
-        /* Project Card Styles */
+.navbar .nav-link:hover, .nav-item:hover .nav-link {
+    color: #f8f9fa;
+    text-decoration: none;
+}
+
+.nav-item {
+    transition: background-color 0.3s ease-in-out;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+
+/* == Skill Card Styles == */
+.skill-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 15px;
+    padding: 20px;
+    transition: transform var(--smooth-transition), box-shadow var(--smooth-transition);
+}
+
+.skill-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 4px 15px var(--box-shadow-color);
+}
+
+
+    
+/* == Icon Styles == */
+i {
+    font-size: 4em;
+    color: var(--primary-color);
+}
+
+        /* == Project Card Styles == */
         .project-card img {
             width: 100%;
             height: auto;
@@ -85,7 +109,8 @@
             transform: scale(1.05);
         }
 
-        /* Form Styles */
+  
+    /* == Form Styles == */
         button.btn-primary {
             background-color: var(--primary-color);
             border: none;
@@ -96,7 +121,8 @@
             background-color: var(--hover-primary-color);
         }
 
-        /* Footer Styles */
+  
+    /* == Footer Styles == */
         footer {
              padding: 1rem 0; /* Added vertical padding */
             background: var(--hover-primary-color);
@@ -112,29 +138,12 @@
             margin-top: 10px;
         }
 
-    /* Navbar Transition */
-    .navbar {
-        transition: opacity 0.3s ease;
-    }
 
-    .navbar .navbar-brand, .navbar .nav-link {
-        transition: color 0.3s ease-in-out;
-    }
-
-    .navbar .nav-link:hover {
-        color: #f8f9fa; /* or any other lighter color you prefer */
-        text-decoration: none;
-    }
-
-    .nav-item {
-        transition: background-color 0.3s ease-in-out;
-    }
-
-    .nav-item:hover {
-        background-color: rgba(255, 255, 255, 0.1); /* subtle highlight on hover */
-    }
+        
 
     /* Slide down animation for the dropdown */
+     
+        /* == Animations == */
     @keyframes slideDown {
         0% {
             transform: translateY(-100%);
@@ -143,18 +152,16 @@
             transform: translateY(0);
         }
     }
-
     .slide-down {
         animation: slideDown 0.3s ease-in-out forwards;
     }
 
 
-
-        
     </style>
 </head>
     <body>  
-  
+
+        
 <!-- Navbar -->
 <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
     <div class="container-fluid">
@@ -176,10 +183,9 @@
 </nav>
 
 
-
 <script>
     // Grab the navbar
-    const navbar = document.querySelector('.custom-navbar');
+    const navbar = document.querySelector('.navbar'); // changed from .custom-navbar to .navbar
     
     // Add an event listener for the scroll event
     window.addEventListener('scroll', () => {
@@ -194,6 +200,7 @@
         }
     });
 </script>
+
 
 
         
