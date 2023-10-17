@@ -146,7 +146,7 @@
         <div class="row justify-content-center mt-5">
             <div class="col-lg-4 mb-lg-4">
                 <!-- Make sure you have an image named "anton_image.jpg" or change the name to match your image. -->
-               <img src="anton_image.jpg" class="img-fluid rounded" alt="Portrait of Anton Smedberg">
+              <img src="images/95261377_10213305378507829_6880456016698277888_n.jpg" class="img-fluid rounded" alt="Portrait of Anton Smedberg">
             </div>
       <div class="col-lg-7">
                 <h2>About Me</h2>
@@ -182,33 +182,57 @@
 <!-- Contact Form -->
 <div class="my-4" id="contactSection">
     <h2>Contact Me</h2>
-    <form action="#yourBackendLink" method="post">
+    <form action="https://formspree.io/f/mwkdaygj" method="POST">
         <fieldset>
             <legend>Fill out the form to contact me:</legend>
 
-            <!-- Name Field -->
+                   <!-- Name Field -->
             <div class="mb-3">
                 <label for="userName" class="form-label">Your Name</label>
-                <input type="text" id="userName" name="userName" class="form-control" placeholder="John Doe" required>
+                <input type="text" id="userName" name="userName" class="form-control input-custom" placeholder="John Doe" required>
             </div>
 
             <!-- Email Field -->
             <div class="mb-3">
                 <label for="userEmail" class="form-label">Your Email</label>
-                <input type="email" id="userEmail" name="userEmail" class="form-control" placeholder="john.doe@example.com" required>
+                <input type="email" id="userEmail" name="email" class="form-control input-custom" placeholder="john.doe@example.com" required>
             </div>
 
             <!-- Message Field -->
             <div class="mb-3">
                 <label for="userMessage" class="form-label">Your Message</label>
-                <textarea id="userMessage" name="userMessage" class="form-control" rows="5" placeholder="Write your message here..." required></textarea>
+                <textarea id="userMessage" name="message" class="form-control input-custom" rows="5" placeholder="Write your message here..." required></textarea>
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">Send Message</button>
+            <button type="submit" class="btn btn-primary btn-custom">Send Message</button>
         </fieldset>
     </form>
 </div>
+
+<!-- CSS for improved UI & UX (You can include this inside a <style> tag or in an external stylesheet) -->
+<style>
+    .input-custom {
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .input-custom:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-custom {
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn-custom:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+</style>
 
 
     <!-- Skills section -->
