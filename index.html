@@ -51,6 +51,15 @@ body {
     transition: opacity 0.3s ease;
 }
 
+.navbar .navbar-brand {
+    padding: 0.5rem 1rem;  /* Added same padding as nav links for alignment */
+}
+
+.nav-link span.fas {
+    margin-right: 10px;  /* Added margin for separation */
+}
+
+        
 .navbar .navbar-brand, .navbar .nav-link {
     color: rgba(255, 255, 255, 0.8);
     transition: color 0.3s ease-in-out;
@@ -199,14 +208,17 @@ i {
         window.addEventListener('scroll', handleScrollOpacity);
     });
 
-    function handleScrollOpacity() {
-        let scrolled = window.scrollY;
-        if (scrolled > 100) {
-            navbar.style.opacity = 1 - scrolled / 1000;
-        } else {
-            navbar.style.opacity = 1;
-        }
+function handleScrollOpacity() {
+    let scrolled = window.scrollY;
+    if (scrolled > 100) {
+        navbar.style.opacity = 1 - scrolled / 1000;
+        navbar.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';  // Add this line
+    } else {
+        navbar.style.opacity = 1;
+        navbar.style.backgroundColor = 'transparent';  // And this line
     }
+}
+
 
     // Add an event listener for the scroll event
     window.addEventListener('scroll', handleScrollOpacity);
