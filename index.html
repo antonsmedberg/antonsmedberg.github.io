@@ -52,8 +52,10 @@ body {
 }
 
 .navbar .navbar-brand, .navbar .nav-link {
+    color: rgba(255, 255, 255, 0.8);
     transition: color 0.3s ease-in-out;
 }
+
 
 .navbar .nav-link {
     padding: 0.5rem 1rem;
@@ -172,10 +174,10 @@ i {
         <div class="collapse navbar-collapse slide-down" id="navbarTogglerDemo02">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="#projectsSection"><i class="fas fa-project-diagram"></i> Projects</a>
+                   <a class="nav-link" href="#projectsSection"><span class="fas fa-project-diagram"></span> Projects</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#contactSection"><i class="fas fa-envelope"></i> Contact</a>
+                    <a class="nav-link" href="#contactSection"><span class="fas fa-envelope"></span> Contact</a>
                 </li>
             </ul>
         </div>
@@ -186,21 +188,30 @@ i {
 
 <script>
     // Grab the navbar
-    const navbar = document.querySelector('.navbar'); // changed from .custom-navbar to .navbar
-    
-    // Add an event listener for the scroll event
-    window.addEventListener('scroll', () => {
-        // Get the scrolled amount
+    const navbar = document.querySelector('.navbar');
+    const navbarCollapse = document.querySelector('.collapse');
+
+    navbarCollapse.addEventListener('show.bs.collapse', function () {
+        window.removeEventListener('scroll', handleScrollOpacity);
+    });
+
+    navbarCollapse.addEventListener('hidden.bs.collapse', function () {
+        window.addEventListener('scroll', handleScrollOpacity);
+    });
+
+    function handleScrollOpacity() {
         let scrolled = window.scrollY;
-        
-        // Set the opacity of the navbar based on how much we've scrolled
-        if(scrolled > 100) {
+        if (scrolled > 100) {
             navbar.style.opacity = 1 - scrolled / 1000;
         } else {
             navbar.style.opacity = 1;
         }
-    });
+    }
+
+    // Add an event listener for the scroll event
+    window.addEventListener('scroll', handleScrollOpacity);
 </script>
+
 
 
 
