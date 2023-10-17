@@ -47,6 +47,12 @@ body {
 }
 
 
+ /* == Smooth Scroll == */
+        html {
+    scroll-behavior: smooth;
+}
+
+
 /* == Navbar Styles == */
 .navbar {
     transition: opacity 0.3s ease;
@@ -55,8 +61,13 @@ body {
     width: 100%;
     z-index: 1000;
     backdrop-filter: saturate(180%) blur(10px); /* This will blur the background content behind the navbar, giving it a frosted glass effect */
+    background-color: rgba(0, 0, 0, 0);
 }
 
+.navbar.scrolled {
+    background-color: rgba(0, 0, 0, 0.85);
+}
+        
 .navbar .navbar-brand {
     padding: 0.5rem 1rem;  /* Added same padding as nav links for alignment */
 }
@@ -216,14 +227,11 @@ i {
 function handleScrollOpacity() {
     let scrolled = window.scrollY;
     if (scrolled > 100) {
-        navbar.style.opacity = 1 - scrolled / 1000;
-        navbar.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';  // Add this line
+        navbar.classList.add('scrolled');
     } else {
-        navbar.style.opacity = 1;
-        navbar.style.backgroundColor = 'transparent';  // And this line
+        navbar.classList.remove('scrolled');
     }
 }
-
 
     // Add an event listener for the scroll event
     window.addEventListener('scroll', handleScrollOpacity);
