@@ -1,0 +1,596 @@
+/* === Colors and Typography === */
+:root {
+    /* Colors */
+    --primary-color: #FF5733;
+    --hover-primary-color: #E84118;
+    --background-dark: #121212;
+    --background-light: #252525;
+    --text-light: #EAEAEA;
+    --text-dark: #333;
+    --accent-color: #3498db;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+
+    /* Typography */
+    --font-family-base: 'Nunito Sans', sans-serif;
+    --font-family-headers: 'Raleway', sans-serif;
+    --font-size-base: 18px;
+    --font-weight-headers: 700;
+    --font-weight-text: 400;
+    --line-height-body: 1.75;
+
+    /* Utility */
+    --transition-speed: 0.3s;
+    --shadow-light: 0 4px 6px var(--shadow-color);
+    --shadow-medium: 0 5px 15px var(--shadow-color);
+    --border-radius: 10px;
+
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+}
+
+/* === Base Reset Styles === */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: all 0.3s ease-in-out;
+}
+
+/* === Global Styling === */
+body {
+    font-family: var(--font-family-base);
+    background: linear-gradient(to bottom, var(--background-light), var(--background-dark));
+    padding-top: 60px;
+    font-size: clamp(16px, 3vw, var(--font-size-base));
+    color: var(--text-light);
+    line-height: var(--line-height-body);
+    font-weight: var(--font-weight-text);
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-headers);
+    font-weight: var(--font-weight-headers);
+    margin-bottom: var(--spacing-sm);
+}
+
+body > *:first-child {
+    margin-top: 80px;
+}
+
+/* === Utility Classes === */
+.smooth-transition {
+    transition: all var(--transition-speed) ease-in-out;
+}
+
+.centered-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+/* === Navbar Styling === */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0; 
+    width: 100%;
+    z-index: 1000;
+    background: var(--background-dark);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); /* Subtler shadow for a sleeker look */
+    padding: 0.5rem 2rem; /* Compact padding for a sleeker bar */
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.navbar.scrolled {
+    background-color: var(--background-dark); 
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Slightly more pronounced shadow when scrolled */
+}
+
+.navbar .navbar-brand {
+    margin-left: 0.5rem; /* Reduced margin */
+    color: var(--text-light);
+    font-weight: bold;
+    font-size: 1.4em; /* Adjusted font size for compactness */
+}
+
+.navbar .nav-link {
+    color: var(--text-light);
+    transition: color 0.3s, background-color 0.3s;
+    margin-right: 1rem; /* Consistent margin for compactness */
+    display: flex;
+    align-items: center; 
+    padding: 0.5rem 1rem; /* Reduced padding for compactness */
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.08); /* Subtler background for active link */
+    border-radius: var(--border-radius);
+}
+
+.navbar .nav-link:hover, .nav-item:hover .nav-link {
+    color: var(--hover-primary-color);
+    background-color: rgba(255, 255, 255, 0.1); /* More subtle hover background */
+    transform: none; /* Removed scale effect for compact feel */
+}
+
+/* Icon Styling */
+.nav-link i {
+    margin-right: 0.5rem; /* Reduced margin for icons */
+    font-size: 1.1em; /* Adjusted font size for compactness */
+}
+
+/* === Icon Styles (for other sections) === */
+i {
+    font-size: 4em;
+    color: var(--primary-color);
+    transition: color 0.3s;
+}
+
+i:hover {
+    color: var(--accent-color);
+}
+
+/* === Section Styles === */
+.section {
+    background-color: var(--background-light);
+    color: var(--text-light);
+    padding: var(--spacing-xl);
+}
+
+
+
+/* Welcome Section Styles */
+.welcome-section {
+    background-color: var(--background-gradient-start); /* Dark background color */
+    color: var(--text-color); /* Text color */
+    padding: 4em 0; /* More padding for airiness */
+
+}
+
+/* About Me Section Styles */
+.about-me-section {
+    background-color: var(--background-gradient-start); /* Dark background color */
+    color: var(--text-color); /* Text color */
+    padding: var(--spacing-xl);  /* Consistent spacing */
+}
+
+
+/* Main Content Section */
+.container {
+    border-radius: 10px; /* Rounded corners for depth */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    padding: 20px;
+}
+
+/* Container Typography Styles */
+.container h1,
+.container h2 {
+    letter-spacing: 1px;
+    font-weight: bold;
+    margin-bottom: var(--spacing-md);  /* Consistent spacing */
+}
+
+.container p {
+    letter-spacing: 0.5px;
+    font-size: 18px;
+}
+
+/* Projects Section Header */
+#projectsSection h2 {
+    color: var(--primary-color); /* Consistency in colors */
+    border-bottom: 2px solid var(--accent-color); /* A subtle line below the section header */
+    margin-bottom: var(--spacing-lg);  /* Added spacing after the header */
+}
+
+
+/* Projects Section */
+.project-card {
+    border-radius: 10px; /* Rounded corners for depth */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    margin-bottom: 20px;
+    margin: 0 0 var(--spacing-md);
+    transition: transform 0.3s; /* Smooth transformation for depth */
+}
+
+.project-card:hover {
+    transform: scale(1.03); /* Slight enlargement on hover for a dynamic feel */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+}
+
+
+
+/* Contact Form Improvements */
+#contactSection {
+    padding: 3rem 0; /* Slightly increased padding for better spacing */
+    background-color: var(--background-gradient-mid);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#contactSection h2 {
+    margin-bottom: 1.5rem;
+}
+
+#contactSection form {
+    max-width: 600px; /* Limit the form width for better UX */
+    margin: 0 auto; /* Center the form */
+}
+
+
+/* === Contact Form Styling === */
+.contact-form {
+    max-width: 600px;
+    margin: 3em auto;
+    padding: 2.5em;
+    background-color: #fff;
+    border-radius: 8px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0,0,0,0.05);
+    transition: all 0.3s ease-in-out;
+    border: 1px solid var(--box-shadow-color);
+}
+
+.contact-form:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.contact-form h2 {
+    font-size: 26px;
+    margin-bottom: var(--spacing-lg);
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.contact-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: var(--spacing-xs);
+    color: var(--primary-color);
+}
+
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form textarea {
+    width: 100%;
+    padding: 0.8em;
+    margin-bottom: var(--spacing-md);
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
+
+    ::placeholder { /* Updated from placeholder-color */
+        color: var(--secondary-color);
+        opacity: 0.7; /* Ensures that placeholders aren't too dominant */
+    }
+}
+   
+.contact-form input:focus, 
+.contact-form textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+.contact-form button.btn-primary:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+
+/* Enhanced feedback for invalid input */
+.contact-form input:invalid, 
+.contact-form textarea:invalid {
+    border-color: #FF7373;
+    box-shadow: 0 0 5px #FF7373;
+    background-color: rgba(255, 115, 115, 0.05); /* A slight red tint for more noticeable feedback */
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.contact-form button.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.7em 2em;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: var(--spacing-md);
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.3s ease-in-out; /* Added transition for color */
+}
+
+.contact-form button.btn-primary:hover, 
+.contact-form button.btn-primary:focus {
+    background-color: var(--hover-primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 7px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0,0,0,0.1);
+    color: #fff;
+}
+
+.contact-form button.btn-primary:active {
+    transform: translateY(2px); /* Added a "pressed" effect */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Subtle shadow for pressed state */
+}
+
+
+/* Skills Section */
+.skill-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 10px;  /* Spacing between skill cards */
+    transition: transform var(--smooth-transition), box-shadow var(--smooth-transition), background-color 0.3s;
+    background-color: #fff;  /* Default background color */
+}
+
+/* Skills Section Hover Effect */
+.skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: #f7f7f7;  /* Slight shade change on hover */
+}
+
+
+/* Footer */
+footer {
+    background-color: var(--background-gradient-end);
+    color: var(--text-color);
+    padding: 1em 2em;  /* Increased padding for a more airy footer */
+    box-shadow: 0 -4px 6px var(--box-shadow-color);
+    display: flex;  /* Flex layout for icon and text alignment */
+    align-items: center;  /* Align items vertically in the center */
+    justify-content: space-between;  /* Space out footer content */
+}
+
+footer .icon-container {  /* Container for the social icons */
+    display: flex;
+    align-items: center;  /* Center icons vertically */
+    gap: 1em;  /* Provide even spacing between icons */
+}
+
+footer a {
+    font-size: 0.9em;  /* Adjust the font size for footer links */
+    transition: color 0.3s;  /* Smooth color transition */
+}
+
+footer a:hover {
+    color: var(--hover-primary-color);
+    text-decoration: none;
+}
+
+footer i {  /* Assuming you're using font icons like Font Awesome */
+    font-size: 1.5em;  /* Adjust icon size in the footer */
+}
+
+
+
+  
+/* === Button Styles === */
+button.btn-primary, .btn-custom {
+    border-radius: 5px;
+    padding: 0.6em 1.5em;
+    color: var(--text-color);
+    border: none;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-custom {
+    background-color: var(--primary-color);
+}
+
+button.btn-primary:hover, .btn-custom:hover {
+    background-color: var(--hover-primary-color);
+    border-color: var(--hover-primary-color);
+    transform: scale(1.05);
+}
+
+button.btn-primary:active, button.btn-primary:focus {
+    box-shadow: inset 0 3px 5px var(--box-shadow-color);
+}
+
+
+
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* === Animations === */
+@keyframes slideDown {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.slide-down {
+    animation: slideDown 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInAnimation 1s ease forwards;
+}
+
+
+
+/* Project Link Base Styles */
+.project-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.project-link:hover {
+    transform: translateY(-5px);
+}
+
+/* Project Image Styles */
+.project-image {
+    width: 100%;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    transition: opacity 0.3s;
+}
+
+.project-image::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.project-link:hover .project-image {
+    opacity: 0.8;
+}
+
+.project-link:hover .project-image::before {
+    opacity: 1;
+}
+
+/* Project Details Styles */
+.project-details {
+    padding: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.project-details h3 {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
+
+.project-details h3:hover {
+    color: var(--primary-color);
+    cursor: pointer; /* Indicate clickability */
+}
+
+
+/* === Media Queries === */
+@media screen and (max-width: 768px) {
+    .navbar .menu-icon {
+        display: block;
+    }
+    .navbar .nav-link {
+        display: none; /* hide text links on mobile for cleaner navbar */
+    }
+    /* Slightly enlarge fonts on mobile for better readability */
+    body {
+        font-size: 18px;
+    }
+}
+
+/* === General Typography and Spacing === */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    color: #FFF; 
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2); 
+    margin-top: 0;
+    letter-spacing: 0.5px; /* Enhance readability */
+}
+
+/* Distinguish between different header levels */
+h1 { font-size: 2.5em; }
+h2 { font-size: 2em; }
+h3 { font-size: 1.75em; }
+h4 { font-size: 1.5em; }
+h5 { font-size: 1.25em; }
+h6 { font-size: 1em; }
+
+p, ul, ol {
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6; /* Improve readability */
+    color: #ccc; /* Slightly muted color for better contrast */
+}
+
+
+
+/* === Image Styles === */
+.img-fluid.rounded {
+    position: relative; /* To position the pseudo-element */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 15px; /* More pronounced rounded edges */
+    overflow: hidden; /* Clip the children, helps with hover effects */
+    transition: all 0.3s ease-out;
+}
+
+.img-fluid.rounded::before {
+    content: ""; /* Pseudo-element for added depth */
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    right: 5%;
+    bottom: 10%;
+    background: rgba(255, 255, 255, 0.1); /* Slight white overlay */
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2); /* Inward shadow */
+    border-radius: 12px;
+    z-index: 1;
+}
+
+.img-fluid.rounded:hover {
+    transform: scale(1.05) perspective(1500px) rotateX(5deg) rotateY(5deg); /* 3D rotation effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* For the Custom Input, let's also enhance it a bit */
+.input-custom {
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    padding: 0.5rem 1rem;
+    background-color: #f5f5f5; /* Light background color for depth */
+    transition: all 0.3s ease-out;
+}
+
+.input-custom:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.6); /* More pronounced focus glow */
+    outline: none;
+}
+
+.input-custom:hover, .input-custom:active {
+    border-color: var(--hover-primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1); /* Soft shadow on hover */
+}

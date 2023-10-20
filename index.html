@@ -7,273 +7,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anton Smedberg</title>
     
-    <!-- Bootstrap CSS -->
+    <!-- Preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    
-    <!-- Devicon CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-    <!-- FontAwesome CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-
-
-
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-
-
-    
-    <style>
-        /* CSS Variables */
-        :root {
-            --primary-color: #495057;
-            --hover-primary-color: #343a40;
-            --background-gradient-start: #f9f9f9;
-            --background-gradient-end: #e9e9e9;
-            --box-shadow-color: rgba(0, 0, 0, 0.1);
-        }
-
-     
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
   
-/* == General Styles == */
-body {
-    font-family: 'Poppins', Arial, sans-serif;
-    background: linear-gradient(to bottom, var(--background-gradient-start), var(--background-gradient-end));
-    line-height: 1.6;
-    padding-top: 80px; /* Adjust based on the height of your navbar */
-}
-
-
-/* == Utility Classes == */
-.smooth-transition {
-    transition: all 0.3s;
-}
-
-
- /* == Smooth Scroll == */
-        html {
-    scroll-behavior: smooth;
-}
-
-
-/* == Navbar Styles == */
-.navbar {
-    transition: opacity 0.3s ease;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    backdrop-filter: saturate(180%) blur(10px); /* This will blur the background content behind the navbar, giving it a frosted glass effect */
-    background-color: rgba(0, 0, 0, 0);
-}
-
-.navbar.scrolled {
-    background-color: rgba(0, 0, 0, 0.85);
-}
-        
-.navbar .navbar-brand {
-    padding: 0.5rem 1rem;  /* Added same padding as nav links for alignment */
-}
-
-.nav-link span.fas {
-    margin-right: 10px;  /* Added margin for separation */
-}
-
-        
-.navbar .navbar-brand, .navbar .nav-link {
-    color: rgba(255, 255, 255, 0.8);
-    transition: color 0.3s ease-in-out;
-}
-
-
-.navbar .nav-link {
-    padding: 0.5rem 1rem;
-    transition: color var(--smooth-transition);
-}
-
-.navbar .nav-link:hover, .nav-item:hover .nav-link {
-    color: #f8f9fa;
-    text-decoration: none;
-}
-
-.nav-item {
-    transition: background-color 0.3s ease-in-out;
-}
-
-.nav-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-
-
-/* == Skill Card Styles == */
-.skill-card {
-    border: 1px solid #e5e5e5;
-    border-radius: 15px;
-    padding: 20px;
-    transition: transform var(--smooth-transition), box-shadow var(--smooth-transition);
-}
-
-.skill-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 4px 15px var(--box-shadow-color);
-}
-
-
-    
-/* == Icon Styles == */
-i {
-    font-size: 4em;
-    color: var(--primary-color);
-}
-
-        /* == Project Card Styles == */
-        .project-card img {
-            width: 100%;
-            height: auto;
-            border-radius: 15px;
-            transition: transform var(--smooth-transition);
-            box-shadow: 0 4px 15px var(--box-shadow-color);
-        }
-
-        .project-card img:hover {
-            transform: scale(1.05);
-        }
-
-  
-    /* == Form Styles == */
-        button.btn-primary {
-            background-color: var(--primary-color);
-            border: none;
-            transition: background-color var(--smooth-transition);
-        }
-
-        button.btn-primary:hover {
-            background-color: var(--hover-primary-color);
-        }
-
-  
-    /* == Footer Styles == */
-        footer {
-             padding: 1rem 0; /* Added vertical padding */
-            background: var(--hover-primary-color);
-        }
-
-        /* LinkedIn Icon Styles */
-        footer a:hover {
-            color: #0e76a8;
-            text-decoration: none;
-        }
-
-        footer i.fab {
-            margin-top: 10px;
-        }
-
-
-        
-
-    /* Slide down animation for the dropdown */
-     
-        /* == Animations == */
-    @keyframes slideDown {
-        0% {
-            transform: translateY(-100%);
-        }
-        100% {
-            transform: translateY(0);
-        }
-    }
-    .slide-down {
-        animation: slideDown 0.3s ease-in-out forwards;
-    }
-
-
-/* Typography and Spacing */
-h1, h2, h3, h4, h5, h6 {
-    font-weight: bold; 
-    margin-top: 0; 
-}
-
-p, ul, ol {
-    margin: 0 0 1.5rem 0; 
-}
-
-/* Add consistent spacing for buttons, form elements, etc. */
-button, input, select, textarea {
-    margin-bottom: 1.5rem;
-}
-
-/* Button Active State */
-button.btn-primary:active, button.btn-primary:focus {
-    background-color: var(--primary-color);
-    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2); 
-}
-        
-    </style>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="main.js"></script>
 </head>
-    <body>         
-
-        <!-- Navbar -->
-<nav class="navbar navbar-dark navbar-expand-lg bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand mx-4" href="#">Anton Smedberg</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse slide-down" id="navbarTogglerDemo02">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                   <a class="nav-link" href="#projectsSection"><span class="fas fa-project-diagram"></span> Projects</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#contactSection"><span class="fas fa-envelope"></span> Contact</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
 
 
-
-<script>
-    // Grab the navbar and the navbarCollapse
-    const navbar = document.querySelector('.navbar');
-    const navbarCollapse = document.querySelector('.collapse');
-
-    // Function to handle the opacity of the navbar on scroll
-    function handleScrollOpacity() {
-        let scrolled = window.scrollY;
-        if (scrolled > 100) { // You can adjust this threshold as per your design needs
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    }
-
-    // Event listeners for the navbar collapse show and hide events
-    navbarCollapse.addEventListener('show.bs.collapse', function () {
-        window.removeEventListener('scroll', handleScrollOpacity);
-    });
-
-    navbarCollapse.addEventListener('hidden.bs.collapse', function () {
-        window.addEventListener('scroll', handleScrollOpacity);
-    });
-
-    // Add an event listener for the scroll event
-    window.addEventListener('scroll', handleScrollOpacity);
-    
-</script>
-
-
+<body style="background-color: var(--background-gradient-start); color: var(--text-color);">     
+ 
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-dark navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand mx-4" href="#">Anton Smedberg</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">                                        
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#projectsSection">
+                                <span class="fas fa-project-diagram"></span> Projects
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#contactSection">
+                                <span class="fas fa-envelope"></span> Contact
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
 
 
         
-    <!-- Main Content Section -->
-    <section class="container mt-5 mb-5 text-center">
+    <!-- Welcome Section wrapped in fade-in -->
+  <main class="container mt-5 mb-5 text-center welcome-section fade-in">
         <h1>Welcome to My Portfolio</h1>
         <p>Discover the latest projects, delve into my journey in SwiftUI and Kotlin, and explore insights from the books that have shaped my understanding.</p>
 
@@ -283,125 +67,65 @@ button.btn-primary:active, button.btn-primary:focus {
                 <!-- Make sure you have an image named "anton_image.jpg" or change the name to match your image. -->
               <img src="images/95261377_10213305378507829_6880456016698277888_n.jpg" class="img-fluid rounded" alt="Portrait of Anton Smedberg">
             </div>
-      <div class="col-lg-7">
+            <div class="col-lg-7 mb-lg-4">
                 <h2>About Me</h2>
-                <p>
+                <p style="color: var(--text-color);"> <!-- Adjust text color -->
                     As a dedicated mobile app developer, I've specialized in creating intuitive apps for iOS and Android. My experience with SwiftUI and Kotlin has deepened my appreciation for the art of mobile development. Striving for excellence, I continually refine my skills to bridge the gap between app intent and user experience.
                 </p>
             </div>
         </div>
+    </main>
 
     
 <!-- Projects Section -->
-<div class="my-4" id="projectsSection">
-    <h2>My Projects</h2>
-    <div class="row g-4 mt-4">
-        <div class="col-md-4 project-card">
-            <a href="#projectLink1" class="project-link">
-                <div class="project-image" style="background-image: url('project1_image.jpg')"></div>
-                <div class="project-details">
-                    <h3>Project 1 Title</h3>
-                    <p>Short description about project 1.</p>
+<section class="my-4" id="projectsSection">
+    <div class="container">
+        <h2 class="text-center text-light">My Projects</h2>
+        <div class="row mt-4">
+            <!-- Project 1 with kotlinicon.PNG -->
+            <div class="col-md-4">
+                <div class="card project-card" style="background-color: var(--background-gradient-start);">
+                    <img src="/images/kotlinicon.PNG" class="card-img-top project-image" alt="Project 1">
+                    <div class="card-body project-details">
+                        <h3 class="card-title text-light">Project 1 Title</h3>
+                        <p class="card-text text-light">Short description about project 1.</p>
+                        <a href="#projectLink1" class="btn btn-dark btn-custom">View Project</a>
+                    </div>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-4 project-card">
-            <a href="#projectLink2" class="project-link">
-                <div class="project-image" style="background-image: url('project2_image.jpg')"></div>
-                <div class="project-details">
-                    <h3>Project 2 Title</h3>
-                    <p>Short description about project 2.</p>
+            </div>
+            
+            <!-- Project 2 with swiftuiicon.jpg -->
+            <div class="col-md-4">
+                <div class="card project-card" style="background-color: var(--background-gradient-start);">
+                    <img src="/images/swiftuiicon.jpg" class="card-img-top project-image" alt="Project 2">
+                    <div class="card-body project-details">
+                        <h3 class="card-title text-light">Project 2 Title</h3>
+                        <p class="card-text text-light">Short description about project 2.</p>
+                        <a href="#projectLink2" class="btn btn-dark btn-custom">View Project</a>
+                    </div>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-4 project-card">
-            <a href="#projectLink3" class="project-link">
-                <div class="project-image" style="background-image: url('project3_image.jpg')"></div>
-                <div class="project-details">
-                    <h3>Project 3 Title</h3>
-                    <p>Short description about project 3.</p>
+            </div>
+            
+            <!-- Project 3 (no image change) -->
+            <div class="col-md-4">
+                <div class="card project-card" style="background-color: var(--background-gradient-start);">
+                    <img src="/images/project3_image.jpg" class="card-img-top project-image" alt="Project 3">
+                    <div class="card-body project-details">
+                        <h3 class="card-title text-light">Project 3 Title</h3>
+                        <p class="card-text text-light">Short description about project 3.</p>
+                        <a href="#projectLink3" class="btn btn-dark btn-custom">View Project</a>
+                    </div>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-  
 
-<style> 
-.project-link {
-    display: block;
-    color: inherit;
-    text-decoration: none;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* soft shadow for depth */
-    overflow: hidden; /* to contain the children with rounded borders */
-    transition: transform 0.3s; /* subtle lift effect */
-}
-
-.project-link:hover {
-    transform: translateY(-5px);
-}
-
-.project-image {
-    width: 100%;
-    height: 200px;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    transition: opacity 0.3s;
-}
-
-.project-image::before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0; right: 0; bottom: 0; left: 0;
-    background-color: rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.project-link:hover .project-image {
-    opacity: 0.8;
-}
-
-.project-link:hover .project-image::before {
-    opacity: 1;
-}
-
-.project-details {
-    padding: 10px;
-    font-size: 16px;
-    line-height: 1.5; /* improves readability */
-}
-
-.project-details h3 {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    font-weight: bold;
-}
-
-.container h1, .container h2 {
-    letter-spacing: 1px; /* enhances typography */
-    font-weight: bold;
-}
-
-.container p {
-    letter-spacing: 0.5px; /* enhances typography */
-    font-size: 18px;
-}
-
-.img-fluid.rounded {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-    
-</style>
-        
 
 <!-- Contact Form -->
-<div class="my-4" id="contactSection">
+<div class="my-4" id="contactSection" style="background-color: var(--background-gradient-start); color: var(--text-color);">
+    <div class="text-center mb-4">
     <h2>Contact Me</h2>
     <form action="https://formspree.io/f/mwkdaygj" method="POST">
         <fieldset>
@@ -431,58 +155,36 @@ button.btn-primary:active, button.btn-primary:focus {
     </form>
 </div>
 
-<!-- CSS for improved UI & UX (You can include this inside a <style> tag or in an external stylesheet) -->
-<style>
-    .input-custom {
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        transition: border-color 0.3s, box-shadow 0.3s;
-    }
 
-    .input-custom:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-
-    .btn-custom {
-        border-radius: 8px;
-        transition: background-color 0.3s, transform 0.3s;
-    }
-
-    .btn-custom:hover {
-        background-color: #0056b3;
-        transform: scale(1.05);
-    }
-</style>
 
 
     <!-- Skills section -->
-       <div class="container my-4">
+    <div class="container my-4" style="background-color: var(--background-gradient-start);">
             <div class="text-center mb-4">
                 <h2>My Expertise</h2>
             </div>
-            <div class="row g-4">
+            <div class="row g-4 justify-content-center"> <!-- Center-align the content -->
                 <!-- Skills -->
                 <div class="col">
-                    <div class="skill-card text-center">
+                    <div class="skill-card text-center" style="background-color: var(--background-gradient-start);">
                         <h4>SwiftUI</h4>
                         <i class="devicon-swift-plain"></i>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="skill-card text-center">
+                    <div class="skill-card text-center" style="background-color: var(--background-gradient-start);">
                         <h4>Kotlin</h4>
                         <i class="devicon-kotlin-plain"></i>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="skill-card text-center">
+                    <div class="skill-card text-center" style="background-color: var(--background-gradient-start);">
                         <h4>iOS Development</h4>
                         <i class="devicon-apple-original"></i>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="skill-card text-center">
+                    <div class="skill-card text-center" style="background-color: var(--background-gradient-start);">
                         <h4>GitHub</h4>
                         <i class="devicon-github-original"></i>
                     </div>
@@ -492,17 +194,21 @@ button.btn-primary:active, button.btn-primary:focus {
     </section>
 
 
-        
-<!-- Footer -->
-<footer class="mt-5 py-4 bg-dark text-white text-center">
-    <p>&copy; 2023 Anton Smedberg. All Rights Reserved.</p>
-    <a href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" class="text-white">
-        <i class="fab fa-linkedin"></i>
-    </a>
-</footer>
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2023 Anton Smedberg. All Rights Reserved.</p>
+        <div class="icon-container">
+            <a href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" class="text-white" rel="noopener noreferrer">
+                <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://github.com/antonsmedberg" target="_blank" rel="noopener noreferrer" class="text-white">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+    </footer>
+    
+    
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 
 </body>
 </html>
