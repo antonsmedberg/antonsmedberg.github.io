@@ -1,35 +1,43 @@
-/* === Colors and Typography === */
+/* === Variables === */
 :root {
     /* Colors */
-    --primary-color: #FF5733;
+    --primary-color: #034ea2;
+    --secondary-color: #ea2027;
     --hover-primary-color: #E84118;
     --background-dark: #121212;
     --background-light: #252525;
     --text-light: #EAEAEA;
-    --text-dark: #333;
+    --text-dark: #c0c0c0;
     --accent-color: #3498db;
     --shadow-color: rgba(0, 0, 0, 0.2);
+    --accent-hover: #333;
 
-    /* Typography */
-    --font-family-base: 'Nunito Sans', sans-serif;
-    --font-family-headers: 'Raleway', sans-serif;
-    --font-size-base: 18px;
-    --font-weight-headers: 700;
-    --font-weight-text: 400;
-    --line-height-body: 1.75;
+
+  /* Typography */
+  --font-family-base: 'Nunito Sans', Arial, sans-serif;
+  --font-family-headers: 'Raleway', Arial, sans-serif;
+  --font-weight-headers: 700;
+  --font-weight-text: 400;
+  --line-height-body: 1.6rem;  /* Increased for better readability */
+
+    /* Transition & Effects */
+    --transition-speed: 0.25s;  /* Reduced for quicker feedback */
+    --smooth-transition: 0.25s ease-out;  /* Added ease-out for smoother transition */
+    --hover-scale: scale(1.08);  /* Increased for a noticeable effect */
+    --hover-translate: translateY(-3px);  /* Increased for better effect */
+
 
     /* Utility */
-    --transition-speed: 0.3s;
-    --shadow-light: 0 4px 6px var(--shadow-color);
-    --shadow-medium: 0 5px 15px var(--shadow-color);
-    --border-radius: 10px;
+    --shadow-light: 0 3px 6px var(--shadow-color);  /* Slightly reduced shadow for subtleness */
+    --shadow-medium: 0 6px 12px var(--shadow-color);
+    --border-radius: 8px;  /* Reduced for a more modern look */
 
     /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 20px;  /* Increased for better spacing */
+    --spacing-lg: 28px;  /* Increased for better spacing */
+    --spacing-xl: 36px;  /* Increased for better spacing */
 }
 
 /* === Base Reset Styles === */
@@ -37,372 +45,438 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: all 0.3s ease-in-out;
 }
 
 /* === Global Styling === */
-body {
+html, body {
+    margin: 0;
+    padding: 0;
     font-family: var(--font-family-base);
     background: linear-gradient(to bottom, var(--background-light), var(--background-dark));
-    padding-top: 60px;
-    font-size: clamp(16px, 3vw, var(--font-size-base));
+    font-size: clamp(16px, 3vw, 18px);  /* Ensuring a base font size */
     color: var(--text-light);
     line-height: var(--line-height-body);
     font-weight: var(--font-weight-text);
+    transition: var(--smooth-transition);
 }
-
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-family-headers);
     font-weight: var(--font-weight-headers);
     margin-bottom: var(--spacing-sm);
-}
-
-body > *:first-child {
-    margin-top: 80px;
+    letter-spacing: 1px; 
 }
 
 /* === Utility Classes === */
 .smooth-transition {
-    transition: all var(--transition-speed) ease-in-out;
+    transition: var(--smooth-transition);
 }
 
 .centered-flex {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
 }
-
-
 
 /* === Navbar Styling === */
 .navbar {
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0; 
-    width: 100%;
-    z-index: 1000;
+    left: 0;
+    z-index: 10;
     background: var(--background-dark);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); /* Subtler shadow for a sleeker look */
-    padding: 0.5rem 2rem; /* Compact padding for a sleeker bar */
+    backdrop-filter: blur(5px);
+    padding: 0.7rem 1.5rem;  /* Increased horizontal padding */
+    box-shadow: var(--shadow-medium);  /* Utilized consistent shadow var */
+    transition: var(--smooth-transition);
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    transition: background-color 0.3s;
-}
-
-.navbar.scrolled {
-    background-color: var(--background-dark); 
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Slightly more pronounced shadow when scrolled */
-}
-
-.navbar .navbar-brand {
-    margin-left: 0.5rem; /* Reduced margin */
-    color: var(--text-light);
-    font-weight: bold;
-    font-size: 1.4em; /* Adjusted font size for compactness */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);  /* subtle underline to separate from the content */
 }
 
 .navbar .nav-link {
-    color: var(--text-light);
-    transition: color 0.3s, background-color 0.3s;
-    margin-right: 1rem; /* Consistent margin for compactness */
+    margin: 0 var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    position: relative;
+    display: inline-block;
+    text-transform: uppercase; /* Changed to uppercase for a more distinct look */
+    font-weight: 500;
+    transition: var(--smooth-transition);
+    color: var(--text-light);  /* Consistent text color */
+}
+
+.navbar-brand {
     display: flex;
-    align-items: center; 
-    padding: 0.5rem 1rem; /* Reduced padding for compactness */
+    align-items: center;
+    color: var(--text-light);
+    font-size: 1.5em;  /* Even larger font for prominence */
+    font-weight: 600;
+    letter-spacing: 1.2px;  /* Increased spacing for enhanced clarity */
+    transition: var(--smooth-transition);
 }
 
-.nav-link.active {
-    color: var(--primary-color);
-    background-color: rgba(255, 255, 255, 0.08); /* Subtler background for active link */
-    border-radius: var(--border-radius);
-}
-
-.navbar .nav-link:hover, .nav-item:hover .nav-link {
+.navbar-brand:hover {
     color: var(--hover-primary-color);
-    background-color: rgba(255, 255, 255, 0.1); /* More subtle hover background */
-    transform: none; /* Removed scale effect for compact feel */
+    transform: none; /* Resetting the translateY effect */
 }
 
-/* Icon Styling */
-.nav-link i {
-    margin-right: 0.5rem; /* Reduced margin for icons */
-    font-size: 1.1em; /* Adjusted font size for compactness */
+.navbar-brand:hover, .navbar .nav-link:hover {
+    color: var(--hover-primary-color);  /* Utilized hover color var */
+    transform: translateY(-2px);  /* Consistent hover effect */
 }
 
-/* === Icon Styles (for other sections) === */
+.navbar-brand .navbar-logo {
+    height: 60px;
+    width: auto;
+    margin-right: 25px;  /* Even more spacing for clarity */
+    transition: var(--smooth-transition);
+    filter: drop-shadow(2px 2px 5px rgba(255, 255, 255, 0.3));  /* Enhanced shadow for depth */
+}
+
+.navbar-brand span {
+    display: inline-block;
+    transition: var(--smooth-transition);
+    padding-bottom: 5px; /* Slight padding for an underline effect */
+    border-bottom: 2px solid transparent; /* Prepare for hover underline effect */
+}
+
+.navbar-brand:hover span {
+    border-color: var(--primary-color); /* Hover underline effect */
+}
+
+.navbar-brand:hover .navbar-logo {
+    transform: var(--hover-scale);
+    filter: brightness(1.1);  /* Less aggressive brightness change */
+}
+
+.navbar .navbar-collapse {
+    transition: all 0.2s;
+}
+
+.navbar .nav-link.active {
+    font-weight: 600;
+    border-bottom: 3px solid var(--primary-color);  /* Highlighted the active link */
+}
+
+.navbar .nav-link::before {
+    content: '';
+    display: block;
+    height: 2px;
+    width: 0;
+    background: var(--primary-color);
+    transition: width var(--smooth-transition) cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5rem 1rem;
+    }
+
+    .navbar .nav-link {
+        margin: var(--spacing-sm) 0;
+        text-align: center;
+    }
+}
+
+
+/* === Icon Styles === */
 i {
     font-size: 4em;
     color: var(--primary-color);
-    transition: color 0.3s;
+    transition: color 0.2s, transform var(--smooth-transition);  /* Reduced color transition time for quicker feedback */
 }
 
 i:hover {
     color: var(--accent-color);
+    transform: scale(1.12);  /* Slightly larger scale for effect */
 }
+
 
 /* === Section Styles === */
 .section {
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    padding: var(--spacing-xl) var(--spacing-md); 
+    transition: transform var(--smooth-transition); 
+}
+
+.section:hover {
+    transform: var(--hover-scale);
+}
+
+
+/* ==================================================================
+   Global Styles & Utility Classes
+================================================================== */
+.clickable:hover, a:hover, button:hover {
+    cursor: pointer; 
+    transform: var(--hover-translate);
+}
+
+/* ==================================================================
+   Layout & Structure
+================================================================== */
+.container {
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
     background-color: var(--background-light);
     color: var(--text-light);
-    padding: var(--spacing-xl);
 }
 
-
-
-/* Welcome Section Styles */
-.welcome-section {
-    background-color: var(--background-gradient-start); /* Dark background color */
-    color: var(--text-color); /* Text color */
-    padding: 4em 0; /* More padding for airiness */
-
-}
-
-/* About Me Section Styles */
-.about-me-section {
-    background-color: var(--background-gradient-start); /* Dark background color */
-    color: var(--text-color); /* Text color */
-    padding: var(--spacing-xl);  /* Consistent spacing */
-}
-
-
-/* Main Content Section */
-.container {
-    border-radius: 10px; /* Rounded corners for depth */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-    padding: 20px;
-}
-
-/* Container Typography Styles */
-.container h1,
-.container h2 {
-    letter-spacing: 1px;
-    font-weight: bold;
-    margin-bottom: var(--spacing-md);  /* Consistent spacing */
+/* ==================================================================
+   Typography
+================================================================== */
+.container h1, .container h2 {
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    color: var(--text-light);
 }
 
 .container p {
+    font-size: 17px;
+    line-height: 1.7; /* Slightly increased line height */
     letter-spacing: 0.5px;
-    font-size: 18px;
+    color: var(--text-dark);
 }
 
-/* Projects Section Header */
-#projectsSection h2 {
-    color: var(--primary-color); /* Consistency in colors */
-    border-bottom: 2px solid var(--accent-color); /* A subtle line below the section header */
-    margin-bottom: var(--spacing-lg);  /* Added spacing after the header */
+/* ==================================================================
+   Sections
+================================================================== */
+.sections-common {
+    padding: 2rem 0;
+    background-color: var(--background-gradient-start);
+    color: var(--text-color);
 }
 
 
-/* Projects Section */
+.welcome-section, .about-me-section {
+    position: relative;
+    background: linear-gradient(160deg, var(--background-light) 0%, var(--background-dark) 100%);
+}
+
+/* ==================================================================
+   Projects
+================================================================== */
+#projectsSection h2, #contactSection h2 {
+    margin-top: var(--spacing-lg); /* Added top margin for better spacing between sections */
+    margin-bottom: var(--spacing-lg);
+    color: var(--accent-color);
+    border-bottom: 3px solid var(--secondary-color); /* Increased border for emphasis */
+    padding-bottom: 12px;
+    transition: color var(--smooth-transition); /* Added transition for smooth color change */
+}
+
+#projectsSection h2:hover, #contactSection h2:hover {
+    color: var(--primary-color); /* Color change on hover for interactivity */
+}
+
 .project-card {
-    border-radius: 10px; /* Rounded corners for depth */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-    margin-bottom: 20px;
-    margin: 0 0 var(--spacing-md);
-    transition: transform 0.3s; /* Smooth transformation for depth */
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--border-radius);
+    background: var(--background-dark); /* Made consistent with dark theme */
+    box-shadow: var(--shadow-light);
+    transition: transform var(--smooth-transition), box-shadow var(--smooth-transition), background-color var(--smooth-transition);
 }
 
 .project-card:hover {
-    transform: scale(1.03); /* Slight enlargement on hover for a dynamic feel */
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    transform: translateY(-5px); /* subtle lift */
+    background-color: var(--background-light); /* subtle background change */
+    box-shadow: var(--shadow-medium);
 }
 
-
-
-/* Contact Form Improvements */
+/* ==================================================================
+   Contact
+================================================================== */
 #contactSection {
-    padding: 3rem 0; /* Slightly increased padding for better spacing */
-    background-color: var(--background-gradient-mid);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 5rem 0; /* Increased padding for better spacing */
+    background: linear-gradient(160deg, var(--background-light) 0%, var(--background-dark) 100%);
+    border-top: 3px solid rgba(255, 255, 255, 0.1); /* Increased border for better visibility */
+    border-bottom: 3px solid rgba(255, 255, 255, 0.1);
 }
 
-#contactSection h2 {
-    margin-bottom: 1.5rem;
-}
-
-#contactSection form {
-    max-width: 600px; /* Limit the form width for better UX */
-    margin: 0 auto; /* Center the form */
-}
-
-
-/* === Contact Form Styling === */
 .contact-form {
-    max-width: 600px;
-    margin: 3em auto;
-    padding: 2.5em;
-    background-color: #fff;
-    border-radius: 8px; 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0,0,0,0.05);
-    transition: all 0.3s ease-in-out;
-    border: 1px solid var(--box-shadow-color);
+    padding: 20px; /* Increased padding for spacious feel */
+    border-radius: var(--border-radius);
+    background: var(--background-dark); /* Consistent dark background */
+    box-shadow: var(--shadow-medium); /* Enhanced shadow for emphasis */
+    transition: box-shadow var(--smooth-transition), transform var(--smooth-transition);
 }
 
 .contact-form:hover {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.contact-form h2 {
-    font-size: 26px;
-    margin-bottom: var(--spacing-lg);
-    color: var(--primary-color);
-    border-bottom: 2px solid var(--accent-color);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-deep); /* deeper shadow on hover */
 }
 
 .contact-form label {
+    color: var(--text-light);
     display: block;
-    font-weight: bold;
-    margin-bottom: var(--spacing-xs);
-    color: var(--primary-color);
+    margin-bottom: 1rem; /* Increased margin for better spacing */
+    font-weight: 500; /* Made the label slightly bold */
 }
 
 .contact-form input[type="text"],
 .contact-form input[type="email"],
 .contact-form textarea {
-    width: 100%;
-    padding: 0.8em;
-    margin-bottom: var(--spacing-md);
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
-
-    ::placeholder { /* Updated from placeholder-color */
-        color: var(--secondary-color);
-        opacity: 0.7; /* Ensures that placeholders aren't too dominant */
-    }
+    border: 2px solid rgba(255, 255, 255, 0.2); /* Increased border for emphasis */
+    padding: 10px 15px; /* Increased padding for better feel */
+    margin-bottom: 1.5rem; /* Increased margin for better spacing */
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+    font-family: inherit;
+    transition: border-color var(--smooth-transition); /* Added transition for smooth color change */
 }
-   
+
 .contact-form input:focus, 
 .contact-form textarea:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 5px var(--primary-color);
-}
-
-.contact-form button.btn-primary:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-
-/* Enhanced feedback for invalid input */
-.contact-form input:invalid, 
-.contact-form textarea:invalid {
-    border-color: #FF7373;
-    box-shadow: 0 0 5px #FF7373;
-    background-color: rgba(255, 115, 115, 0.05); /* A slight red tint for more noticeable feedback */
-}
-
-.contact-form textarea {
-    resize: vertical;
-    min-height: 100px;
+    box-shadow: 0 0 10px rgba(var(--primary-color), 0.1);
 }
 
 .contact-form button.btn-primary {
+    padding: 10px 20px; /* Increased padding for better feel */
     background-color: var(--primary-color);
-    color: var(--text-color);
-    border: none;
-    padding: 0.7em 2em;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 18px;
-    transition: all 0.3s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-top: var(--spacing-md);
-    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.3s ease-in-out; /* Added transition for color */
+    color: var(--text-dark);
+    font-weight: 600;
+    transition: all 0.25s; /* Enhanced transition for all changes */
+    box-shadow: var(--shadow-light);
 }
 
-.contact-form button.btn-primary:hover, 
-.contact-form button.btn-primary:focus {
-    background-color: var(--hover-primary-color);
+.contact-form button.btn-primary:hover {
+    background-color: darken(var(--primary-color), 10%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 7px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0,0,0,0.1);
-    color: #fff;
+    box-shadow: var(--shadow-medium);
 }
 
 .contact-form button.btn-primary:active {
-    transform: translateY(2px); /* Added a "pressed" effect */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Subtle shadow for pressed state */
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 
-/* Skills Section */
+/* ==================================================================
+   Skills Section
+================================================================== */
 .skill-card {
-    border: 1px solid #e5e5e5;
-    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Adjusted for dark theme */
+    border-radius: var(--border-radius);
     padding: 20px;
-    margin: 10px;  /* Spacing between skill cards */
-    transition: transform var(--smooth-transition), box-shadow var(--smooth-transition), background-color 0.3s;
-    background-color: #fff;  /* Default background color */
+    font-size: 1.6em;
+    margin: 15px;
+    transition: transform var(--smooth-transition), box-shadow var(--smooth-transition), background-color var(--smooth-transition);
+    box-shadow: var(--shadow-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(160deg, var(--background-light) 0%, var(--background-dark) 100%);
+    color: var(--text-light);
 }
 
 /* Skills Section Hover Effect */
 .skill-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    background-color: #f7f7f7;  /* Slight shade change on hover */
+    box-shadow: var(--shadow-medium);
+    background-color: rgba(255, 255, 255, 0.08); /* Made the hover a bit more pronounced */
 }
 
 
-/* Footer */
+/* ==================================================================
+   Footer
+================================================================== */
 footer {
-    background-color: var(--background-gradient-end);
-    color: var(--text-color);
-    padding: 1em 2em;  /* Increased padding for a more airy footer */
-    box-shadow: 0 -4px 6px var(--box-shadow-color);
-    display: flex;  /* Flex layout for icon and text alignment */
-    align-items: center;  /* Align items vertically in the center */
-    justify-content: space-between;  /* Space out footer content */
+    background: linear-gradient(160deg, var(--background-light) 0%, var(--background-dark) 100%);
+    color: var(--text-light);
+    padding: 1.2em 2.5em;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-footer .icon-container {  /* Container for the social icons */
+footer .icon-container {
     display: flex;
-    align-items: center;  /* Center icons vertically */
-    gap: 1em;  /* Provide even spacing between icons */
+    gap: 1.5em;
 }
 
 footer a {
-    font-size: 0.9em;  /* Adjust the font size for footer links */
-    transition: color 0.3s;  /* Smooth color transition */
+    font-size: 0.95em;
+    transition: color var(--smooth-transition), border-color var(--smooth-transition);
+    border-bottom: 1px solid transparent;
+    color: var(--text-light);
 }
 
 footer a:hover {
-    color: var(--hover-primary-color);
-    text-decoration: none;
+    color: darken(var(--hover-primary-color), 12%); /* Increase darkness for better contrast */
+    border-bottom: 1px solid var(--hover-primary-color); /* Show an underline to indicate it's clickable */
+    transform: translateY(-2px); /* Slight upward motion for depth */
 }
 
-footer i {  /* Assuming you're using font icons like Font Awesome */
-    font-size: 1.5em;  /* Adjust icon size in the footer */
+footer .back-to-top:hover {
+    color: darken(var(--hover-primary-color), 10%); /* Consistency in hover effects */
+    transform: translateY(-3px); /* Slight change for a better hover effect */
+}
+
+/* Microinteraction: Rotate effect on icons */
+footer i:hover {
+    transform: rotate(5deg);
+    color: darken(var(--hover-primary-color), 10%);
+}
+
+footer i {
+    font-size: 1.7em;
+    transition: color var(--smooth-transition);
 }
 
 
-
-  
-/* === Button Styles === */
-button.btn-primary, .btn-custom {
-    border-radius: 5px;
-    padding: 0.6em 1.5em;
-    color: var(--text-color);
+footer .back-to-top {
+    background: none;
     border: none;
-    transition: background-color 0.3s, transform 0.3s;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: color var(--smooth-transition), transform var(--smooth-transition);
 }
 
-.btn-custom {
+
+
+/* ==================================================================
+   Buttons
+================================================================== */
+button.btn-primary, .btn-custom {
+    border-radius: var(--border-radius);
+    padding: 0.65em 1.6em;
+    color: var(--text-light);
     background-color: var(--primary-color);
+    transition: background-color var(--smooth-transition), transform var(--smooth-transition), border-color var(--smooth-transition);
+    box-shadow: var(--shadow-light);
 }
 
+/* Enhanced Button Hover Effects */
 button.btn-primary:hover, .btn-custom:hover {
-    background-color: var(--hover-primary-color);
-    border-color: var(--hover-primary-color);
-    transform: scale(1.05);
+    background-color: darken(var(--primary-color), 12%); /* Slightly darker */
+    transform: translateY(-3px) scale(1.01); /* Added scale for more depth */
+    box-shadow: var(--shadow-deep); /* Added shadow for depth */
+}
+
+.btn-custom:hover, button.btn-primary:hover {
+    background-color: darken(var(--primary-color), 10%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
 }
 
 button.btn-primary:active, button.btn-primary:focus {
-    box-shadow: inset 0 3px 5px var(--box-shadow-color);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.15);
 }
-
-
 
 
 

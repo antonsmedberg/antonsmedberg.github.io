@@ -26,63 +26,73 @@
 </head>
 
 
-<body style="background-color: var(--background-gradient-start); color: var(--text-color);">     
+<body style="background-color: var(--background-gradient-start); color: var(--text-color);"> 
  
-    <!-- Navbar -->
-    <header>
-        <nav class="navbar navbar-dark navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand mx-4" href="#">Anton Smedberg</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">                                        
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#projectsSection">
-                                <span class="fas fa-project-diagram"></span> Projects
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#contactSection">
-                                <span class="fas fa-envelope"></span> Contact
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+<!-- Navbar -->
+<header>
+    <nav class="navbar navbar-dark navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand mx-4" href="#" aria-label="Anton Smedberg's Homepage">
+                <img src="images/antonlogowebsitetransperant-removebg-preview.png" alt="Anton's Logo" class="navbar-logo">
+                <span>Anton Smedberg</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">                                        
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo02">
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" aria-label="Navigate to Home">
+                            <span class="fas fa-home" aria-hidden="true"></span> <span class="nav-text">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#projectsSection" aria-label="Navigate to Projects">
+                            <span class="fas fa-project-diagram" aria-hidden="true"></span> <span class="nav-text">Projects</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#aboutSection" aria-label="Navigate to About">
+                            <span class="fas fa-user" aria-hidden="true"></span> <span class="nav-text">About</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contactSection" aria-label="Navigate to Contact">
+                            <span class="fas fa-envelope" aria-hidden="true"></span> <span class="nav-text">Contact</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
+
 
 
         
-    <!-- Welcome Section wrapped in fade-in -->
-  <main class="container mt-5 mb-5 text-center welcome-section fade-in">
-        <h1>Welcome to My Portfolio</h1>
-        <p>Discover the latest projects, delve into my journey in SwiftUI and Kotlin, and explore insights from the books that have shaped my understanding.</p>
+<!-- Welcome Section -->
+<main class="container mt-5 mb-5 text-center welcome-section">
+    <h1>Welcome to My Portfolio</h1>
+    <p>Discover the latest projects, delve into my journey in SwiftUI and Kotlin, and explore insights from the books that have shaped my understanding.</p>
 
-
-        <div class="row justify-content-center mt-5">
-            <div class="col-lg-4 mb-lg-4">
-                <!-- Make sure you have an image named "anton_image.jpg" or change the name to match your image. -->
-              <img src="images/95261377_10213305378507829_6880456016698277888_n.jpg" class="img-fluid rounded" alt="Portrait of Anton Smedberg">
-            </div>
-            <div class="col-lg-7 mb-lg-4">
-                <h2>About Me</h2>
-                <p style="color: var(--text-color);"> <!-- Adjust text color -->
-                    As a dedicated mobile app developer, I've specialized in creating intuitive apps for iOS and Android. My experience with SwiftUI and Kotlin has deepened my appreciation for the art of mobile development. Striving for excellence, I continually refine my skills to bridge the gap between app intent and user experience.
-                </p>
-            </div>
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-4 mb-lg-4">
+            <img src="images/95261377_10213305378507829_6880456016698277888_n.jpg" class="img-fluid rounded" alt="Portrait of Anton Smedberg" loading="lazy">            
         </div>
-    </main>
+        <div class="col-lg-7 mb-lg-4">
+            <h2>About Me</h2>
+            <p>As a dedicated mobile app developer, I've specialized in creating intuitive apps for iOS and Android. My experience with SwiftUI and Kotlin has deepened my appreciation for the art of mobile development. Striving for excellence, I continually refine my skills to bridge the gap between app intent and user experience.</p>
+        </div>
+    </div>
+</main>
 
     
 <!-- Projects Section -->
-<section class="my-4" id="projectsSection">
-    <div class="container">
-        <h2 class="text-center text-light">My Projects</h2>
+<section id="projectsSection" class="projects-section container">
+    <h2 class="text-center">My Projects</h2>
+    <div class="row mt-4 project-container">
         <div class="row mt-4">
-            <!-- Project 1 with kotlinicon.PNG -->
+            <!-- Project Cards: Let's create a consistent structure for all projects -->
             <div class="col-md-4">
                 <div class="card project-card" style="background-color: var(--background-gradient-start);">
                     <img src="/images/kotlinicon.PNG" class="card-img-top project-image" alt="Project 1">
@@ -93,8 +103,7 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Project 2 with swiftuiicon.jpg -->
+
             <div class="col-md-4">
                 <div class="card project-card" style="background-color: var(--background-gradient-start);">
                     <img src="/images/swiftuiicon.jpg" class="card-img-top project-image" alt="Project 2">
@@ -105,8 +114,7 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Project 3 (no image change) -->
+
             <div class="col-md-4">
                 <div class="card project-card" style="background-color: var(--background-gradient-start);">
                     <img src="/images/project3_image.jpg" class="card-img-top project-image" alt="Project 3">
@@ -124,46 +132,38 @@
 
 
 <!-- Contact Form -->
-<div class="my-4" id="contactSection" style="background-color: var(--background-gradient-start); color: var(--text-color);">
-    <div class="text-center mb-4">
-    <h2>Contact Me</h2>
-    <form action="https://formspree.io/f/mwkdaygj" method="POST">
-        <fieldset>
-            <legend>Fill out the form to contact me:</legend>
+<section id="contactSection" class="contact-section">
+     <div class="container text-center">
+        <h2>Contact Me</h2>
+        <form action="https://formspree.io/f/mwkdaygj" method="POST">
+            <fieldset>
+                <legend>Fill out the form to contact me:</legend>
+                <div class="mb-3">
+                    <label for="userName" class="form-label">Your Name</label>
+                    <input type="text" id="userName" name="userName" class="form-control input-custom" placeholder="Anton Smedberg" required>
+                </div>
+                <div class="mb-3">
+                    <label for="userEmail" class="form-label">Your Email</label>
+                    <input type="email" id="userEmail" name="email" class="form-control input-custom" placeholder="anton@smedberg.eu" required>
+                </div>
+                <div class="mb-3">
+                    <label for="userMessage" class="form-label">Your Message</label>
+                    <textarea id="userMessage" name="message" class="form-control input-custom" rows="5" placeholder="Write your message here..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-custom">Send Message</button>
+            </fieldset>
+        </form>
+    </div>
+</section>
 
-                   <!-- Name Field -->
-            <div class="mb-3">
-                <label for="userName" class="form-label">Your Name</label>
-                <input type="text" id="userName" name="userName" class="form-control input-custom" placeholder="Anton Smedberg" required>
+
+
+
+<!-- Skills section -->
+<section id="skillsSection" class="skills-section container">
+    <h2 class="text-center mb-4">My Expertise</h2>
+    <div class="row g-4 justify-content-center"> <!-- Center-align the content -->
             </div>
-
-            <!-- Email Field -->
-            <div class="mb-3">
-                <label for="userEmail" class="form-label">Your Email</label>
-                <input type="email" id="userEmail" name="email" class="form-control input-custom" placeholder="anton@smedberg.eu" required>
-            </div>
-
-            <!-- Message Field -->
-            <div class="mb-3">
-                <label for="userMessage" class="form-label">Your Message</label>
-                <textarea id="userMessage" name="message" class="form-control input-custom" rows="5" placeholder="Write your message here..." required></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary btn-custom">Send Message</button>
-        </fieldset>
-    </form>
-</div>
-
-
-
-
-    <!-- Skills section -->
-    <div class="container my-4" style="background-color: var(--background-gradient-start);">
-            <div class="text-center mb-4">
-                <h2>My Expertise</h2>
-            </div>
-            <div class="row g-4 justify-content-center"> <!-- Center-align the content -->
                 <!-- Skills -->
                 <div class="col">
                     <div class="skill-card text-center" style="background-color: var(--background-gradient-start);">
@@ -195,7 +195,7 @@
 
 
     <!-- Footer -->
-    <footer>
+    <footer class="footer-container text-center">
         <p>&copy; 2023 Anton Smedberg. All Rights Reserved.</p>
         <div class="icon-container">
             <a href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" class="text-white" rel="noopener noreferrer">
