@@ -1,0 +1,166 @@
+
+/*---------------------- Navbar Styling (Start) ---------------------*/
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    padding: 1rem;  /* More padding for better spacing */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);  /* Lighter shadow for a cleaner look */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--navbar-background); /* Set a variable for navbar background */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);  /* Slight border for a defined navbar boundary */
+    transition: background-color var(--smooth-transition), border-bottom var(--smooth-transition), box-shadow var(--smooth-transition);
+}
+
+.navbar.scrolled {
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);  /* Lighter shadow for a cleaner look on scroll */
+}
+
+.navbar .nav-link {
+    margin: 0 var(--spacing-xs);
+    padding: 0.5rem 1rem;  /* Increased padding for better clickability */
+    font-size: 1em; /* Adjust font size */
+    position: relative;
+    display: inline-block;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: all var(--smooth-transition); /* Updated transition timing */
+    color: var(--text-light);
+    border-radius: var(--border-radius);  /* Rounded corners for a modern look */
+    border: 2px solid transparent;  /* Increased border size for a more pronounced effect on hover */
+    transform: translateY(0); /* Initial state for transition */
+}
+
+.navbar .nav-link:hover {
+    border-color: var(--primary-color);  /* Consistent border color with underline color on hover */
+    background-color: rgba(255, 255, 255, 0.05); /* Slight background color change for a subtle hover effect */
+    transform: translateY(-2px); /* Slight upward lift on hover */
+}
+
+
+.navbar .nav-link:focus {
+    outline: none;  /* Remove outline */
+    border-bottom: none;  /* Remove border */
+    background-color: rgba(255, 255, 255, 0.1);  /* Add slight background color on focus */
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    color: var(--text-light);
+    font-size: 1.75em;  /* Increased font size for better visibility */
+    letter-spacing: 1.5px; /* Adjusted letter spacing */
+    font-weight: 600;
+    transition: color var(--smooth-transition), text-shadow var(--smooth-transition);  /* Added text-shadow transition */
+    padding: 0.5rem 0; /* Adding some padding */
+}
+
+/* Navbar Brand Improvements */
+.navbar-brand:hover {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);  /* Text shadow for a glowing effect on hover */
+}
+
+.navbar-brand .navbar-logo {
+    height: 50px;  /* Adjusted size */
+    width: auto; /* Keeps the aspect ratio intact */
+    margin-right: 1rem;
+    transition: transform var(--smooth-transition), filter var(--smooth-transition);
+    transform: scale(1.1); /* Slight scaling on hover */
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.7)); /* Enhanced shadow for depth */
+}
+
+
+.navbar-brand .brand-text {
+    font-size: 1.25em; /* Adjusted font size */
+    transition: transform var(--smooth-transition), opacity var(--smooth-transition); /* New transition properties */
+}
+
+.navbar-brand:focus, .navbar-brand .navbar-logo:focus, .navbar-brand .brand-text:focus {
+    outline: none;
+    background-color: var(--focus-background-color); /* Replace with your preferred color */
+}
+
+
+.navbar-brand:hover .navbar-logo, .navbar-brand:hover .brand-text {
+    border: none;
+    outline: none;
+    transform: scale(1.1); /* Slight scaling on hover */
+    opacity: 1; /* Full opacity on hover */
+}
+
+.navbar .navbar-collapse {
+    transition: all 0.2s;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+}
+
+.navbar .nav-link.active {
+    border-color: var(--primary-color);  /* Consistent border color with underline color when active */
+    background-color: rgba(255, 255, 255, 0.1); /* Slight background color change for a subtle active effect */
+}
+
+/* Underline Animation Improvements */
+.navbar .nav-link::before {
+    transition-duration: var(--smooth-transition); /* Consistent transition timing with other elements */
+}
+
+.navbar-toggler {
+    border: none;  /* Remove border for a cleaner look */
+    border-color: rgba(255, 255, 255, 0.5); /* Adjusted border color */
+}
+/* Toggler Icon Improvements */
+.navbar-toggler-icon {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));  /* Shadow for a 3D lift effect */
+}
+
+
+/* Hamburger Menu Styling */
+.hamburger-menu {
+    display: none;  /* Hidden by default */
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    position: absolute; 
+    top: 60px; /* Adjust based on your navbar height */
+    right: 20px;
+    background-color: var(--background-dark);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);  /* Broader shadow for a 3D lift effect */
+    overflow: hidden; /* Prevent any child elements from extending beyond the menu */
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity var(--smooth-transition), transform var(--smooth-transition);
+}
+
+.hamburger-menu.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hamburger-icon {
+    background-color: rgba(255, 255, 255, 0.05);  /* Slight background color for better visibility */
+    display: block; /* Visible on mobile */
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 11;
+    transition: transform var(--smooth-transition);  /* Added transition for a smoother toggle effect */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  /* Shadow for depth */
+
+    border: 1px solid rgba(255, 255, 255, 0.2); /* subtle border */
+    border-radius: var(--border-radius); /* rounded corners */
+    padding: 0.5rem; /* some padding */
+}
+
+/* Adding a hover effect to the hamburger icon */
+.hamburger-icon:hover {
+    background-color: rgba(255, 255, 255, 0.05); /* slight background color change on hover */
+}
+
+.hamburger-icon.active {
+    transform: rotate(90deg);  /* Rotates the hamburger icon when active for a visual cue */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);  /* Increased shadow on active for a 3D lift effect */
+}
+

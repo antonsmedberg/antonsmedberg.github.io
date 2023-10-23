@@ -1,55 +1,82 @@
-document.addEventListener("DOMContentLoaded", function() {
-    
-    const navbar = document.querySelector('.navbar');
-    const navbarCollapse = document.querySelector('.collapse');
-    const fadeElements = document.querySelectorAll('.fade-in');
+// Wrap your code in an IIFE to avoid polluting the global scope
+(function() {
+    document.addEventListener("DOMContentLoaded", function() {
 
-    // Debounce function to optimize scroll events
-    function debounce(func, wait, immediate) {
-        let timeout;
-        return function() {
-            const context = this, args = arguments;
-            const later = function() {
-                timeout = null;
-                if (!immediate) func.apply(context, args);
-            };
-            const callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-        };
-    }
+        const navbar = document.querySelector('.navbar');
+        const navbarCollapse = document.querySelector('.collapse');
+        const fadeElements = document.querySelectorAll('.fade-in');
 
-    function handleNavbarChangeOnScroll() {
-        let scrolled = window.scrollY;
-        if (scrolled > 100) { 
+        const textToType = "Welcome to My Portfolio";
+        const outputContainer = document.getElementById('typed-output');
+        const cursorSpan = document.createElement('span');
+        cursorSpan.classList.add('cursor');
+        outputContainer.appendChild(cursorSpan);
+        let index = 0;
+
+       
+        function typeCharacter() {
+            if(index < textToType.length) {
+                outputContainer.textContent = textToType.substring(0, index + 1);
+                index++;
+                setTimeout(typeCharacter, 100);  // Set typing speed (100ms between characters in this case)
+            } else {
+                blinkCursor();  // Start blinking cursor animation after typing
+            }
+        }
+        
+        function blinkCursor() {
+            let blink = true;
+            setInterval(function() {
+                cursorSpan.style.visibility = blink ? 'visible' : 'hidden';
+                blink = !blink;
+            }, 500);  // Set cursor blink speed (500ms in this case)
+        }
+
+        typeCharacter();  // Start typing
+        
+
+        let observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);  // Stop observing this element
+                }
+            });
+        }, { threshold: 0.5 });  // Configure observer to trigger when element is 50% visible
+
+        fadeElements.forEach(element => {
+            observer.observe(element);  // Start observing each element
+        });
+
+        function handleNavbarChangeOnScroll() {
+            let scrolled = window.scrollY;
+            if (scrolled > 100) { 
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+
+        navbarCollapse.addEventListener('show.bs.collapse', function() {
+            window.removeEventListener('scroll', handleNavbarChangeOnScroll);
+        });
+
+        navbarCollapse.addEventListener('hidden.bs.collapse', function() {
+            window.addEventListener('scroll', handleNavbarChangeOnScroll);
+        });
+
+        window.addEventListener('scroll', handleNavbarChangeOnScroll);  // No need for debounce with one-off check
+
+    });
+
+    // Moved the script inside the IIFE
+    window.addEventListener('scroll', function() {
+        let navbar = document.querySelector('.navbar');
+        if(window.scrollY > 10) {
             navbar.classList.add('scrolled');
         } else {
             navbar.classList.remove('scrolled');
         }
-    }
-
-    navbarCollapse.addEventListener('show.bs.collapse', function() {
-        window.removeEventListener('scroll', handleNavbarChangeOnScroll);
     });
 
-    navbarCollapse.addEventListener('hidden.bs.collapse', function() {
-        window.addEventListener('scroll', handleNavbarChangeOnScroll);
-    });
-
-    window.addEventListener('scroll', debounce(handleNavbarChangeOnScroll, 20));
-
-    function fadeInOnScroll() {
-        let windowBottom = window.scrollY + window.innerHeight;
-        fadeElements.forEach((element, index) => {
-            let elementBottom = element.offsetTop + element.offsetHeight;
-            if (elementBottom < windowBottom) {
-                setTimeout(() => {
-                    element.classList.add('visible');
-                }, index * 50);
-            }
-        });
-    }
-
-    window.addEventListener('scroll', debounce(fadeInOnScroll, 20));
-});
+})();  // Corrected this line

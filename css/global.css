@@ -1,0 +1,353 @@
+/*--------------------- Global CSS ---------------------*/
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;300;400;600;700;800&display=swap');
+
+
+
+/* === Variables === */
+:root {
+    --header-padding: 2rem 5%;
+
+    /* Colors */
+    --primary-color: #21c7a8;  /* A shade of teal */
+    --secondary-color: #2ecc71; /* Green */
+    --hover-primary-color: #2980b9; /* Darker Blue */
+    --background-dark: #121212;
+    --background-light: #121212;  /* A lighter shade of black */
+    --text-light: #ffffff;  /* White */
+    --text-dark: #b0b0b0;  /* Light Grey */
+    --accent-color: #ff4081;  /* A shade of pink */
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --accent-hover: #c0392b; /* Darker Red */
+
+
+    /* Typography */
+    --font-family-base: 'Nunito Sans', sans-serif;
+    --line-height-body: 1.6rem;
+    
+    /* Transition & Effects */
+    --transition-speed: 0.25s;
+    --smooth-transition: 0.5s ease-in-out; /* Adjusted transition timing for a smoother effect */
+    --hover-scale: scale(1.08);
+    --hover-translate: translateY(-3px);
+    
+    /* Utility */
+    --shadow-light: 0 3px 6px var(--shadow-color);
+    --shadow-medium: 0 6px 12px var(--shadow-color);
+    --border-radius: 8px;
+
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 3rem;
+    --spacing-xl: 4rem;
+
+}
+
+
+html, body {
+    background: linear-gradient(160deg, var(--background-light) 0%, var(--background-dark) 100%);
+    font-family: var(--font-family-base);
+    box-sizing: border-box;
+    font-size: 100%; /* 16px */
+    padding-top: 80px; /* Adjust this value to match your navbar's height */
+    color: var(--text-light);
+    line-height: var(--line-height-body);
+    
+    -webkit-font-smoothing: antialiased; /* Improves font rendering */
+    -moz-osx-font-smoothing: grayscale;   /* Improves font rendering */
+   
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+}
+
+
+/* ==================================================================
+   Layout & Structure
+================================================================== */
+.container {
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);  /* Adds a border */
+    border-radius: var(--border-radius);
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.08);
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    transition: all 0.3s; /* Smooth transition for hover states */
+}
+.container:hover {
+    transform: translateY(-5px) scale(1.02);  /* Slight scaling on hover for a more dynamic effect */
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.container h1, .container h2 {
+    margin-bottom: 1rem; /* increased margin for better spacing */
+    font-size: 1.6em;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    color: var(--text-light);
+}
+
+.container p {
+    font-size: 1.0625rem; /* This is equivalent to 17px if base font size is 16px */
+    line-height: 1.75; /* increased line-height for better readability */
+    letter-spacing: 0.5px;
+    color: var(--text-light); /* changed from --text-dark to --text-light */
+}
+
+
+/* ==================================================================
+    General Typography and Spacing 
+================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    color: var(--text-light); 
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2); 
+    margin-top: 0;
+    letter-spacing: 0.5px; /* Enhance readability */
+}
+
+/* Distinguish between different header levels */
+h1 { font-size: 2.5em; }
+h2 { font-size: 2em; }
+h3 { font-size: 1.75em; }
+h4 { font-size: 1.5em; }
+h5 { font-size: 1.25em; }
+h6 { font-size: 1em; }
+
+p, ul, ol {
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6; /* Improve readability */
+    color: var(--text-light);
+}
+
+
+body, * {
+    margin: 0;
+    font-family: var(--font-family-base);
+    box-sizing: border-box;
+    transition: var(--transition-speed);
+}
+
+*::selection {
+    color: var(--text-light);
+    background-color: var(--primary-color);
+}
+
+
+
+
+
+/* Utility Classes */
+.flex-center {
+    flex-wrap: wrap;  /* Allows flex items to wrap onto new lines */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.smooth-transition {
+    transition: var(--smooth-transition);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 0.8rem;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 1rem;
+    background-color: var(--accent-color);
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--background-dark);
+}
+
+.swiper-pagination-bullet{
+    height: 1rem;
+    width: 1rem;
+    border-radius: 50rem;
+    background-color: var(--grey);
+}
+
+.swiper-pagination-bullet-active{
+    width: 3rem;
+    background: var(--purple);
+}
+
+
+
+/* ==================================================================
+   Header Styles
+================================================================== */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: var(--header-padding);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-light);  /* Adds a subtle shadow for depth */
+    background: linear-gradient(160deg, var(--background-light) 0%, var(--background-dark) 100%);
+    transition: var(--smooth-transition);
+    transition: background 0.3s ease-in-out, border-bottom 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+
+header.sticky {
+    padding: 1rem 5%; /* Reduced padding for sticky header */
+    background: var(--background-light); /* changed from --background-dark to --background-light */
+    border-bottom: 1px solid var(--background-dark); /* changed from --background-light to --background-dark for contrast */
+    box-shadow: var(--shadow-medium);  /* Adds a stronger shadow when sticky */
+}
+
+header .logo h2 {
+    font-size: 2rem; /* Adjusted font size */
+    font-weight: 900;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+}
+
+header .navbar a {
+    font-size: 1rem; /* Adjusted font size */
+    margin-left: 1rem;
+    color: var(--text-muted); /* Muted color for non-active links */
+    transition: color var(--smooth-transition), text-decoration var(--smooth-transition);
+    font-weight: 700; /* Bold font for better visibility */
+}
+
+
+
+header .navbar a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+header .logo h2 {
+    font-size: 2.5rem;
+    font-weight: 700;  /* Moved here for better organization */
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+}
+
+
+
+
+
+/* ==================================================================
+   Home Area Styles
+================================================================== */
+.home {
+    padding: 2rem 5%;
+    background-color: var(--background-dark);
+    min-height: 100vh;
+   
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;  /* Centers content vertically and horizontally */
+}
+
+.home .box-container{
+    min-height: 100vh;
+    max-width: 1200px;  /* Restricts width to improve readability */
+    width: 100%;  /* Ensures full width */
+
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: 4rem;
+}
+
+.home .image{
+    text-align: center;
+    -webkit-box-flex: 1;
+      -ms-flex: 1 1 40rem;
+          flex: 1 1 40rem;
+
+}
+
+.home .image img{
+    height: 40rem;
+    max-width: 100%; /* Ensure the image does not overflow */
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    object-fit:cover;
+   transition: border-color var(--smooth-transition), 
+                box-shadow var(--smooth-transition), 
+                transform var(--smooth-transition), 
+                filter var(--smooth-transition);  /* Adds a transition to the filter property */
+}
+
+.home .image:hover img {
+    filter: brightness(1.1);  /* Slightly brightens image on hover */
+    border-color: var(--secondary-color); /* Change border color on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    transform: scale(1.05); /* Slight scaling on hover */
+}
+
+.home .content{
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 40rem;
+        flex: 1 1 40rem;
+
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+
+    text-align: center;  /* Centers text for better alignment */
+    margin-top: 0; /* Removed margin-top for balanced layout */
+}
+
+.home .content h2, .home .content h1, .home .content p {
+    text-align: center; /* Centered text for better alignment */
+}
+
+.home .content h2{
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: var(--text-light);
+}
+
+.home .content h1{
+    font-size: 4rem;
+    color: var(--white);
+    padding: 1rem 0;
+    text-transform: none;
+}
+
+.home .content h1 span{
+    color: var(--purple);
+
+}
+
+.home .content p{
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+    font-size: 1.7rem;
+    font-weight: 400;
+    color: var(--white);
+    padding-bottom: 2rem;
+}
