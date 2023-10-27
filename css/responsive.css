@@ -1,87 +1,161 @@
 
-/*--------------------- Responsive (Start) ---------------------*/
-@media (max-width: 991px){
-    html{
-        font-size: 55%;
-    }
-}
 
-/* ==================================================================
-   Responsive Design
-================================================================== */
-@media screen and (max-width: 768px) {
-    
-    #projectsSection .projects-grid, #contactSection .projects-grid {
-        grid-template-columns: 1fr;
-    }
 
-    #contactSection {
-        padding: 3rem 1rem;
-    }
-  
-    .navbar {
-        flex-direction: column;
-    }
-    .hamburger-menu {
-        display: flex; /* Shown on mobile */
+
+/* Larger Screens Styles (Enhancements) */
+@media screen and (max-width: 991px){
+   
+    .welcome-section .image img,
+    .about-me-section .image img {
+        max-width: 60%;
+        height: auto;
+        border-width: 1px;
     }
    
-    .hamburger-icon {
-        display: block;  /* Visible on mobile */
+    /* Social Media Icons */
+    .social-media-icons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0;
+        list-style: none;
+    }
+
+    .icon-link {
+        margin: 15px; /* Consistent margin */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: none;
+        border: none;
+        box-shadow: none;
     }
     
+    .icon-link i {
+        font-size: 24px; /* Consistent icon size */
+        color: #ddd; /* Light color for icons */
+    }
+
+    .icon-link:hover {
+        transform: scale(0.9); /* Slightly enlarge icon on hover */
+    }
+
+
+
+    /* Navbar */
+    .navbar {
+        display: flex;
+        flex-direction: column;
+        padding: 10px; /* Consistent padding */
+        background-color: rgba(0, 0, 0, 0.5); /* More transparent background */
+        transition: background-color 0.3s ease; /* Smooth transition for background color change */
+    }
+      
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-brand .logo-icon {
+        width: 20px; /* Smaller logo icon */
+        height: 20px; /* Smaller logo icon */
+        margin-right: 5px; /* Slight space between logo icon and brand text */
+    }
+
+    .navbar-brand .brand-text {
+        font-size: 1.2rem; /* Increased brand text size for better readability */
+        font-weight: bold; /* Bold brand text */
+    }
+
+    .hamburger-menu {
+        display: flex;
+        justify-content: center;
+    }
+
+    .hamburger-icon {
+        display: block;
+        font-size: 2.5rem; /* Increased hamburger icon size for better visibility */
+        cursor: pointer; /* Indicate it's clickable */
+    }
+
     .navbar-collapse {
-        display: none;  /* Hidden on mobile by default */
+        display: none; /* Hidden on mobile by default */
     }
 
     .navbar-collapse.show {
-        display: flex;  /* Display when toggled */
+        display: flex; /* Display when toggled */
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Center items */
     }
 
     .navbar .nav-link {
-        margin: 0 var(--spacing-xs);
-        padding: var(--spacing-sm) var(--spacing-md);
+        margin: 5px 0; /* Reduced margin for a more compact look */
+        padding: 10px 20px; /* Consistent padding */
         text-align: center;
+        font-size: 1.2rem; /* Adjusted font size for better readability */
     }
 
+
+
+    /* Common Styles */
+    .modal-content {
+        max-width: 90%;
+    }
+
+    /* Contact Section */
+    #contactSection {
+        padding: 3rem 1rem;
+    }
+
+    /* Icons */
     i {
-        font-size: 2em; /* Smaller icons for mobile */
-        margin-right: var(--spacing-xs); /* Some spacing when used next to text */
+        font-size: 1.5em;
+        margin-right: 10px; /* Consistent spacing */
     }
 
     i:hover {
-        color: var(--accent-color);
-        transform: scale(1.12);  /* Slightly larger scale for effect */
+        color: #ff4081; /* Accent color on hover */
+        transform: scale(1.12);
     }
-    
-    header, .home {
-        padding: 1rem 3%;
-    }
-
-    .home .image, .home .content {
-        flex: 1 1 100%;
+  
+     /* Additional styles for the contact form */
+    .contact-form {
+        padding: 10px; /* Increase padding for spacious feel */
     }
 
-    .home .image img {
-        height: auto;
-        width: 80%;
-        border-width: 1px; /* Reduced border width for smaller screens */
+    .contact-form input[type="text"],
+    .contact-form input[type="email"],
+    .contact-form textarea {
+        padding: 8px 12px;
+        margin-bottom: 10px; /* Consistent margin */
     }
 
-    .home .content h2, .home .content h1 {
-        font-size: 3rem;
+    .modal-content {
+        padding: 5px; /* Reduce padding for wider screens */
+        max-width: 500px; /* Set a maximum width for the modal content */
+        margin: 0 auto; /* Center the modal horizontally */
     }
-    
-    .home .content p {
-        font-size: 1.4rem; /* Reduced font size for smaller screens */
+
+    .modal-body h6 {
+        margin-top: 10px; /* Consistent margin */
     }
-    
-    .section, .sections-common, .welcome-section, .about-me-section {
-        padding: 2rem 1rem;  /* Adjust padding for smaller screens */
+
+    .modal-divider {
+        margin: 10px 0; /* Consistent margin */
+    }
+
+    .modal-body p,
+    .modal-body ul {
+        margin-bottom: 10px; /* Consistent margin */
+    }
+
+    .modal-body ul {
+        padding-left: 20px; /* Consistent padding */
+    }
+
+    .modal-footer .btn {
+        padding: 8px 16px; /* Reduced padding for wider screens */
+        font-size: 1rem; /* Consistent font size */
     }
 }
 
-/* Enhanced box shadow on hover for better visual feedback */
-.section:hover, .sections-common:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-}

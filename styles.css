@@ -3,60 +3,58 @@
 
 
 
-/* ==================================================================
-   Contact
-================================================================== */
+/* Contact */
 #contactSection {
-    padding: 5rem 0; /* Increased padding for better spacing */
+    padding: 3rem 0; /* Reduced padding for a more compact form */
     background: linear-gradient(160deg, var(--background-light) 0%, var(--background-dark) 100%);
-    border-top: 3px solid rgba(255, 255, 255, 0.1); /* Increased border for better visibility */
-    border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 2px solid rgba(255, 255, 255, 0.1); /* Slightly reduced border */
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1); /* Slightly reduced border */
 }
 
 .contact-form {
-    padding: 20px; /* Increased padding for spacious feel */
+    padding: 15px; /* Reduced padding for a more compact form */
     border-radius: var(--border-radius);
-    background: var(--background-dark); /* Consistent dark background */
-    box-shadow: var(--shadow-medium); /* Enhanced shadow for emphasis */
+    background: var(--background-dark);
+    box-shadow: var(--shadow-medium);
     transition: box-shadow var(--smooth-transition), transform var(--smooth-transition);
 }
 
 .contact-form:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-deep); /* deeper shadow on hover */
+    transform: translateY(-3px); /* Slightly reduced hover effect */
+    box-shadow: var(--shadow-deep);
 }
 
 .contact-form label {
     color: var(--text-light);
     display: block;
-    margin-bottom: 1rem; /* Increased margin for better spacing */
-    font-weight: 500; /* Made the label slightly bold */
+    margin-bottom: 0.5rem; /* Reduced margin for tighter spacing */
+    font-weight: 500;
 }
 
 .contact-form input[type="text"],
 .contact-form input[type="email"],
 .contact-form textarea {
-    border: 2px solid rgba(255, 255, 255, 0.2); /* Increased border for emphasis */
-    padding: 10px 15px; /* Increased padding for better feel */
-    margin-bottom: 1.5rem; /* Increased margin for better spacing */
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 12px; /* Reduced padding for a more compact feel */
+    margin-bottom: 1rem;
     background-color: rgba(255, 255, 255, 0.05);
     color: var(--text-light);
     font-family: inherit;
-    transition: border-color var(--smooth-transition); /* Added transition for smooth color change */
+    transition: border-color var(--smooth-transition);
 }
 
 .contact-form input:focus, 
 .contact-form textarea:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 10px rgba(var(--primary-color), 0.1);
+    box-shadow: 0 0 8px rgba(var(--primary-color), 0.1);
 }
 
 .contact-form button.btn-primary {
-    padding: 10px 20px; /* Increased padding for better feel */
+    padding: 8px 16px; /* Reduced padding for a more compact button */
     background-color: var(--primary-color);
     color: var(--text-dark);
     font-weight: 600;
-    transition: all 0.25s; /* Enhanced transition for all changes */
+    transition: all 0.25s;
     box-shadow: var(--shadow-light);
 }
 
@@ -70,6 +68,7 @@
     transform: translateY(0);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
+
 
 
 
@@ -91,24 +90,16 @@ button.btn-primary:disabled {
     cursor: not-allowed;
 }
 
-
 /* Enhanced Button Hover Effects */
 button.btn-primary:hover, .btn-custom:hover {
-    background-color: var(--hover-primary-color);
-    transform: translateY(-3px) scale(1.01); /* Added scale for more depth */
-    box-shadow: var(--shadow-deep); /* Added shadow for depth */
-}
-
-.btn-custom:hover, button.btn-primary:hover {
     background-color: darken(var(--primary-color), 10%);
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.01);
     box-shadow: var(--shadow-medium);
 }
 
 button.btn-primary:active, button.btn-primary:focus {
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.15);
 }
-
 
 
 /* ==================================================================
@@ -196,8 +187,8 @@ button.btn-primary:active, button.btn-primary:focus {
 /* Project Image Styles */
 .project-image {
     width: 100%;
-    height: 200px;
-    background-size: cover;
+    height: auto; /* Changed to auto for maintaining aspect ratio */
+    object-fit: cover; /* Ensures the image covers the container */
     background-position: center;
     position: relative;
     transition: opacity 0.3s;
