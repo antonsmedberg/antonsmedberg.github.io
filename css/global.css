@@ -1,258 +1,64 @@
 /* Global CSS */
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;300;400;600;700;800&display=swap');
 
-/* Variables */
 :root {
-    /* Responsive breakpoints */
-    --breakpoint-sm: 576px;
-    --breakpoint-md: 768px;
-    --breakpoint-lg: 992px;
-    --breakpoint-xl: 1200px;
-
-    /* Color Scheme */
-    --text-light: #ffffff;
-    --text-dark: #b0b0b0;
     --primary-color: #21c7a8;
     --secondary-color: #494949;
+    --accent-color: #fbbc05;
     --hover-primary-color: #2980b9;
     --background-dark: #121212;
     --background-light: #1e1e1e;
+    --text-light: #ffffff;
+    --text-dark: #b0b0b0;
 
-    /* Gradient Backgrounds */
+    /* Add a third color for accent or highlights */
+    --highlight-color: #f54291;
+    
+    /* Gradient Updates */
     --gradient-bg: linear-gradient(135deg, var(--background-dark), var(--background-light));
     --gradient-hover: linear-gradient(135deg, var(--hover-primary-color), var(--primary-color));
-    --gradient-text: linear-gradient(to right, #ff4081, var(--primary-color));
 
-    /* Typography */
-    --font-family-base: 'Nunito Sans', sans-serif;
-    --line-height-body: 1.6rem;
+    /* Font Sizes (using rem for better scalability) */
+    --font-size-base: 1rem;
+    --font-size-large: 1.25rem;
+    --font-size-small: 0.875rem;
 
-    /* Spacing & Sizes */
-    --header-padding: 1.5rem 3%;
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 1rem;
-    --spacing-md: 2rem;
-    --spacing-lg: 3rem;
-    --spacing-xl: 4rem;
-    --border-radius: 8px;
-
-    /* Effects */
-    --transition-speed: 0.25s;
-    --smooth-transition: 0.5s ease-in-out;
-    --hover-scale: scale(1.08);
-    --hover-translate: translateY(-3px);
-    --shadow-light: 0 3px 6px rgba(0, 0, 0, 0.2);
-    --shadow-medium: 0 6px 12px rgba(0, 0, 0, 0.3);
-
-    /* Button Styles */
-    --button-bg: var(--primary-color);
-    --button-hover-bg: var(--hover-primary-color);
-    --button-border-radius: 5px;
-    --button-padding: 10px 15px;
-    --button-font-size: 1rem;
-    --button-text-color: var(--text-light);
-    --button-hover-transform: scale(1.05);
-}
-
-/* Reset & Defaults */
-html, body, * {
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-family-base);
-    box-sizing: border-box;
-    transition: var(--transition-speed);
-    color: var(--text-light);
-}
-
-
-/* Global Background */
-html, body {
-    background: var(--gradient-bg);
-    font-size: 100%;
-    line-height: var(--line-height-body);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-    scroll-padding-top: 6rem;
-}
-
-*::selection {
-    color: var(--text-light);
-    background-color: var(--primary-color);
+    /* Enhanced Shadows */
+    --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --shadow-deep: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
-    background: var(--gradient-text);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: bold;
-    margin: 0;
-    margin-bottom: var(--spacing-md);
-    letter-spacing: 0.5px;
-    color: var(--text-dark);
-}
-
-h1 { font-size: 2.5rem; font-weight: 300; }
-h2 { font-size: 2rem; font-weight: 400; }
-h3 { font-size: 1.75rem; font-weight: 500; }
-h4 { font-size: 1.5rem; font-weight: 600; }
-h5 { font-size: 1.25rem; font-weight: 700; }
-h6 { font-size: 1rem; font-weight: 800; }
-
-p, ul, ol {
-    line-height: 1.6;
-    color: var(--text-dark);
-    font-size: 1.0625rem;
-    letter-spacing: 0.5px;
-    margin-bottom: 1.5rem;
+html, body {
+    font-size: var(--font-size-base);
+    font-family: 'Nunito Sans', sans-serif;
+    line-height: 1.75;
+    color: var(--text-light);
+    background: var(--gradient-bg);
 }
 
 /* Links */
 a {
     color: var(--primary-color);
-    text-decoration: underline;
-    transition: color var(--smooth-transition), text-decoration var(--smooth-transition);
+    transition: color 0.3s ease, text-decoration 0.3s ease;
 }
 
 a:hover {
-    background: var(--gradient-hover);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--highlight-color);
     text-decoration: none;
 }
 
-
-/* Layout & Structure */
+/* Utility Classes */
 .container {
-    padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--border-radius);
+    padding: 1rem;
+    border-radius: 8px;
     box-shadow: var(--shadow-light);
-    background: var(--gradient-bg);
-    transition: all var(--smooth-transition);
+    background: var(--background-light);
+    transition: all 0.3s ease;
 }
 
 .container:hover {
     transform: translateY(-5px) scale(1.02);
     box-shadow: var(--shadow-medium);
-}
-
-@media (max-width: var(--breakpoint-md)) {
-    .container {
-        padding: 10px;
-    }
-}
-
-/* Button Styles */
-button, .button {
-    background: var(--button-bg);
-    color: var(--button-text-color);
-    padding: var(--button-padding);
-    border: none;
-    border-radius: var(--button-border-radius);
-    font-size: var(--button-font-size);
-    cursor: pointer;
-    transition: background var(--smooth-transition), transform var(--smooth-transition);
-}
-
-button:hover, .button:hover {
-    background: var(--button-hover-bg);
-    transform: var(--button-hover-transform);
-}
-
-
-/* Header Styles */
-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: var(--header-padding);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--shadow-light);
-    background: var(--section-background); /* Consistent background for header */
-    transition: background var(--smooth-transition), border-bottom var(--smooth-transition), padding var(--smooth-transition);
-}
-
-header.sticky {
-    padding: 1rem 3%;
-    background: var(--background-dark);
-    border-bottom: 1px solid var(--background-dark);
-    box-shadow: var(--shadow-medium);
-}
-
-header .logo h2 {
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--primary-color);
-    text-transform: uppercase;
-    letter-spacing: 0.2rem;
-}
-
-header .navbar a {
-    font-size: 0.9rem;
-    margin-left: var(--spacing-xs);
-    color: var(--text-light);
-    transition: color var(--smooth-transition), text-decoration var(--smooth-transition);
-    font-weight: 700;
-}
-
-header .navbar a:hover {
-    color: var(--primary-color);
-    text-decoration: underline;
-}
-
-@media (max-width: var(--breakpoint-md)) {
-    header {
-        padding: 1rem 5%;
-    }
-
-    header .logo h2 {
-        font-size: 2rem;
-    }
-}
-
-/* Utility Classes */
-.flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.smooth-transition {
-    transition: var(--smooth-transition);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 0.8rem;
-    background-color: var(--secondary-color); /* Grey */
-}
-
-::-webkit-scrollbar-thumb {
-    border-radius: 1rem;
-    background-color: var(--background-dark); /* Black */
-}
-
-::-webkit-scrollbar-track {
-    background-color: var(--background-light); /* White */
-}
-
-.swiper-pagination-bullet {
-    height: 1rem;
-    width: 1rem;
-    border-radius: 50rem;
-    background-color: var(--secondary-color); /* Grey */
-}
-
-.swiper-pagination-bullet-active {
-    width: 3rem;
-    background: var(--background-dark); /* Black */
 }
