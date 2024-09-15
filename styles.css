@@ -1,153 +1,105 @@
 
-
-
-
-
-/* Contact */
-#contactSection {
-    padding: 3rem 0; /* Reduced padding for a more compact form */
-    background: linear-gradient(160deg, var(--background-light) 0%, var(--background-dark) 100%);
-    border-top: 2px solid rgba(255, 255, 255, 0.1); /* Slightly reduced border */
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1); /* Slightly reduced border */
+:root {
+    --primary-color: #1a73e8;
+    --accent-color: #fbbc05;
+    --background-light: #f5f7fa;
+    --background-dark: #181818;
+    --text-light: #ffffff;
+    --text-dark: #333333;
+    --hover-primary-color: #155bb5;
+    --border-radius: 8px;
+    --shadow-light: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 10px rgba(0, 0, 0, 0.15);
+    --shadow-deep: 0 6px 15px rgba(0, 0, 0, 0.2);
+    --smooth-transition: 0.3s ease;
 }
 
-.contact-form {
-    padding: 15px; /* Reduced padding for a more compact form */
-    border-radius: var(--border-radius);
-    background: var(--background-dark);
-    box-shadow: var(--shadow-medium);
-    transition: box-shadow var(--smooth-transition), transform var(--smooth-transition);
-}
-
-.contact-form:hover {
-    transform: translateY(-3px); /* Slightly reduced hover effect */
-    box-shadow: var(--shadow-deep);
-}
-
-.contact-form label {
+/* General Typography */
+body {
+    font-family: 'Nunito Sans', sans-serif;
     color: var(--text-light);
-    display: block;
-    margin-bottom: 0.5rem; /* Reduced margin for tighter spacing */
-    font-weight: 500;
+    background-color: var(--background-dark);
+    line-height: 1.6;
 }
 
-.contact-form input[type="text"],
-.contact-form input[type="email"],
-.contact-form textarea {
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    padding: 8px 12px; /* Reduced padding for a more compact feel */
-    margin-bottom: 1rem;
-    background-color: rgba(255, 255, 255, 0.05);
-    color: var(--text-light);
-    font-family: inherit;
-    transition: border-color var(--smooth-transition);
-}
-
-.contact-form input:focus, 
-.contact-form textarea:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 8px rgba(var(--primary-color), 0.1);
-}
-
-.contact-form button.btn-primary {
-    padding: 8px 16px; /* Reduced padding for a more compact button */
-    background-color: var(--primary-color);
-    color: var(--text-dark);
-    font-weight: 600;
-    transition: all 0.25s;
-    box-shadow: var(--shadow-light);
-}
-
-.contact-form button.btn-primary:hover {
-    background-color: darken(var(--primary-color), 10%);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
-}
-
-.contact-form button.btn-primary:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-}
-
-
-
-
-
-/* ==================================================================
-   Buttons
-================================================================== */
+/* Buttons */
 button.btn-primary, .btn-custom {
     border-radius: var(--border-radius);
     padding: 0.65em 1.6em;
     background-color: var(--primary-color);
     color: var(--text-light);
-    transition: background-color var(--smooth-transition), transform var(--smooth-transition), border-color var(--smooth-transition);
+    transition: background-color var(--smooth-transition), transform var(--smooth-transition), box-shadow var(--smooth-transition);
     box-shadow: var(--shadow-light);
 }
 
-button.btn-primary:disabled {
-    background-color: var(--disabled-bg-color);
-    cursor: not-allowed;
-}
-
-/* Enhanced Button Hover Effects */
 button.btn-primary:hover, .btn-custom:hover {
-    background-color: darken(var(--primary-color), 10%);
-    transform: translateY(-2px) scale(1.01);
+    background-color: var(--hover-primary-color);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-medium);
 }
 
-button.btn-primary:active, button.btn-primary:focus {
-    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.15);
+/* Image Hover Effects */
+.img-fluid.rounded {
+    box-shadow: var(--shadow-light);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-
-/* ==================================================================
-   Global Styles & Utility Classes
-================================================================== */
-
-/* Example */
-.clickable, a, button {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.img-fluid.rounded:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-medium);
 }
 
-.button-loading {
-    background-image: url('loading-icon.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    cursor: wait;
+/* Project Links */
+.project-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-
-.clickable:hover, a:hover, button:hover {
-    cursor: pointer; 
-    transform: var(--hover-translate);
+.project-link:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-deep);
 }
 
-.clickable:active, a:active, button:active {
-    transform: var(--hover-translate) scale(0.97);
+/* Contact Form */
+.contact-form {
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    background: var(--background-dark);
+    box-shadow: var(--shadow-light);
+    transition: box-shadow var(--smooth-transition), transform var(--smooth-transition);
 }
 
-.clickable:focus, a:focus, button:focus {
-    outline: 2px solid var(--accent-color);
-    transform: var(--hover-translate);
+.contact-form:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
 }
 
-
-
-
-/* === Animations === */
-@keyframes slideDown {
-    0% {
-        transform: translateY(-100%);
-    }
-    100% {
-        transform: translateY(0);
-    }
+/* Input Fields */
+.input-custom {
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+    transition: border-color var(--smooth-transition), box-shadow var(--smooth-transition);
 }
 
-.slide-down {
-    animation: slideDown 0.3s ease-in-out forwards;
+.input-custom:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(26, 115, 232, 0.4);
+    outline: none;
+}
+
+/* Animations */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInAnimation 1s ease forwards;
 }
 
 @keyframes fadeInAnimation {
@@ -161,146 +113,14 @@ button.btn-primary:active, button.btn-primary:focus {
     }
 }
 
-.fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInAnimation 1s ease forwards;
-}
-
-
-
-/* Project Link Base Styles */
-.project-link {
-    display: block;
-    color: inherit;
-    text-decoration: none;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.project-link:hover {
-    transform: translateY(-5px);
-}
-
-/* Project Image Styles */
-.project-image {
-    width: 100%;
-    height: auto; /* Changed to auto for maintaining aspect ratio */
-    object-fit: cover; /* Ensures the image covers the container */
-    background-position: center;
-    position: relative;
-    transition: opacity 0.3s;
-}
-
-.project-image::before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.project-link:hover .project-image {
-    opacity: 0.8;
-}
-
-.project-link:hover .project-image::before {
-    opacity: 1;
-}
-
-/* Project Details Styles */
-.project-details {
-    padding: 10px;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
+/* Project Details */
 .project-details h3 {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    font-weight: bold;
+    font-weight: 700;
+    margin: 1rem 0;
+    transition: color 0.3s;
 }
 
 .project-details h3:hover {
     color: var(--primary-color);
-    cursor: pointer; /* Indicate clickability */
 }
 
-
-
-
-
-
-
-/* === Image Styles === */
-
-
-.img-fluid {
-    border-radius: var(--border-radius);
-    transition: transform 0.3s;
-}
-
-.img-fluid:hover {
-    transform: scale(1.05);
-}
-
-
-.img-fluid.rounded {
-    position: relative; /* To position the pseudo-element */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 15px; /* More pronounced rounded edges */
-    overflow: hidden; /* Clip the children, helps with hover effects */
-    transition: all 0.3s ease-out;
-}
-
-.img-fluid.rounded::before {
-    content: ""; /* Pseudo-element for added depth */
-    position: absolute;
-    top: 10%;
-    left: 5%;
-    right: 5%;
-    bottom: 10%;
-    background: rgba(255, 255, 255, 0.1); /* Slight white overlay */
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2); /* Inward shadow */
-    border-radius: 12px;
-    z-index: 1;
-}
-
-.img-fluid.rounded:hover {
-    transform: scale(1.05) perspective(1500px) rotateX(5deg) rotateY(5deg); /* 3D rotation effect */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* For the Custom Input, let's also enhance it a bit */
-.input-custom {
-    border-radius: 10px;
-    border: 1px solid #e0e0e0;
-    padding: 0.5rem 1rem;
-    background-color: #f5f5f5; /* Light background color for depth */
-    transition: all 0.3s ease-out;
-}
-
-.input-custom:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 15px rgba(74, 144, 226, 0.6); /* More pronounced focus glow */
-    outline: none;
-}
-
-.input-error {
-    border-color: var(--error-color);
-    background-color: rgba(var(--error-color), 0.1);
-}
-
-
-.input-custom:hover, .input-custom:active {
-    border-color: var(--hover-primary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1); /* Soft shadow on hover */
-}
