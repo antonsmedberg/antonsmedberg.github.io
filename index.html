@@ -1,409 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anton Smedberg</title>
-    
-    <!-- Preconnects -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+    <!-- Preconnect and Font Links -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 
     <!-- Stylesheets -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-  
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles.css?v=5">
+    <link rel="stylesheet" href="styles.css"> <!-- Custom CSS -->
 
-
-    <!-- Stylesheets -->
-<link rel="stylesheet" href="css/navbar.css">
-<link rel="stylesheet" href="css/global.css">
-<link rel="stylesheet" href="css/sections.css">
-<link rel="stylesheet" href="css/responsive.css">
-
-
-  
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
+<body>
 
-<body style="background-color: var(--background-gradient-start); color: var(--text-color);"> 
- 
 <!-- Navbar -->
 <header>
-    <nav class="navbar navbar-dark navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand mx-4" href="#" aria-label="Anton Smedberg's Homepage">
-                <img src="images/antonlogowebsitetransperant-removebg-preview.png" alt="Anton's Logo" class="navbar-logo">
-                <span>Anton Smedberg</span>
+            <a class="navbar-brand mx-4" href="#">
+                <img src="images/antonlogowebsitetransperant.png" alt="Anton's Logo" class="navbar-logo">
+                Anton Smedberg
             </a>
-            <button class="navbar-toggler" id="menuToggle" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo02">
-                <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" aria-label="Navigate to Home">
-                            <span class="fas fa-home" aria-hidden="true"></span> <span class="nav-text">Home</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#projectsSection" aria-label="Navigate to Projects">
-                            <span class="fas fa-project-diagram" aria-hidden="true"></span> <span class="nav-text">Projects</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#aboutSection" aria-label="Navigate to About">
-                            <span class="fas fa-user" aria-hidden="true"></span> <span class="nav-text">About</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contactSection" aria-label="Navigate to Contact">
-                            <span class="fas fa-envelope" aria-hidden="true"></span> <span class="nav-text">Contact</span>
-                        </a>
-                    </li>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projectsSection">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#aboutSection">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contactSection">Contact</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 </header>
 
-
-
-        
 <!-- Welcome Section -->
-<main class="container mt-5 mb-5 text-center welcome-section">
-    <div class="welcome-message">
-        <div id="typed-output"></div> <!-- Typing Animation will appear here -->
-    </div>
-    <p>Discover the latest projects, delve into my journey in SwiftUI and Kotlin, and explore insights from the books that have shaped my understanding.</p>
+<main class="container text-center mt-5 pt-5">
+    <section class="welcome-section mb-5">
+        <h1 class="mb-4">Hi, I'm Anton Smedberg</h1>
+        <p class="lead">A mobile app developer passionate about creating innovative solutions with SwiftUI and Kotlin.</p>
+        <div class="d-flex justify-content-center">
+            <a href="#projectsSection" class="btn btn-primary mx-2">View My Projects</a>
+            <a href="#contactSection" class="btn btn-outline-secondary mx-2">Contact Me</a>
+        </div>
+    </section>
 
-    <div class="row justify-content-center mt-5">
-        <div class="col-12 col-md-4 mb-4"> <!-- Adjust the column size for mobile -->
-            <img src="images/289046037_10216844855592544_4865221184126086534_n.jpg" class="img-fluid rounded" alt="Portrait of Anton Smedberg" loading="lazy">
+    <!-- About Section -->
+    <section id="aboutSection" class="mb-5">
+        <div class="row">
+            <div class="col-md-4">
+                <img src="images/profile.jpg" class="img-fluid rounded-circle" alt="Anton Smedberg">
+            </div>
+            <div class="col-md-8">
+                <h2>About Me</h2>
+                <p>With experience in mobile app development for both iOS and Android, I’m passionate about combining functionality with clean, intuitive design. I focus on delivering exceptional user experiences.</p>
+            </div>
         </div>
-        <div class="col-12 col-md-7 mb-4"> <!-- Adjust the column size for mobile -->
-            <h2>About Me</h2>
-            <p>As a dedicated mobile app developer, I've specialized in creating intuitive apps for iOS and Android. My experience with SwiftUI and Kotlin has deepened my appreciation for the art of mobile development. Striving for excellence, I continually refine my skills to bridge the gap between app intent and user experience.</p>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projectsSection" class="mb-5">
+        <h2 class="text-center mb-4">Projects</h2>
+        <div class="row">
+            <!-- Project Card -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <img src="images/project1.jpg" class="card-img-top" alt="Project 1">
+                    <div class="card-body">
+                        <h5 class="card-title">MapSwe</h5>
+                        <p class="card-text">An Android app built with Kotlin for location-based services.</p>
+                        <a href="#" class="btn btn-info">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Repeat for other projects -->
         </div>
-    </div>
-  
-    <!-- Social Media Icons -->
-    <div class="social-media-icons mt-4">
-        <a href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" class="icon-link linkedin">
-            <i class="fab fa-linkedin"></i>
-        </a>
-        <a href="https://github.com/antonsmedberg" target="_blank" class="icon-link github">
-            <i class="fab fa-github"></i>
-        </a>
-    </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contactSection" class="mb-5">
+        <h2 class="text-center mb-4">Contact Me</h2>
+        <form action="https://formspree.io/f/mwkdaygj" method="POST">
+            <div class="mb-3">
+                <label for="userName" class="form-label">Your Name</label>
+                <input type="text" class="form-control" id="userName" name="userName" required>
+            </div>
+            <div class="mb-3">
+                <label for="userEmail" class="form-label">Your Email</label>
+                <input type="email" class="form-control" id="userEmail" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="userMessage" class="form-label">Message</label>
+                <textarea class="form-control" id="userMessage" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+    </section>
 </main>
 
-
-    
-<!-- Projects Section -->
-<section id="projectsSection" class="projects-section container">
-    <h2 class="text-center">My Projects</h2>
-    <div class="row mt-4 project-container">
-        <!-- Project Cards -->
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card project-card" style="background-color: var(--background-gradient-start);">
-                <img src="/images/kotlinicon.PNG" class="card-img-top project-image" alt="Project 1">
-                <div class="card-body project-details">
-                    <h3 class="card-title text-light">MapSwe</h3>
-                    <p class="card-text text-light">Android App byggd i Kotlin.</p>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#projectModal1">
-                        More Info <i class="fas fa-info-circle"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card project-card" style="background-color: var(--background-gradient-start);">
-                <img src="/images/swiftuiicon.jpg" class="card-img-top project-image" alt="Project 2">
-                <div class="card-body project-details">
-                    <h3 class="card-title text-light">1TripAway</h3>
-                    <p class="card-text text-light">iOS App byggd i SwiftUi.</p>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#projectModal2">
-                        More Info <i class="fas fa-info-circle"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card project-card" style="background-color: var(--background-gradient-start);">
-                <img src="/images/985381.jpg" class="card-img-top project-image" alt="Project 3">
-                <div class="card-body project-details">
-                    <h3 class="card-title text-light">Weavy Chat</h3>
-                    <p class="card-text text-light">Chatt App, LIA med Kotlin Compose.</p>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#projectModal3">
-                        More Info <i class="fas fa-info-circle"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-
-<!-- Project Modals -->
-<div class="modal fade" id="projectModal1" tabindex="-1" role="dialog" aria-labelledby="projectModalLabel1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="projectModalLabel1">MapSwe</h5>
-                <button type="button" class="custom-close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Carousel -->
-                <div id="project1Carousel" class="carousel slide mb-3" data-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="/images/mapswe1.png" class="d-block w-100 img-fluid" alt="Project 1 Image 1">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="/images/mapswe2.png" class="d-block w-100 img-fluid" alt="Project 1 Image 2">
-                        </div>
-                    </div>
-                    <a class="carousel-control-prev" href="#project1Carousel" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#project1Carousel" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </div>
-                <!-- ... rest of your modal content ... -->
-                <h6 class="small"><i class="fas fa-info-circle"></i>Description:</h6>
-                <p class="small">MapSwe är en bekväm och användarvänlig app som hjälper dig att hitta matställen nära din plats med hjälp av Google Maps. Med MapSwe kan du enkelt hitta närliggande restauranger, caféer och andra matställen med bara några få klick. Utforska olika typer av kök, läs detaljerad information om varje företag, inklusive deras menyer, recensioner och kontaktinformation. Oavsett om du söker efter en snabbtugg eller planerar en speciell matupplevelse, gör MapSwe det enkelt att hitta och lära känna matställen som passar dina preferenser. Njut av bekvämligheten att upptäcka och utforska lokala matalternativ med MapSwe.</p>
-                <div class="modal-divider"></div>
-                <h6><i class="fas fa-list-ul"></i>Features:</h6>
-                <ul>
-                    <li>Google Maps Api</li>
-                    <li>Food finder</li>
-                    <!-- ...other features... -->
-                </ul>
-                <div class="modal-divider"></div>
-                <a href="https://play.google.com/store/apps/details?id=ant1.mapswe.app" target="_blank" class="btn btn-primary btn-sm view-project-btn">
-                    <i class="fas fa-external-link-alt"></i> View Project
-                </a>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Project Modals -->
-<div class="modal fade" id="projectModal2" tabindex="-1" role="dialog" aria-labelledby="projectModalLabel2" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="projectModalLabel2">1TripAway</h5>
-                <button type="button" class="custom-close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Carousel -->
-                <div id="project2Carousel" class="carousel slide mb-3" data-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="/images/1TripAwayfirst.jpg" class="d-block w-100 img-fluid" alt="Project 2 Image 1">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="/images/1TripAwaysecond.jpg" class="d-block w-100 img-fluid" alt="Project 2 Image 2">
-                        </div>
-                    </div>
-                    <a class="carousel-control-prev" href="#project2Carousel" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#project2Carousel" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </div>
-                <!-- ... rest of your modal content ... -->
-                <h6 class="small"><i class="fas fa-info-circle"></i>Description:</h6>
-                <p class="small">Den här appen innehåller ett vänligt gränssnitt, med lite animation, navigera i appen du hittar och utforska vy där du kan läsa om olika destinationer/populära platser du kanske vill besöka en dag, detta är perfekt för personer som saknar idéer om vart de ska resa härnäst , vi har också en uppslagssida för att se vädret på din favoritdestination.</p>
-                <div class="modal-divider"></div>
-                <h6><i class="fas fa-list-ul"></i>Features:</h6>
-                <ul>
-                    <li>Weather Api</li>
-                    <li>Navigation, Animations</li>
-                    <!-- ...other features... -->
-                </ul>
-                <div class="modal-divider"></div>
-                <a href="https://apps.apple.com/pl/app/1tripaway/id1667135772" target="_blank" class="btn btn-primary btn-sm view-project-btn">
-                    <i class="fas fa-external-link-alt"></i> View Project
-                </a>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Project Modals -->
-<div class="modal fade" id="projectModal3" tabindex="-1" role="dialog" aria-labelledby="projectModalLabel3" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="projectModalLabel3">Weavy Kotlin Compose</h5>
-                <button type="button" class="custom-close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Carousel -->
-                <div id="project3Carousel" class="carousel slide mb-3" data-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="/images/w-icon.png" class="d-block w-100 img-fluid" alt="Project 3 Image 1">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="/images/w-logo-h-min.png" class="d-block w-100 img-fluid" alt="Project 3 Image 2">
-                        </div>
-                    </div>
-                    <a class="carousel-control-prev" href="#project3Carousel" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#project3Carousel" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </div>
-                <!-- ... rest of your modal content ... -->
-                <h6 class="small"><i class="fas fa-info-circle"></i>Description:</h6>
-                <p class="small">Min period på Weavy var en intensiv inlärningsresa. Jag förbättrade mina programmeringskunskaper avsevärt och fick en solid förståelse för DevOps-principer.
-                    Backend och APIer
-                    En av de mest värdefulla erfarenheterna jag fick var inom backend-utveckling och API-integration. Tidigare hade jag en grundläggande förståelse för dessa koncept, men det var först när jag aktivt arbetade med dem som jag verkligen fick förståelse för deras betydelse och komplexitet.
-                    .</p>
-                <div class="modal-divider"></div>
-                <h6><i class="fas fa-list-ul"></i>Features:</h6>
-                <ul>
-                    <li>Backend Api</li>
-                    <li>Kotlin Compose</li>
-                    <li>Github</li>
-                    <!-- ...other features... -->
-                </ul>
-                <div class="modal-divider"></div>
-                <a href="https://github.com/antonsmedberg/Weavy/tree/dev" target="_blank" class="btn btn-primary btn-sm view-project-btn">
-                    <i class="fas fa-external-link-alt"></i> View Project
-                </a>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
-<!-- Contact Form -->
-<section id="contactSection" class="contact-section">
-     <div class="container text-center">
-        <h2>Contact Me</h2>
-        <form action="https://formspree.io/f/mwkdaygj" method="POST">
-            <fieldset>
-                <legend>Fill out the form to contact me:</legend>
-                <div class="mb-3 col-12">
-                    <label for="userName" class="form-label">Your Name</label>
-                    <input type="text" id="userName" name="userName" class="form-control input-custom" placeholder="Anton Smedberg" required>
-                </div>
-                <div class="mb-3 col-12">
-                    <label for="userEmail" class="form-label">Your Email</label>
-                    <input type="email" id="userEmail" name="email" class="form-control input-custom" placeholder="anton@smedberg.eu" required>
-                </div>
-                <div class="mb-3 col-12">
-                    <label for="userMessage" class="form-label">Your Message</label>
-                    <textarea id="userMessage" name="message" class="form-control input-custom" rows="5" placeholder="Write your message here..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary btn-custom btn-block">Send Message</button>
-            </fieldset>
-        </form>
-    </div>
-</section>
-
-
-
-
-<!-- Skills section -->
-<section id="skillsSection" class="skills-section container">
-    <h2 class="text-center mb-4">My Expertise</h2>
-    <div class="row justify-content-center">
-        <!-- Skill Cards -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <div class="skill-card text-center mb-4" style="background-color: var(--background-gradient-start);">
-                <h4>SwiftUI</h4>
-                <i class="devicon-swift-plain"></i>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-3">
-            <div class="skill-card text-center mb-4" style="background-color: var(--background-gradient-start);">
-                <h4>Kotlin</h4>
-                <i class="devicon-kotlin-plain"></i>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-3">
-            <div class="skill-card text-center mb-4" style="background-color: var(--background-gradient-start);">
-                <h4>iOS Development</h4>
-                <i class="devicon-apple-original"></i>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-3">
-            <div class="skill-card text-center mb-4" style="background-color: var(--background-gradient-start);">
-                <h4>GitHub</h4>
-                <i class="devicon-github-original"></i>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-
-    <!-- Footer -->
-    <footer class="footer-container text-center">
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+    <div class="container text-center">
         <p>&copy; 2023 Anton Smedberg. All Rights Reserved.</p>
-        <div class="icon-container">
-            <a href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" class="text-white" rel="noopener noreferrer">
-                <i class="fab fa-linkedin"></i>
-            </a>
-            <a href="https://github.com/antonsmedberg" target="_blank" rel="noopener noreferrer" class="text-white">
-                <i class="fab fa-github"></i>
-            </a>
+        <div class="social-icons">
+            <a href="https://www.linkedin.com/in/anton-smedberg" target="_blank" class="text-white mx-2"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/antonsmedberg" target="_blank" class="text-white mx-2"><i class="fab fa-github"></i></a>
         </div>
-        
-    </footer>
-    
-    
-
+    </div>
+</footer>
 
 </body>
 </html>
