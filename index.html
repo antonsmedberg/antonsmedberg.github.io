@@ -49,7 +49,7 @@
 <!-- Welcome Section -->
 <main class="container text-center mt-5 pt-5">
     <section class="welcome-section mb-5">
-        <h1 class="mb-4">Hi, I'm Anton Smedberg</h1>
+        <h1 class="display-4 mb-4">Hi, I'm Anton Smedberg</h1>
         <p class="lead">A mobile app developer passionate about creating innovative solutions with SwiftUI and Kotlin.</p>
         <div class="d-flex justify-content-center">
             <a href="#projectsSection" class="btn btn-primary mx-2">View My Projects</a>
@@ -58,9 +58,9 @@
     </section>
 
     <!-- About Section -->
-    <section id="aboutSection" class="mb-5">
+    <section id="aboutSection" class="about-section mb-5">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 d-flex justify-content-center mb-4">
                 <img src="images/profile.jpg" class="img-fluid rounded-circle" alt="Anton Smedberg">
             </div>
             <div class="col-md-8">
@@ -71,13 +71,13 @@
     </section>
 
     <!-- Projects Section -->
-    <section id="projectsSection" class="mb-5">
-        <h2 class="text-center mb-4">Projects</h2>
+    <section id="projectsSection" class="projects-section mb-5">
+        <h2 class="text-center mb-4">My Projects</h2>
         <div class="row">
             <!-- Project Card -->
             <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <img src="images/project1.jpg" class="card-img-top" alt="Project 1">
+                <div class="card shadow-sm project-card">
+                    <img src="images/project1.jpg" class="card-img-top project-image" alt="Project 1">
                     <div class="card-body">
                         <h5 class="card-title">MapSwe</h5>
                         <p class="card-text">An Android app built with Kotlin for location-based services.</p>
@@ -85,27 +85,27 @@
                     </div>
                 </div>
             </div>
-            <!-- Repeat for other projects -->
+            <!-- Add more project cards as necessary -->
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section id="contactSection" class="mb-5">
+    <section id="contactSection" class="contact-section mb-5">
         <h2 class="text-center mb-4">Contact Me</h2>
-        <form action="https://formspree.io/f/mwkdaygj" method="POST">
+        <form action="https://formspree.io/f/mwkdaygj" method="POST" class="contact-form">
             <div class="mb-3">
                 <label for="userName" class="form-label">Your Name</label>
-                <input type="text" class="form-control" id="userName" name="userName" required>
+                <input type="text" class="form-control input-custom" id="userName" name="userName" required>
             </div>
             <div class="mb-3">
                 <label for="userEmail" class="form-label">Your Email</label>
-                <input type="email" class="form-control" id="userEmail" name="email" required>
+                <input type="email" class="form-control input-custom" id="userEmail" name="email" required>
             </div>
             <div class="mb-3">
                 <label for="userMessage" class="form-label">Message</label>
-                <textarea class="form-control" id="userMessage" name="message" rows="5" required></textarea>
+                <textarea class="form-control input-custom" id="userMessage" name="message" rows="5" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Send Message</button>
+            <button type="submit" class="btn btn-primary btn-custom">Send Message</button>
         </form>
     </section>
 </main>
@@ -123,3 +123,4 @@
 
 </body>
 </html>
+
