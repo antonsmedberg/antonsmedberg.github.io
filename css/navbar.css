@@ -6,150 +6,38 @@
     left: 0;
     width: 100%;
     z-index: 1000;
-    backdrop-filter: blur(10px);
-    padding: 0.25rem 0.5rem; /* Reduced vertical padding for a more compact navbar */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--navbar-background);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: background-color var(--smooth-transition), border-bottom var(--smooth-transition), box-shadow var(--smooth-transition);
+    backdrop-filter: blur(15px); /* Enhances transparency with blur */
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+    padding: 0.5rem 1rem; /* Consistent padding */
+    box-shadow: var(--shadow-light);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .navbar.scrolled {
-    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1); /* Even lighter shadow on scroll */
+    background-color: rgba(0, 0, 0, 0.9); /* Darker background on scroll */
+    box-shadow: var(--shadow-medium);
 }
-
-.navbar .nav-link {
-    margin: 0 var(--spacing-xs);
-    padding: 0.5rem 0.75rem; /* Slightly reduced horizontal padding */
-    font-size: 1em; /* Adjust font size */
-    position: relative;
-    display: inline-block;
-    text-transform: uppercase;
-    font-weight: 500;
-    transition: color var(--smooth-transition), transform var(--smooth-transition); /* Simplify transition */
-    color: var(--text-light);
-    border-radius: var(--border-radius);  /* Rounded corners for a modern look */
-    border: 2px solid transparent;  /* Increased border size for a more pronounced effect on hover */
-    transform: translateY(0); /* Keep this to maintain initial state */
-}
-
-.navbar .nav-link:hover {
-    background-color: transparent;
-    color: var(--primary-color);
-    /* Ensure no transform on hover */
-}
-
 
 .navbar-brand {
-    display: flex;
-    align-items: center;
     color: var(--text-light);
-    font-size: 2em;
+    font-size: 1.5rem;
+    font-weight: bold;
     letter-spacing: 1px;
-    font-weight: 700;
-    transition: color var(--smooth-transition), text-shadow var(--smooth-transition);
-    padding: 0; /* Removed padding */
-    margin-left: 0; /* Removed left margin for alignment to the very left */
+    transition: color 0.3s ease;
 }
 
-/* Navbar Brand Improvements */
 .navbar-brand:hover {
-    color: var(--primary-color);
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); /* More subtle shadow */
+    color: var(--highlight-color); /* Accent color on hover */
 }
 
-.navbar-brand .navbar-logo {
-    height: 60px; /* Adjusted logo size for a more compact look */
-    width: auto;
-    margin-right: 0.5rem; /* Reduced spacing between logo and text */
-    transition: opacity var(--smooth-transition);
+.nav-link {
+    color: var(--text-light);
+    padding: 0.5rem 1rem;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
 }
 
-.navbar-brand .brand-text {
-    font-size: 2.5em; /* Adjusted font size for a more compact look */
-    font-weight: 900; /* Increased font weight for a bolder look */
-    transition: opacity var(--smooth-transition);
-}
-
-.navbar-brand:focus, .navbar-brand .navbar-logo:focus, .navbar-brand .brand-text:focus {
-    outline: none;
-    background-color: transparent;
-}
-
-.navbar-brand:hover .navbar-logo, .navbar-brand:hover .brand-text {
-    opacity: 0.9; /* Subtle opacity change on hover */
-}
-
-.navbar .navbar-collapse {
-    transition: all 0.2s;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-}
-
-.navbar .nav-link.active {
-    border-color: var(--primary-color);  /* Consistent border color with underline color when active */
-    background-color: rgba(255, 255, 255, 0.1); /* Slight background color change for a subtle active effect */
-}
-
-/* Underline Animation Improvements */
-.navbar .nav-link::before {
-    transition-duration: var(--smooth-transition); /* Consistent transition timing with other elements */
-}
-
-.navbar-toggler {
-    border: none;  /* Remove border for a cleaner look */
-    border-color: rgba(255, 255, 255, 0.5); /* Adjusted border color */
-}
-/* Toggler Icon Improvements */
-.navbar-toggler-icon {
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-}
-
-
-/* Hamburger Menu Styling */
-.hamburger-menu {
-    display: none;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    position: absolute; 
-    top: 55px; /* Adjusted top position for better alignment with the more compact navbar */
-    right: 20px;
-    background-color: var(--background-dark);
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: opacity var(--smooth-transition), transform var(--smooth-transition);
-}
-
-.hamburger-menu.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.hamburger-icon {
-    background-color: rgba(255, 255, 255, 0.05);
-    display: block;
-    font-size: 24px;
-    cursor: pointer;
-    z-index: 11;
-    transition: transform var(--smooth-transition);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--border-radius);
-    padding: 0.5rem;
-}
-
-/* Adding a hover effect to the hamburger icon */
-.hamburger-icon:hover {
-    background-color: rgba(255, 255, 255, 0.05); /* slight background color change on hover */
-}
-
-.hamburger-icon.active {
-    transform: rotate(90deg);  /* Rotates the hamburger icon when active for a visual cue */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);  /* Increased shadow on active for a 3D lift effect */
+.nav-link:hover {
+    color: var(--highlight-color); /* Accent color on hover */
 }
 
