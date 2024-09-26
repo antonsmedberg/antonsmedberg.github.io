@@ -4,292 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anton Smedberg - Mobile App Developer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f39c12;
-            --bg-dark: #1a1a1a;
-            --bg-light: #f5f5f5;
-            --text-light: #ffffff;
-            --text-dark: #333333;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background-color: var(--bg-light);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            padding: 20px 0;
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-            transition: background-color 0.3s ease;
-        }
-
-        header.scrolled {
-            background-color: rgba(26, 26, 26, 0.9);
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-left: 30px;
-        }
-
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--secondary-color);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://source.unsplash.com/random/1600x900/?technology') no-repeat center center/cover;
-            height: 100vh;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            text-align: center;
-        }
-
-        .hero-content h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .hero-content p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: var(--text-light);
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn:hover {
-            background-color: #3a7bc8;
-        }
-
-        /* About Section */
-        .about {
-            padding: 100px 0;
-            background-color: var(--bg-light);
-        }
-
-        .about-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .about-text {
-            flex: 1;
-            padding-right: 50px;
-        }
-
-        .about-image {
-            flex: 1;
-        }
-
-        .about-image img {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Projects Section */
-        .projects {
-            padding: 100px 0;
-            background-color: #f9f9f9;
-        }
-
-        .project-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .project-card {
-            background-color: #ffffff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .project-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .project-image {
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .project-info {
-            padding: 20px;
-        }
-
-        .project-info h3 {
-            margin-bottom: 10px;
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: 100px 0;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-        }
-
-        .contact-form {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-light);
-        }
-
-        .form-group textarea {
-            height: 150px;
-        }
-
-        /* Footer */
-        footer {
-            background-color: #111;
-            color: var(--text-light);
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .social-links {
-            margin-top: 20px;
-        }
-
-        .social-links a {
-            color: var(--text-light);
-            font-size: 1.5rem;
-            margin: 0 10px;
-            transition: color 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--secondary-color);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .about-content {
-                flex-direction: column;
-            }
-
-            .about-text {
-                padding-right: 0;
-                margin-bottom: 30px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
     <header>
         <nav class="container">
-            <div class="logo">Anton Smedberg</div>
+            <div class="logo">AS</div>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
         </nav>
     </header>
 
     <main>
         <section id="home" class="hero">
             <div class="container">
-                <div class="hero-content">
-                    <h1>Anton Smedberg</h1>
-                    <p>Mobile App Developer | SwiftUI & Kotlin Expert</p>
-                    <a href="#projects" class="btn">View My Work</a>
-                </div>
+                <h1 class="glitch" data-text="Anton Smedberg">Anton Smedberg</h1>
+                <p class="subtitle">Mobile App Developer | SwiftUI & Kotlin Expert</p>
+                <a href="#projects" class="cta-button">View My Work</a>
             </div>
         </section>
 
         <section id="about" class="about">
             <div class="container">
-                <h2>About Me</h2>
+                <h2 class="section-title">About Me</h2>
                 <div class="about-content">
-                    <div class="about-text">
-                        <p>With extensive experience in mobile app development for both iOS and Android, I'm passionate about combining functionality with clean, intuitive design. My focus is on delivering exceptional user experiences through innovative solutions.</p>
-                        <p>Specializing in SwiftUI and Kotlin, I create robust, scalable applications that meet the highest standards of performance and user satisfaction.</p>
-                    </div>
                     <div class="about-image">
-                        <img src="images/profile.jpg" alt="Anton Smedberg">
+                        <img src="images/profile.jpg" alt="Anton Smedberg" class="profile-image">
+                    </div>
+                    <div class="about-text">
+                        <p>Hello! I'm Anton, a passionate mobile app developer specializing in SwiftUI and Kotlin. With years of experience in crafting intuitive and powerful applications, I bring ideas to life through clean code and stunning design.</p>
+                        <p>My journey in tech has led me to work on diverse projects, from startup MVPs to enterprise-level applications. I'm constantly learning and adapting to new technologies to stay at the forefront of mobile development.</p>
+                        <a href="#contact" class="btn-secondary">Let's Connect</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="skills">
+            <div class="container">
+                <h2 class="section-title">My Skills</h2>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <i class="fab fa-swift"></i>
+                        <h3>SwiftUI</h3>
+                        <div class="skill-level" data-level="90"></div>
+                    </div>
+                    <div class="skill-card">
+                        <i class="fab fa-android"></i>
+                        <h3>Kotlin</h3>
+                        <div class="skill-level" data-level="85"></div>
+                    </div>
+                    <div class="skill-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>iOS Development</h3>
+                        <div class="skill-level" data-level="95"></div>
+                    </div>
+                    <div class="skill-card">
+                        <i class="fas fa-code"></i>
+                        <h3>Clean Architecture</h3>
+                        <div class="skill-level" data-level="80"></div>
                     </div>
                 </div>
             </div>
@@ -297,38 +80,50 @@
 
         <section id="projects" class="projects">
             <div class="container">
-                <h2>My Projects</h2>
+                <h2 class="section-title">Featured Projects</h2>
                 <div class="project-grid">
                     <div class="project-card">
                         <div class="project-image" style="background-image: url('images/project1.jpg');"></div>
                         <div class="project-info">
                             <h3>MapSwe</h3>
-                            <p>An Android app built with Kotlin for location-based services.</p>
-                            <a href="#" class="btn">Learn More</a>
+                            <p>A location-based Android app built with Kotlin, featuring real-time updates and custom map overlays.</p>
+                            <a href="#" class="btn-tertiary">View Project</a>
                         </div>
                     </div>
-                    <!-- Add more project cards here -->
+                    <div class="project-card">
+                        <div class="project-image" style="background-image: url('images/project2.jpg');"></div>
+                        <div class="project-info">
+                            <h3>SwiftTask</h3>
+                            <p>An iOS task management app built with SwiftUI, incorporating CoreData and CloudKit for seamless sync.</p>
+                            <a href="#" class="btn-tertiary">View Project</a>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image" style="background-image: url('images/project3.jpg');"></div>
+                        <div class="project-info">
+                            <h3>FitTrack</h3>
+                            <p>A cross-platform fitness tracking app developed using Kotlin Multiplatform, with HealthKit and Google Fit integration.</p>
+                            <a href="#" class="btn-tertiary">View Project</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section id="contact" class="contact">
             <div class="container">
-                <h2>Get In Touch</h2>
+                <h2 class="section-title">Get In Touch</h2>
                 <form class="contact-form" action="https://formspree.io/f/mwkdaygj" method="POST">
                     <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
+                        <input type="text" id="name" name="name" required placeholder="Your Name">
                     </div>
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
+                        <input type="email" id="email" name="email" required placeholder="Your Email">
                     </div>
                     <div class="form-group">
-                        <label for="message">Message</label>
-                        <textarea id="message" name="message" required></textarea>
+                        <textarea id="message" name="message" required placeholder="Your Message"></textarea>
                     </div>
-                    <button type="submit" class="btn">Send Message</button>
+                    <button type="submit" class="btn-primary">Send Message</button>
                 </form>
             </div>
         </section>
@@ -340,33 +135,11 @@
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/anton-smedberg" target="_blank"><i class="fab fa-linkedin"></i></a>
                 <a href="https://github.com/antonsmedberg" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
             </div>
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const header = document.querySelector('header');
-            const scrollThreshold = 100;
-
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > scrollThreshold) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
-                }
-            });
-
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            });
-        });
-    </script>
+    <script src="js/main.js"></script>
 </body>
 </html>
