@@ -1,13 +1,13 @@
 /* Reset and Base Styles */
 :root {
-    --primary-color: #6c5ce7;
-    --secondary-color: #00cec9;
-    --accent-color: #fd79a8;
-    --bg-dark: #2d3436;
-    --bg-light: #f9f9f9;
+    --primary-color: #4b7bec; /* Soft blue */
+    --secondary-color: #20bf6b; /* Green */
+    --accent-color: #eb3b5a; /* Soft red */
+    --bg-dark: #1e272e; /* Darker background */
+    --bg-light: #f5f6fa; /* Softer light background */
     --text-light: #ffffff;
     --text-dark: #2d3436;
-    --transition: all 0.3s ease;
+    --transition: all 0.4s ease;
 }
 
 * {
@@ -18,15 +18,15 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    line-height: 1.6;
+    line-height: 1.8;
     color: var(--text-dark);
     background-color: var(--bg-light);
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1140px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 15px;
 }
 
 /* Typography */
@@ -35,32 +35,32 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     text-align: center;
     margin-bottom: 50px;
-    position: relative;
     color: var(--primary-color);
+    position: relative;
 }
 
 .section-title::after {
     content: '';
     display: block;
-    width: 50px;
-    height: 3px;
+    width: 80px;
+    height: 4px;
     background-color: var(--accent-color);
-    margin: 10px auto 0;
+    margin: 15px auto 0;
 }
 
 /* Floating Header and Navigation */
 .floating-header {
-    background-color: rgba(45, 52, 54, 0.9);
+    background-color: rgba(30, 39, 46, 0.95);
     color: var(--text-light);
-    padding: 15px 0;
+    padding: 12px 0;
     position: fixed;
     width: 100%;
     z-index: 1000;
     transition: var(--transition);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .floating-header nav {
@@ -70,11 +70,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .logo {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: var(--secondary-color);
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
 }
 
 .nav-links {
@@ -83,7 +83,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-links li {
-    margin-left: 30px;
+    margin-left: 20px;
 }
 
 .nav-links a {
@@ -127,21 +127,21 @@ h1, h2, h3, h4, h5, h6 {
     height: 100vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(rgba(45, 52, 54, 0.8), rgba(45, 52, 54, 0.8)), url('../images/hero-bg.jpg') no-repeat center center/cover;
+    background: linear-gradient(rgba(30, 39, 46, 0.85), rgba(30, 39, 46, 0.85)), url('../images/hero-bg.jpg') no-repeat center center/cover;
     color: var(--text-light);
     text-align: center;
 }
 
 .hero h1 {
-    font-size: 4.5rem;
+    font-size: 4rem;
     margin-bottom: 20px;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
 }
 
 .hero .subtitle {
-    font-size: 1.8rem;
-    margin-bottom: 30px;
+    font-size: 1.5rem;
+    margin-bottom: 25px;
     font-weight: 300;
 }
 
@@ -149,7 +149,7 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-block;
     background-color: var(--primary-color);
     color: var(--text-light);
-    padding: 15px 40px;
+    padding: 12px 30px;
     text-decoration: none;
     border-radius: 50px;
     font-weight: 600;
@@ -160,13 +160,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .cta-button:hover {
     background-color: var(--secondary-color);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(75, 123, 236, 0.5);
 }
 
 /* About Section */
 .about {
-    padding: 120px 0;
+    padding: 100px 0;
     background-color: var(--bg-light);
 }
 
@@ -174,17 +174,18 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .about-image {
     flex: 1;
-    margin-right: 50px;
+    margin-right: 40px;
 }
 
 .profile-image {
     max-width: 100%;
     border-radius: 15px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
     transition: var(--transition);
 }
 
@@ -194,12 +195,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .about-text {
     flex: 2;
+    max-width: 600px;
 }
 
 .about-text p {
-    margin-bottom: 25px;
-    font-size: 1.1rem;
+    margin-bottom: 20px;
+    font-size: 1rem;
     line-height: 1.8;
+    color: var(--text-dark);
 }
 
 .btn-secondary {
@@ -207,7 +210,7 @@ h1, h2, h3, h4, h5, h6 {
     background-color: transparent;
     color: var(--primary-color);
     border: 2px solid var(--primary-color);
-    padding: 12px 30px;
+    padding: 10px 25px;
     text-decoration: none;
     border-radius: 50px;
     font-weight: 600;
@@ -219,13 +222,13 @@ h1, h2, h3, h4, h5, h6 {
 .btn-secondary:hover {
     background-color: var(--primary-color);
     color: var(--text-light);
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(75, 123, 236, 0.3);
 }
 
 /* Skills Section */
 .skills {
-    padding: 120px 0;
+    padding: 100px 0;
     background-color: var(--bg-dark);
     color: var(--text-light);
 }
@@ -233,12 +236,12 @@ h1, h2, h3, h4, h5, h6 {
 .skills-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
+    gap: 30px;
 }
 
 .skill-card {
     background-color: rgba(255, 255, 255, 0.1);
-    padding: 40px;
+    padding: 30px;
     border-radius: 15px;
     text-align: center;
     transition: var(--transition);
@@ -246,19 +249,19 @@ h1, h2, h3, h4, h5, h6 {
 
 .skill-card:hover {
     transform: translateY(-10px);
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .skill-card i {
-    font-size: 4rem;
+    font-size: 3.5rem;
     color: var(--secondary-color);
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .skill-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
 }
 
 .skill-level {
@@ -280,14 +283,14 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Projects Section */
 .projects {
-    padding: 120px 0;
+    padding: 100px 0;
     background-color: var(--bg-light);
 }
 
 .project-filters {
     display: flex;
     justify-content: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .filter-btn {
@@ -296,8 +299,8 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-dark);
     font-size: 1rem;
     font-weight: 600;
-    margin: 0 15px;
-    padding: 10px 20px;
+    margin: 0 10px;
+    padding: 8px 20px;
     cursor: pointer;
     transition: var(--transition);
     position: relative;
@@ -323,7 +326,7 @@ h1, h2, h3, h4, h5, h6 {
 .project-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 40px;
+    gap: 30px;
 }
 
 .project-card {
@@ -351,16 +354,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .project-info {
-    padding: 30px;
+    padding: 25px;
 }
 
 .project-info h3 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
 }
 
 .project-info p {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     color: #666;
 }
 
@@ -390,7 +393,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Contact Section */
 .contact {
-    padding: 120px 0;
+    padding: 100px 0;
     background-color: var(--bg-dark);
     color: var(--text-light);
 }
@@ -401,7 +404,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .form-group input,
@@ -420,7 +423,7 @@ h1, h2, h3, h4, h5, h6 {
 .form-group textarea:focus {
     outline: none;
     background-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+    box-shadow: 0 0 10px rgba(75, 123, 236, 0.5);
 }
 
 .form-group textarea {
@@ -432,7 +435,7 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-block;
     background-color: var(--primary-color);
     color: var(--text-light);
-    padding: 15px 40px;
+    padding: 12px 30px;
     border: none;
     border-radius: 50px;
     font-size: 1rem;
@@ -445,13 +448,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-primary:hover {
     background-color: var(--secondary-color);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 206, 201, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(32, 191, 107, 0.5);
 }
 
 /* Footer */
 footer {
-    background-color: #222;
+    background-color: #1e272e;
     color: var(--text-light);
     text-align: center;
     padding: 40px 0;
@@ -464,13 +467,13 @@ footer {
 .social-links a {
     color: var(--text-light);
     font-size: 1.5rem;
-    margin: 0 15px;
+    margin: 0 10px;
     transition: var(--transition);
 }
 
 .social-links a:hover {
     color: var(--secondary-color);
-    transform: translateY(-3px);
+    transform: translateY(-5px);
 }
 
 /* Responsive Design */
