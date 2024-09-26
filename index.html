@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anton Smedberg - Mobile App Developer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
-    <header>
+    <header class="floating-header">
         <nav class="container">
             <div class="logo">AS</div>
+            <div class="hamburger-menu">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
@@ -19,9 +25,6 @@
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
-            <div class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </div>
         </nav>
     </header>
 
@@ -81,25 +84,31 @@
         <section id="projects" class="projects">
             <div class="container">
                 <h2 class="section-title">Featured Projects</h2>
+                <div class="project-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="android">Android</button>
+                    <button class="filter-btn" data-filter="ios">iOS</button>
+                    <button class="filter-btn" data-filter="cross-platform">Cross-Platform</button>
+                </div>
                 <div class="project-grid">
-                    <div class="project-card">
-                        <div class="project-image" style="background-image: url('images/project1.jpg');"></div>
+                    <div class="project-card android" data-src="images/project1.jpg">
+                        <div class="project-image"></div>
                         <div class="project-info">
                             <h3>MapSwe</h3>
                             <p>A location-based Android app built with Kotlin, featuring real-time updates and custom map overlays.</p>
                             <a href="#" class="btn-tertiary">View Project</a>
                         </div>
                     </div>
-                    <div class="project-card">
-                        <div class="project-image" style="background-image: url('images/project2.jpg');"></div>
+                    <div class="project-card ios" data-src="images/project2.jpg">
+                        <div class="project-image"></div>
                         <div class="project-info">
                             <h3>SwiftTask</h3>
                             <p>An iOS task management app built with SwiftUI, incorporating CoreData and CloudKit for seamless sync.</p>
                             <a href="#" class="btn-tertiary">View Project</a>
                         </div>
                     </div>
-                    <div class="project-card">
-                        <div class="project-image" style="background-image: url('images/project3.jpg');"></div>
+                    <div class="project-card cross-platform" data-src="images/project3.jpg">
+                        <div class="project-image"></div>
                         <div class="project-info">
                             <h3>FitTrack</h3>
                             <p>A cross-platform fitness tracking app developed using Kotlin Multiplatform, with HealthKit and Google Fit integration.</p>
@@ -131,7 +140,7 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2023 Anton Smedberg. All Rights Reserved.</p>
+            <p>&copy; 2024 Anton Smedberg. All Rights Reserved.</p>
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/anton-smedberg" target="_blank"><i class="fab fa-linkedin"></i></a>
                 <a href="https://github.com/antonsmedberg" target="_blank"><i class="fab fa-github"></i></a>
