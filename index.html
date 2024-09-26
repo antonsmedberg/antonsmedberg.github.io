@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
+    <!-- Header -->
     <header class="floating-header">
         <nav class="container">
             <div class="logo">AS</div>
@@ -28,7 +29,9 @@
         </nav>
     </header>
 
+    <!-- Main Content -->
     <main>
+        <!-- Hero Section -->
         <section id="home" class="hero">
             <div class="container">
                 <h1 class="glitch" data-text="Anton Smedberg">Anton Smedberg</h1>
@@ -37,12 +40,13 @@
             </div>
         </section>
 
+        <!-- About Section -->
         <section id="about" class="about">
             <div class="container">
                 <h2 class="section-title">About Me</h2>
                 <div class="about-content">
                     <div class="about-image">
-                        <img src="images/profile.jpg" alt="Anton Smedberg" class="profile-image">
+                        <img src="https://picsum.photos/400/400?random=1" alt="Anton Smedberg" class="profile-image">
                     </div>
                     <div class="about-text">
                         <p>Hello! I'm Anton, a passionate mobile app developer specializing in SwiftUI and Kotlin. With years of experience in crafting intuitive and powerful applications, I bring ideas to life through clean code and stunning design.</p>
@@ -53,6 +57,7 @@
             </div>
         </section>
 
+        <!-- Skills Section -->
         <section id="skills" class="skills">
             <div class="container">
                 <h2 class="section-title">My Skills</h2>
@@ -81,6 +86,7 @@
             </div>
         </section>
 
+        <!-- Projects Section -->
         <section id="projects" class="projects">
             <div class="container">
                 <h2 class="section-title">Featured Projects</h2>
@@ -91,27 +97,30 @@
                     <button class="filter-btn" data-filter="cross-platform">Cross-Platform</button>
                 </div>
                 <div class="project-grid">
-                <div class="project-card android">
-                    <div class="project-image">
-                        <img src="https://picsum.photos/300/200?random=1" alt="Project image">
+                    <div class="project-card android">
+                        <div class="project-image">
+                            <img src="https://picsum.photos/300/200?random=2" alt="MapSwe project image">
+                        </div>
+                        <div class="project-info">
+                            <h3>MapSwe</h3>
+                            <p>A location-based Android app built with Kotlin, featuring real-time updates and custom map overlays.</p>
+                            <a href="#" class="btn-tertiary">View Project</a>
+                        </div>
                     </div>
-                    <div class="project-info">
-                        <h3>MapSwe</h3>
-                        <p>A location-based Android app built with Kotlin, featuring real-time updates and custom map overlays.</p>
-                        <a href="#" class="btn-tertiary">View Project</a>
-                    </div>
-                </div>
-
-                    <div class="project-card ios" data-src="images/project2.jpg">
-                        <div class="project-image"></div>
+                    <div class="project-card ios">
+                        <div class="project-image">
+                            <img src="https://picsum.photos/300/200?random=3" alt="SwiftTask project image">
+                        </div>
                         <div class="project-info">
                             <h3>SwiftTask</h3>
                             <p>An iOS task management app built with SwiftUI, incorporating CoreData and CloudKit for seamless sync.</p>
                             <a href="#" class="btn-tertiary">View Project</a>
                         </div>
                     </div>
-                    <div class="project-card cross-platform" data-src="images/project3.jpg">
-                        <div class="project-image"></div>
+                    <div class="project-card cross-platform">
+                        <div class="project-image">
+                            <img src="https://picsum.photos/300/200?random=4" alt="FitTrack project image">
+                        </div>
                         <div class="project-info">
                             <h3>FitTrack</h3>
                             <p>A cross-platform fitness tracking app developed using Kotlin Multiplatform, with HealthKit and Google Fit integration.</p>
@@ -122,6 +131,7 @@
             </div>
         </section>
 
+        <!-- Contact Section -->
         <section id="contact" class="contact">
             <div class="container">
                 <h2 class="section-title">Get In Touch</h2>
@@ -141,6 +151,7 @@
         </section>
     </main>
 
+    <!-- Footer -->
     <footer>
         <div class="container">
             <p>&copy; 2024 Anton Smedberg. All Rights Reserved.</p>
