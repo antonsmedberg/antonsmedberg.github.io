@@ -1,5 +1,3 @@
-// main.js
-
 document.addEventListener('DOMContentLoaded', () => {
     // Navbar scroll effect
     const header = document.querySelector('header');
@@ -14,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Mobile menu toggle
-    const menuToggle = document.querySelector('.menu-toggle');
+    const menuToggle = document.querySelector('.hamburger-menu');
     const navLinks = document.querySelector('.nav-links');
 
     menuToggle.addEventListener('click', () => {
@@ -153,5 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     projectImages.forEach(img => {
         imageObserver.observe(img);
+    });
+
+    // Parallax scrolling effect
+    window.addEventListener('scroll', function() {
+        const parallaxSections = document.querySelectorAll('.parallax');
+        parallaxSections.forEach(section => {
+            let speed = section.getAttribute('data-speed');
+            let yPos = -(window.scrollY * speed);
+            section.style.backgroundPosition = `center ${yPos}px`;
+        });
     });
 });
