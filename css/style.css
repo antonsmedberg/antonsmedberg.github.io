@@ -5,6 +5,18 @@
   --dark: #1f2937;
   --light: #f3f4f6;
   --transition: all 0.3s ease;
+  
+  /* Light Mode Colors */
+  --bg-primary: #ffffff;
+  --text-primary: #1f2937;
+  --bg-secondary: #f3f4f6;
+}
+
+/* Dark Mode Colors */
+.dark-mode {
+  --bg-primary: #121212;
+  --text-primary: #e0e0e0;
+  --bg-secondary: #1e1e1e;
 }
 
 * {
@@ -21,13 +33,63 @@ html {
 body {
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
-  color: var(--dark);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+}
+
+/* Enhanced Responsive Design */
+@media screen and (max-width: 1200px) {
+  .container {
+    max-width: 95%;
+    padding: 0 1rem;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  /* Adjust layout for tablets */
+  .about-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .about-image {
+    margin: 2rem auto;
+    max-width: 400px;
+  }
+
+  .skills-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@media screen and (max-width: 768px) {
+  /* Mobile-specific adjustments */
+  .hero-cta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
 }
 
 /* Header and Navigation */
@@ -73,7 +135,7 @@ body {
 }
 
 .nav-link {
-  color: var(--dark);
+  color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
@@ -103,7 +165,54 @@ body {
   border: none;
   cursor: pointer;
   font-size: 1.5rem;
-  color: var(--dark);
+  color: var(--text-primary);
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1100;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: transform 0.3s;
+}
+
+.theme-toggle:hover {
+  transform: rotate(180deg);
+}
+
+/* Responsive Navigation */
+@media screen and (max-width: 768px) {
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-primary);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+    z-index: 1100;
+  }
+
+  .nav-link {
+    font-size: 1.5rem;
+    margin: 1rem 0;
+  }
 }
 
 /* Hero Section */
@@ -178,13 +287,21 @@ body {
 /* Sections */
 .section {
   padding: 6rem 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.section.in-view {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .section-title {
   font-size: 2.5rem;
   text-align: center;
   margin-bottom: 3rem;
-  color: var(--dark);
+  color: var(--text-primary);
   position: relative;
 }
 
@@ -201,7 +318,7 @@ body {
 }
 
 .bg-light {
-  background: var(--light);
+  background: var(--bg-secondary);
 }
 
 /* About Section */
@@ -316,16 +433,15 @@ body {
 }
 
 .project-card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: var(--transition);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .project-image {
@@ -416,7 +532,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--dark);
+  color: var(--text-primary);
   text-decoration: none;
   margin-bottom: 1rem;
   transition: var(--transition);
@@ -429,15 +545,24 @@ body {
 .contact-form {
   display: grid;
   gap: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 1rem;
-  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  border: 1px solid var(--text-primary);
   border-radius: 0.5rem;
-  transition: var(--transition);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.3s;
 }
 
 .form-group input:focus,
@@ -487,6 +612,32 @@ body {
   }
 }
 
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Typography */
+@media screen and (max-width: 480px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+}
+
 /* Media Queries */
 @media (max-width: 768px) {
   .menu-toggle {
@@ -499,7 +650,7 @@ body {
     top: 80px;
     left: 0;
     right: 0;
-    background: white;
+    background: var(--bg-primary);
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     flex-direction: column;
@@ -532,34 +683,55 @@ body {
 /* Utilities */
 .notification {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  padding: 1rem 2rem;
+  top: 20px;
+  right: 20px;
+  padding: 1rem;
   border-radius: 0.5rem;
-  background: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  transform: translateY(100%);
+  gap: 0.5rem;
+  z-index: 2000;
   opacity: 0;
-  transition: var(--transition);
-}
-
-.notification.show {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.notification.hide {
-  transform: translateY(100%);
-  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.3s ease;
 }
 
 .notification.success {
-  border-left: 4px solid #10b981;
+  background-color: #4caf50;
+  color: white;
 }
 
 .notification.error {
-  border-left: 4px solid #ef4444;
+  background-color: #f44336;
+  color: white;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.notification.hide {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+/* Progressive Enhancement for Images */
+img {
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.05);
+}
+
+/* Accessibility and Performance Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
