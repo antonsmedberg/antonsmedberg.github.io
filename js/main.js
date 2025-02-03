@@ -166,6 +166,114 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     };
 
+    // Advanced Scroll and Interaction Animations
+    // Parallax Effect
+    const parallaxElements = document.querySelectorAll('.parallax');
+    window.addEventListener('scroll', () => {
+        parallaxElements.forEach(el => {
+            const speed = parseFloat(el.dataset.speed) || 0.5;
+            const yPos = -(window.scrollY * speed);
+            el.style.transform = `translateY(${yPos}px)`;
+        });
+    });
+
+    // Advanced Scroll Reveal
+    const revealElements = document.querySelectorAll('.reveal');
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const delay = el.dataset.delay || 0;
+                const animationType = el.dataset.animation || 'fadeInUp';
+
+                setTimeout(() => {
+                    el.classList.add('animated', animationType);
+                    observer.unobserve(el);
+                }, delay);
+            }
+        });
+    }, observerOptions);
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // Cursor Interaction
+    const cursor = document.createElement('div');
+    cursor.classList.add('custom-cursor');
+    document.body.appendChild(cursor);
+
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+    });
+
+    const interactiveElements = document.querySelectorAll('a, button, .project-card');
+    interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+    // Skill Visualization
+    const skillObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const bar = entry.target;
+                const level = bar.getAttribute('data-level');
+                bar.style.width = `${level}%`;
+                skillObserver.unobserve(bar);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    skillBars.forEach(bar => skillObserver.observe(bar));
+
+    // Advanced Mobile Menu and Navbar Interactions
+    const navWrapper = select('.nav-wrapper');
+
+    // Smooth Mobile Menu Toggle
+    menuToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.contains('active');
+        
+        menuToggle.classList.toggle('open');
+        navLinks.classList.toggle('active');
+        navWrapper.classList.toggle('menu-open');
+        
+        // Accessibility attributes
+        menuToggle.setAttribute('aria-expanded', !isOpen);
+        
+        // Prevent body scroll when menu is open
+        document.body.style.overflow = isOpen ? 'auto' : 'hidden';
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (event) => {
+        const isClickInsideNav = navWrapper.contains(event.target);
+        const isMenuToggle = menuToggle.contains(event.target);
+        
+        if (!isClickInsideNav && !isMenuToggle && navLinks.classList.contains('active')) {
+            menuToggle.classList.remove('open');
+            navLinks.classList.remove('active');
+            navWrapper.classList.remove('menu-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Navbar Scroll Effects
+    const handleNavbarScroll = () => {
+        const scrollPosition = window.scrollY;
+        const isScrolled = scrollPosition > 50;
+        
+        header.classList.toggle('scrolled', isScrolled);
+    };
+
+    window.addEventListener('scroll', handleNavbarScroll);
+    handleNavbarScroll(); // Initial check
+
     // Initialize
     window.addEventListener('scroll', handleScroll);
     handleScroll(); // Initial check
