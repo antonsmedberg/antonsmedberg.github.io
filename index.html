@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Anton Smedberg - Mobile App Developer specializing in SwiftUI and Kotlin development">
-    <meta name="keywords" content="mobile developer, SwiftUI, Kotlin, iOS, Android, app development">
-    <meta name="author" content="Anton Smedberg">
     
     <title>Anton Smedberg | Mobile App Developer</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     
-    <!-- Preload critical assets -->
+    <!-- Preconnect to domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
@@ -22,18 +20,11 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/animations.css">
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     
-    <!-- Dark mode -->
-    <script>
-        // Check for saved dark mode preference or system preference
-        if (localStorage.getItem('darkMode') === 'true' || 
-            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-    </script>
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="animate-on-load">
     <!-- Loading Screen -->
@@ -42,26 +33,23 @@
     </div>
 
     <!-- Header -->
-    <header class="fixed w-full z-50 transition-all duration-300">
-        <nav class="container mx-auto px-4 py-4">
+    <header class="header">
+        <nav class="container">
             <div class="flex justify-between items-center">
                 <!-- Logo -->
-                <a href="#home" class="logo text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 
-                    bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-                    AS
-                </a>
+                <a href="#home" class="logo">AS</a>
 
                 <!-- Desktop Navigation -->
-                <ul class="nav-links hidden md:flex space-x-8">
+                <ul class="nav-links">
                     <li><a href="#home" class="nav-link active">Home</a></li>
                     <li><a href="#about" class="nav-link">About</a></li>
                     <li class="relative group">
                         <a href="#skills" class="nav-link">Skills</a>
                         <div class="dropdown-content">
-                            <a href="#skills">SwiftUI</a>
-                            <a href="#skills">Kotlin</a>
-                            <a href="#skills">iOS Development</a>
-                            <a href="#skills">Clean Architecture</a>
+                            <a href="#skills" class="nav-link">SwiftUI</a>
+                            <a href="#skills" class="nav-link">Kotlin</a>
+                            <a href="#skills" class="nav-link">iOS Development</a>
+                            <a href="#skills" class="nav-link">Clean Architecture</a>
                         </div>
                     </li>
                     <li><a href="#projects" class="nav-link">Projects</a></li>
@@ -69,13 +57,13 @@
                 </ul>
 
                 <!-- Dark Mode Toggle -->
-                <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <i class="fas fa-moon dark:hidden"></i>
-                    <i class="fas fa-sun hidden dark:block"></i>
+                <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon dark-icon"></i>
+                    <i class="fas fa-sun light-icon"></i>
                 </button>
 
                 <!-- Mobile Menu Button -->
-                <button class="hamburger-menu md:hidden">
+                <button class="hamburger-menu" aria-label="Toggle menu">
                     <span class="bar"></span>
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -85,133 +73,119 @@
     </header>
 
     <!-- Main Content -->
-    <main class="pt-16">
+    <main>
         <!-- Hero Section -->
-        <section id="home" class="hero min-h-screen flex items-center justify-center relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800"></div>
-            <div class="container mx-auto px-4 text-center relative z-10">
-                <div class="animate-fade-in-up">
-                    <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 
-                        bg-clip-text text-transparent">
-                        Anton Smedberg
-                    </h1>
-                    <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-12">
-                        Mobile App Developer | SwiftUI & Kotlin Expert
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="#projects" 
-                            class="btn-primary group">
-                            View My Work
-                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                        </a>
-                        <a href="#contact" 
-                            class="btn-secondary">
-                            Get in Touch
-                        </a>
-                    </div>
+        <section id="home" class="hero section-padding">
+            <div class="container">
+                <h1 class="hero-title">Anton Smedberg</h1>
+                <p class="hero-subtitle">Mobile App Developer | SwiftUI & Kotlin Expert</p>
+                <div class="flex gap-4">
+                    <a href="#projects" class="btn btn-primary">
+                        View My Work
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                    <a href="#contact" class="btn btn-secondary">Get in Touch</a>
                 </div>
-            </div>
-            
-            <!-- Animated background -->
-            <div class="absolute inset-0 opacity-20">
-                <div class="floating-shapes"></div>
             </div>
         </section>
 
         <!-- About Section -->
-        <section id="about" class="about section-padding parallax">
-            <div class="container mx-auto px-4">
+        <section id="about" class="section-padding bg-gray-50">
+            <div class="container">
                 <h2 class="section-title">About Me</h2>
-                <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="grid md:grid-cols-2 gap-12">
                     <div class="space-y-6">
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                            <h3 class="text-xl font-semibold mb-4">Background</h3>
-                            <p class="text-gray-600 dark:text-gray-300">
-                                Hello! I'm Anton, a passionate mobile app developer specializing in SwiftUI and Kotlin. 
-                                With experience in crafting intuitive applications, I bring ideas to life through clean 
-                                code and stunning design.
-                            </p>
+                        <div class="card">
+                            <h3 class="card-title">Background</h3>
+                            <p>Hello! I'm Anton, a passionate mobile app developer specializing in SwiftUI and Kotlin. 
+                            With experience in crafting intuitive applications, I bring ideas to life through clean 
+                            code and stunning design.</p>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                            <h3 class="text-xl font-semibold mb-4">My Approach</h3>
-                            <p class="text-gray-600 dark:text-gray-300">
-                                I believe in writing clean, maintainable code and creating intuitive user experiences. 
-                                Every project is an opportunity to learn and improve.
-                            </p>
+                        <div class="card">
+                            <h3 class="card-title">My Approach</h3>
+                            <p>I believe in writing clean, maintainable code and creating intuitive user experiences. 
+                            Every project is an opportunity to learn and improve.</p>
                         </div>
                     </div>
                     <div class="relative group">
-                        <img src="/api/placeholder/500/500" alt="Profile" 
-                            class="w-full rounded-2xl shadow-lg transform group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-transparent rounded-2xl"></div>
+                        <img src="/api/placeholder/500/500" alt="Profile" class="profile-image">
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Skills Section -->
-        <section id="skills" class="skills section-padding bg-gray-50 dark:bg-gray-900">
-            <div class="container mx-auto px-4">
+        <section id="skills" class="section-padding">
+            <div class="container">
                 <h2 class="section-title">Skills & Expertise</h2>
-                <div class="grid md:grid-cols-2 gap-8">
+                <div class="skills-grid">
                     <div class="skill-card">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="skill-icon">
-                                <i class="fab fa-swift"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h3>SwiftUI</h3>
-                                <div class="skill-level" data-level="90">
-                                    <div class="skill-progress"></div>
-                                </div>
-                            </div>
+                        <div class="skill-icon">
+                            <i class="fab fa-swift"></i>
+                        </div>
+                        <h3>SwiftUI</h3>
+                        <div class="skill-level">
+                            <div class="skill-progress" data-level="90"></div>
                         </div>
                     </div>
-                    <!-- More skill cards... -->
+                    <!-- More skill cards -->
                 </div>
             </div>
         </section>
 
         <!-- Projects Section -->
-        <section id="projects" class="projects section-padding">
-            <div class="container mx-auto px-4">
+        <section id="projects" class="section-padding bg-gray-50">
+            <div class="container">
                 <h2 class="section-title">Featured Projects</h2>
-                <div class="project-filters mb-12 flex justify-center flex-wrap gap-4">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="android">Android</button>
-                    <button class="filter-btn" data-filter="ios">iOS</button>
-                    <button class="filter-btn" data-filter="cross-platform">Cross-Platform</button>
+                <div class="project-filters">
+                    <button class="btn btn-filter active" data-filter="all">All</button>
+                    <button class="btn btn-filter" data-filter="android">Android</button>
+                    <button class="btn btn-filter" data-filter="ios">iOS</button>
+                    <button class="btn btn-filter" data-filter="cross-platform">Cross-Platform</button>
                 </div>
                 <div class="project-grid">
-                    <!-- Project cards will be populated here -->
+                    <div class="project-card" data-category="android">
+                        <div class="project-image">
+                            <img src="/api/placeholder/600/400" alt="MapSwe project">
+                        </div>
+                        <div class="project-info">
+                            <h3>MapSwe</h3>
+                            <p>A location-based Android app built with Kotlin, featuring real-time updates and custom map overlays.</p>
+                            <div class="project-tags">
+                                <span class="project-tag">Kotlin</span>
+                                <span class="project-tag">Android</span>
+                                <span class="project-tag">Maps API</span>
+                            </div>
+                            <a href="#" class="btn btn-link">
+                                View Project
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- More project cards -->
                 </div>
             </div>
         </section>
 
         <!-- Contact Section -->
-        <section id="contact" class="contact section-padding bg-gray-50 dark:bg-gray-900">
-            <div class="container mx-auto px-4">
+        <section id="contact" class="section-padding">
+            <div class="container">
                 <h2 class="section-title">Get In Touch</h2>
                 <div class="max-w-2xl mx-auto">
-                    <form class="contact-form space-y-6">
+                    <form class="contact-form">
                         <div class="form-group">
                             <label for="name" class="sr-only">Your Name</label>
-                            <input type="text" id="name" name="name" required 
-                                class="form-input" placeholder="Your Name">
+                            <input type="text" id="name" name="name" class="form-input" required placeholder="Your Name">
                         </div>
                         <div class="form-group">
                             <label for="email" class="sr-only">Your Email</label>
-                            <input type="email" id="email" name="email" required 
-                                class="form-input" placeholder="Your Email">
+                            <input type="email" id="email" name="email" class="form-input" required placeholder="Your Email">
                         </div>
                         <div class="form-group">
                             <label for="message" class="sr-only">Your Message</label>
-                            <textarea id="message" name="message" required 
-                                class="form-input min-h-[150px]" placeholder="Your Message"></textarea>
+                            <textarea id="message" name="message" class="form-input" required placeholder="Your Message"></textarea>
                         </div>
-                        <button type="submit" class="btn-primary w-full">
-                            Send Message
-                        </button>
+                        <button type="submit" class="btn btn-primary w-full">Send Message</button>
                     </form>
                 </div>
             </div>
@@ -219,36 +193,33 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-300 py-12">
-        <div class="container mx-auto px-4">
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container">
             <div class="grid md:grid-cols-3 gap-8">
                 <div>
-                    <h3 class="text-xl font-semibold mb-4">Anton Smedberg</h3>
+                    <h3 class="text-xl font-bold mb-4">Anton Smedberg</h3>
                     <p class="text-gray-400">Building exceptional mobile experiences</p>
                 </div>
                 <div>
-                    <h3 class="text-xl font-semibold mb-4">Quick Links</h3>
+                    <h3 class="text-xl font-bold mb-4">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="#home" class="hover:text-white transition-colors">Home</a></li>
-                        <li><a href="#about" class="hover:text-white transition-colors">About</a></li>
-                        <li><a href="#projects" class="hover:text-white transition-colors">Projects</a></li>
-                        <li><a href="#contact" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#home" class="footer-link">Home</a></li>
+                        <li><a href="#about" class="footer-link">About</a></li>
+                        <li><a href="#projects" class="footer-link">Projects</a></li>
+                        <li><a href="#contact" class="footer-link">Contact</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-xl font-semibold mb-4">Connect</h3>
-                    <div class="flex space-x-4">
-                        <a href="https://github.com/antonsmedberg" target="_blank" rel="noopener noreferrer"
-                            class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-github text-2xl"></i>
+                    <h3 class="text-xl font-bold mb-4">Connect</h3>
+                    <div class="social-links">
+                        <a href="https://github.com/antonsmedberg" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-github"></i>
                         </a>
-                        <a href="https://linkedin.com/in/anton-smedberg" target="_blank" rel="noopener noreferrer"
-                            class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-linkedin text-2xl"></i>
+                        <a href="https://linkedin.com/in/anton-smedberg" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-linkedin"></i>
                         </a>
-                        <a href="mailto:contact@example.com"
-                            class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fas fa-envelope text-2xl"></i>
+                        <a href="mailto:contact@example.com">
+                            <i class="fas fa-envelope"></i>
                         </a>
                     </div>
                 </div>
@@ -260,8 +231,7 @@
     </footer>
 
     <!-- Scroll to top button -->
-    <button id="scrollToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg 
-        opacity-0 pointer-events-none transition-all hover:bg-blue-700">
+    <button id="scrollToTop" class="scroll-top-btn" aria-label="Scroll to top">
         <i class="fas fa-arrow-up"></i>
     </button>
 
