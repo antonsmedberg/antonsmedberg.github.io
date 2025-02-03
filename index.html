@@ -3,28 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-    <meta name="description" content="Anton Smedberg - Mobile App Developer Portfolio showcasing skills, projects, and expertise in iOS and Android development">
-    <meta name="keywords" content="Mobile App Developer, iOS, Android, SwiftUI, Kotlin, App Development">
-    <meta name="author" content="Anton Smedberg">
+    <meta name="description" content="Anton Smedberg - Mobile App Developer Portfolio">
     
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://yourdomain.com/">
-    <meta property="og:title" content="Anton Smedberg | Mobile App Developer">
-    <meta property="og:description" content="Professional mobile app developer specializing in iOS and Android development">
-    <meta property="og:image" content="path/to/your/social-image.jpg">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://yourdomain.com/">
-    <meta name="twitter:title" content="Anton Smedberg | Mobile App Developer">
-    <meta name="twitter:description" content="Professional mobile app developer specializing in iOS and Android development">
-    <meta name="twitter:image" content="path/to/your/social-image.jpg">
-
     <title>Anton Smedberg | Mobile App Developer</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="path/to/favicon.png">
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,269 +13,217 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        :root {
+            --primary: #ee4b6c;
+            --primary-dark: #d63d5c;
+            --bg-gradient: linear-gradient(to right, #ee4b6c, #ff6b6b);
+            --transition: all 0.3s ease;
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fafafa;
+        }
+
+        /* Floating Navigation */
+        .navbar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem;
+            transition: var(--transition);
+        }
+
+        .navbar-container.scrolled {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-nav a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .navbar-nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 6rem 1rem 4rem;
+            background: linear-gradient(45deg, #fef2f6, #fff5f5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            margin: 0;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: slideUp 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #666;
+            margin: 1rem 0 2rem;
+            animation: slideUp 1s ease 0.2s backwards;
+        }
+
+        /* Sections */
+        .section {
+            padding: 6rem 1rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .navbar-nav {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
 </head>
-<body class="light-mode">
-    <!-- Preloader -->
-    <div id="preloader" class="preloader">
-        <div class="loader">
-            <div class="spinner"></div>
-        </div>
+<body>
+    <!-- Floating Navigation -->
+    <div class="navbar-container">
+        <nav class="navbar">
+            <a href="#" class="navbar-brand">AS</a>
+            <ul class="navbar-nav">
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
     </div>
 
-    <!-- Parallax Background -->
-    <div class="parallax-bg parallax" data-speed="0.3"></div>
-
-    <!-- Theme Toggle Button -->
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-        <i data-feather="moon"></i>
-    </button>
-
-    <!-- Navbar with Premium Floating Design -->
-    <nav class="navbar">
-        <a href="#" class="navbar-brand">AS</a>
-        <ul class="navbar-nav">
-            <li><a href="#about">About</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
-
-    <main id="main-content" role="main">
-        <!-- Hero Section with Advanced Reveal -->
-        <section id="hero" class="hero reveal" data-animation="revealSlideUp" data-delay="200">
-            <div class="container">
-                <h1 id="hero-title" class="hero-title">Anton Smedberg</h1>
-                <p class="hero-subtitle">Mobile App Developer</p>
-                <div class="hero-cta">
-                    <a href="#projects" class="btn btn-primary" aria-label="View Projects">
-                        <i class="fas fa-code"></i>
-                        View Projects
-                    </a>
-                    <a href="#contact" class="btn btn-secondary" aria-label="Contact Me">
-                        <i class="fas fa-envelope"></i>
-                        Contact Me
-                    </a>
-                </div>
-            </div>
-            <div class="hero-shape" aria-hidden="true"></div>
-        </section>
-
-        <!-- About Section with Premium Design -->
-        <section id="about" class="section about-section reveal" data-animation="revealSlideUp">
-            <div class="container">
-                <div class="about-grid">
-                    <div class="about-image">
-                        <div class="image-wrapper">
-                            <img src="path/to/professional-headshot.jpg" alt="Anton Smedberg" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="about-content">
-                        <h2 class="section-title">About Me</h2>
-                        <div class="about-text">
-                            <p>Mobile app developer specializing in iOS and Android development. I create intuitive, elegant digital solutions that transform complex problems into user-friendly experiences.</p>
-                            <p>With a passion for clean code and innovative design, I craft mobile applications that not only meet but exceed user expectations.</p>
-                        </div>
-                        <div class="professional-stats">
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-code"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h3>4+ Years</h3>
-                                    <p>Experience</p>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-project-diagram"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h3>20+</h3>
-                                    <p>Projects</p>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-award"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h3>15+</h3>
-                                    <p>Clients</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Skills Section with Premium Design -->
-        <section id="skills" class="section skills-section reveal" data-animation="revealSlideUp">
-            <div class="container skills-container">
-                <h2 class="section-title">My Skills</h2>
-                <div class="skills-grid">
-                    <div class="skill-category">
-                        <h3>Mobile Development</h3>
-                        <div class="skill-grid">
-                            <div class="skill-item">
-                                <div class="skill-icon">
-                                    <i class="fab fa-swift"></i>
-                                </div>
-                                <div class="skill-details">
-                                    <h4>SwiftUI</h4>
-                                    <div class="skill-bar">
-                                        <div class="skill-progress" data-skill-level="90"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-icon">
-                                    <i class="fab fa-android"></i>
-                                </div>
-                                <div class="skill-details">
-                                    <h4>Kotlin</h4>
-                                    <div class="skill-bar">
-                                        <div class="skill-progress" data-skill-level="85"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="skill-category">
-                        <h3>Tools & Technologies</h3>
-                        <div class="skill-grid">
-                            <div class="skill-item">
-                                <div class="skill-icon">
-                                    <i class="fab fa-git"></i>
-                                </div>
-                                <div class="skill-details">
-                                    <h4>Git & Version Control</h4>
-                                    <div class="skill-bar">
-                                        <div class="skill-progress" data-skill-level="95"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="skill-item">
-                                <div class="skill-icon">
-                                    <i class="fas fa-database"></i>
-                                </div>
-                                <div class="skill-details">
-                                    <h4>Firebase</h4>
-                                    <div class="skill-bar">
-                                        <div class="skill-progress" data-skill-level="80"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Featured Projects Section -->
-        <section id="projects" class="section projects-section reveal" data-animation="revealSlideUp">
-            <div class="container">
-                <h2 class="section-title">Featured Projects</h2>
-                <div class="projects-grid">
-                    <div class="project-card">
-                        <div class="project-image">
-                            <img src="path/to/project1.jpg" alt="Project 1" loading="lazy">
-                        </div>
-                        <div class="project-content">
-                            <h3 class="project-title">SwiftTask Pro</h3>
-                            <p class="project-description">Innovative task management app with cloud synchronization</p>
-                            <div class="project-links">
-                                <a href="#" class="project-link">View Project</a>
-                                <a href="#" class="project-link">GitHub</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Add more project cards as needed -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact -->
-        <section id="contact" class="section bg-light" aria-labelledby="contact-title">
-            <div class="container">
-                <h2 id="contact-title" class="section-title">Get in Touch</h2>
-                <div class="contact-content">
-                    <div class="contact-info">
-                        <h3>Let's talk about your project</h3>
-                        <p>Feel free to reach out if you're looking for a developer, have a question, or just want to connect.</p>
-                        <div class="contact-details">
-                            <a href="mailto:contact@example.com" class="contact-link" aria-label="Email Me">
-                                <i class="fas fa-envelope"></i>
-                                contact@example.com
-                            </a>
-                            <a href="https://github.com/antonsmedberg" class="contact-link" target="_blank" aria-label="Visit my GitHub Profile">
-                                <i class="fab fa-github"></i>
-                                GitHub
-                            </a>
-                            <a href="https://linkedin.com/in/anton-smedberg" class="contact-link" target="_blank" aria-label="Visit my LinkedIn Profile">
-                                <i class="fab fa-linkedin"></i>
-                                LinkedIn
-                            </a>
-                        </div>
-                    </div>
-                    <form class="contact-form" action="#" method="POST">
-                        <div class="form-group">
-                            <input type="text" name="name" placeholder="Your Name" required aria-label="Your Name">
-                        </div>
-                        <div class="form-group">
-                            <input type="email" name="email" placeholder="Your Email" required aria-label="Your Email">
-                        </div>
-                        <div class="form-group">
-                            <textarea name="message" placeholder="Your Message" required aria-label="Your Message"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" aria-label="Send Message">
-                            <i class="fas fa-paper-plane"></i>
-                            Send Message
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer with Professional Design -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-text">
-                    <p>Crafting elegant mobile experiences that solve real-world problems. Always learning, always innovating.</p>
-                </div>
-                
-                <div class="footer-social">
-                    <a href="https://linkedin.com/in/yourusername" target="_blank" aria-label="LinkedIn">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                    <a href="https://github.com/yourusername" target="_blank" aria-label="GitHub">
-                        <i class="fab fa-github"></i>
-                    </a>
-                    <a href="https://twitter.com/yourusername" target="_blank" aria-label="Twitter">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="mailto:your.email@example.com" aria-label="Email">
-                        <i class="fas fa-envelope"></i>
-                    </a>
-                </div>
-                
-                <div class="footer-copyright">
-                    2024 Anton Smedberg. All rights reserved.
-                </div>
-            </div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Anton Smedberg</h1>
+            <p class="hero-subtitle">Mobile App Developer</p>
+            <!-- Add your hero content here -->
         </div>
-    </footer>
+    </section>
 
-    <!-- Performance and Interaction Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollTrigger/1.0.6/ScrollTrigger.min.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Rest of your sections -->
+    
+    <script>
+        // Navbar Scroll Effect
+        const navbarContainer = document.querySelector('.navbar-container');
+        const navbar = document.querySelector('.navbar');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbarContainer.classList.add('scrolled');
+                navbar.style.transform = 'scale(0.98)';
+            } else {
+                navbarContainer.classList.remove('scrolled');
+                navbar.style.transform = 'scale(1)';
+            }
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
