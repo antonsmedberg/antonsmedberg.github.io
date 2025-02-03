@@ -2,10 +2,29 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Anton Smedberg - Mobile App Developer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="Anton Smedberg - Mobile App Developer Portfolio showcasing skills, projects, and expertise in iOS and Android development">
+    <meta name="keywords" content="Mobile App Developer, iOS, Android, SwiftUI, Kotlin, App Development">
+    <meta name="author" content="Anton Smedberg">
     
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:title" content="Anton Smedberg | Mobile App Developer">
+    <meta property="og:description" content="Professional mobile app developer specializing in iOS and Android development">
+    <meta property="og:image" content="path/to/your/social-image.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yourdomain.com/">
+    <meta name="twitter:title" content="Anton Smedberg | Mobile App Developer">
+    <meta name="twitter:description" content="Professional mobile app developer specializing in iOS and Android development">
+    <meta name="twitter:image" content="path/to/your/social-image.jpg">
+
     <title>Anton Smedberg | Mobile App Developer</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="path/to/favicon.png">
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,52 +34,62 @@
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 </head>
-<body>
+<body class="light-mode">
+    <!-- Accessibility Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+        <i data-feather="moon"></i>
+    </button>
+
     <!-- Header -->
-    <header class="header">
-        <nav class="nav-container">
-            <a href="#" class="logo">
+    <header class="header" role="banner">
+        <nav class="nav-container" aria-label="Main Navigation">
+            <a href="#" class="logo" aria-label="Home">
                 <span>AS</span>
             </a>
             
-            <ul class="nav-links">
-                <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#skills" class="nav-link">Skills</a></li>
-                <li><a href="#projects" class="nav-link">Projects</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
+            <ul class="nav-links" role="menu">
+                <li role="none"><a href="#about" class="nav-link" role="menuitem">About</a></li>
+                <li role="none"><a href="#skills" class="nav-link" role="menuitem">Skills</a></li>
+                <li role="none"><a href="#projects" class="nav-link" role="menuitem">Projects</a></li>
+                <li role="none"><a href="#contact" class="nav-link" role="menuitem">Contact</a></li>
             </ul>
 
-            <button class="menu-toggle" aria-label="Toggle menu">
+            <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
                 <i class="fas fa-bars"></i>
             </button>
         </nav>
     </header>
 
-    <main>
+    <main id="main-content" role="main">
         <!-- Hero -->
-        <section id="hero" class="hero">
+        <section id="hero" class="hero" aria-labelledby="hero-title">
             <div class="container">
-                <h1 class="hero-title">Anton Smedberg</h1>
+                <h1 id="hero-title" class="hero-title">Anton Smedberg</h1>
                 <p class="hero-subtitle">Mobile App Developer</p>
                 <div class="hero-cta">
-                    <a href="#projects" class="btn btn-primary">
+                    <a href="#projects" class="btn btn-primary" aria-label="View Projects">
                         <i class="fas fa-code"></i>
                         View Projects
                     </a>
-                    <a href="#contact" class="btn btn-secondary">
+                    <a href="#contact" class="btn btn-secondary" aria-label="Contact Me">
                         <i class="fas fa-envelope"></i>
                         Contact Me
                     </a>
                 </div>
             </div>
-            <div class="hero-shape"></div>
+            <div class="hero-shape" aria-hidden="true"></div>
         </section>
 
         <!-- About -->
-        <section id="about" class="section">
+        <section id="about" class="section" aria-labelledby="about-title">
             <div class="container">
-                <h2 class="section-title">About Me</h2>
+                <h2 id="about-title" class="section-title">About Me</h2>
                 <div class="about-content">
                     <div class="about-text">
                         <p>Mobile app developer specializing in SwiftUI and Kotlin development. Building elegant, user-friendly applications with clean code and modern design principles.</p>
@@ -83,16 +112,16 @@
                         </div>
                     </div>
                     <div class="about-image">
-                        <img src="/api/placeholder/400/400" alt="Anton Smedberg">
+                        <img src="/api/placeholder/400/400" alt="Anton Smedberg" loading="lazy">
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Skills -->
-        <section id="skills" class="section bg-light">
+        <section id="skills" class="section bg-light" aria-labelledby="skills-title">
             <div class="container">
-                <h2 class="section-title">Skills</h2>
+                <h2 id="skills-title" class="section-title">Skills</h2>
                 <div class="skills-grid">
                     <div class="skill-card">
                         <div class="skill-icon">
@@ -129,20 +158,20 @@
         </section>
 
         <!-- Projects -->
-        <section id="projects" class="section">
+        <section id="projects" class="section" aria-labelledby="projects-title">
             <div class="container">
-                <h2 class="section-title">Featured Projects</h2>
+                <h2 id="projects-title" class="section-title">Featured Projects</h2>
                 <div class="projects-grid">
                     <!-- Project Card -->
                     <article class="project-card">
                         <div class="project-image">
-                            <img src="/api/placeholder/600/400" alt="SwiftTask Pro">
+                            <img src="/api/placeholder/600/400" alt="SwiftTask Pro" loading="lazy">
                             <div class="project-overlay">
                                 <div class="project-links">
-                                    <a href="#" class="project-link">
+                                    <a href="#" class="project-link" aria-label="View Project">
                                         <i class="fas fa-link"></i>
                                     </a>
-                                    <a href="#" class="project-link">
+                                    <a href="#" class="project-link" aria-label="View on GitHub">
                                         <i class="fab fa-github"></i>
                                     </a>
                                 </div>
@@ -165,23 +194,23 @@
         </section>
 
         <!-- Contact -->
-        <section id="contact" class="section bg-light">
+        <section id="contact" class="section bg-light" aria-labelledby="contact-title">
             <div class="container">
-                <h2 class="section-title">Get in Touch</h2>
+                <h2 id="contact-title" class="section-title">Get in Touch</h2>
                 <div class="contact-content">
                     <div class="contact-info">
                         <h3>Let's talk about your project</h3>
                         <p>Feel free to reach out if you're looking for a developer, have a question, or just want to connect.</p>
                         <div class="contact-details">
-                            <a href="mailto:contact@example.com" class="contact-link">
+                            <a href="mailto:contact@example.com" class="contact-link" aria-label="Email Me">
                                 <i class="fas fa-envelope"></i>
                                 contact@example.com
                             </a>
-                            <a href="https://github.com/antonsmedberg" class="contact-link" target="_blank">
+                            <a href="https://github.com/antonsmedberg" class="contact-link" target="_blank" aria-label="Visit my GitHub Profile">
                                 <i class="fab fa-github"></i>
                                 GitHub
                             </a>
-                            <a href="https://linkedin.com/in/anton-smedberg" class="contact-link" target="_blank">
+                            <a href="https://linkedin.com/in/anton-smedberg" class="contact-link" target="_blank" aria-label="Visit my LinkedIn Profile">
                                 <i class="fab fa-linkedin"></i>
                                 LinkedIn
                             </a>
@@ -189,15 +218,15 @@
                     </div>
                     <form class="contact-form" action="#" method="POST">
                         <div class="form-group">
-                            <input type="text" name="name" placeholder="Your Name" required>
+                            <input type="text" name="name" placeholder="Your Name" required aria-label="Your Name">
                         </div>
                         <div class="form-group">
-                            <input type="email" name="email" placeholder="Your Email" required>
+                            <input type="email" name="email" placeholder="Your Email" required aria-label="Your Email">
                         </div>
                         <div class="form-group">
-                            <textarea name="message" placeholder="Your Message" required></textarea>
+                            <textarea name="message" placeholder="Your Message" required aria-label="Your Message"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" aria-label="Send Message">
                             <i class="fas fa-paper-plane"></i>
                             Send Message
                         </button>
@@ -207,23 +236,14 @@
         </section>
     </main>
 
-    <!-- Footer -->
+    <!-- Footer with current year -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <p>&copy; <span id="year"></span> Anton Smedberg. All rights reserved.</p>
-                <div class="social-links">
-                    <a href="https://github.com/antonsmedberg" target="_blank">
-                        <i class="fab fa-github"></i>
-                    </a>
-                    <a href="https://linkedin.com/in/anton-smedberg" target="_blank">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                </div>
-            </div>
+            <p>&copy; <span id="year">2024</span> Anton Smedberg. All Rights Reserved.</p>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="js/main.js"></script>
 </body>
 </html>
