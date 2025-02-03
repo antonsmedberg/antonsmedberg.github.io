@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = select('.nav-links');
     const sections = selectAll('section');
     const skillBars = selectAll('.skill-progress');
+    const themeToggle = select('#theme-toggle');
 
     // Scroll Handler
     const handleScroll = () => {
@@ -49,6 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 menuToggle.classList.remove('active');
                 document.body.classList.remove('menu-open');
             }
+        });
+    }
+
+    // Theme Toggle
+    if (themeToggle) {
+        const body = document.body;
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Update theme toggle icon
+            const currentIcon = themeToggle.querySelector('svg');
+            currentIcon.setAttribute('data-feather', body.classList.contains('dark-mode') ? 'sun' : 'moon');
+            feather.replace();
         });
     }
 
