@@ -1,232 +1,272 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, Github, Linkedin, Mail, ExternalLink } from 'lucide-react';
-
-const Portfolio = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const navLinks = ['About', 'Skills', 'Projects', 'Contact'];
+// Main Portfolio JavaScript with optimized animations and interactions
+document.addEventListener('DOMContentLoaded', () => {
+  // Utility functions
+  const select = (selector) => document.querySelector(selector);
+  const selectAll = (selector) => document.querySelectorAll(selector);
   
-  const skills = [
-    { name: 'SwiftUI', level: 'Advanced' },
-    { name: 'Kotlin', level: 'Advanced' },
-    { name: 'iOS Development', level: 'Advanced' },
-    { name: 'Clean Architecture', level: 'Intermediate' },
-  ];
+  // Cache DOM elements
+  const elements = {
+    header: select('header'),
+    navLinks: select('.nav-links'),
+    menuToggle: select('.hamburger-menu'),
+    sections: selectAll('section'),
+    skillLevels: selectAll('.skill-level'),
+    projectCards: selectAll('.project-card'),
+    filterButtons: selectAll('.filter-btn'),
+    contactForm: select('.contact-form')
+  };
 
-  const projects = [
-    {
-      title: 'MapSwe',
-      description: 'A location-based Android app built with Kotlin, featuring real-time updates and custom map overlays.',
-      tags: ['Kotlin', 'Android', 'Maps API'],
-      category: 'android'
-    },
-    {
-      title: 'SwiftTask',
-      description: 'An iOS task management app built with SwiftUI, incorporating CoreData and CloudKit for seamless sync.',
-      tags: ['SwiftUI', 'iOS', 'CoreData'],
-      category: 'ios'
-    },
-    {
-      title: 'FitTrack',
-      description: 'A cross-platform fitness tracking app developed using Kotlin Multiplatform, with HealthKit integration.',
-      tags: ['Kotlin', 'iOS', 'Android'],
-      category: 'cross-platform'
+  // Intersection Observer configurations
+  const observerOptions = {
+    threshold: 0.2,
+    rootMargin: '0px'
+  };
+
+  // Animation class names
+  const CLASSES = {
+    active: 'active',
+    scrolled: 'scrolled',
+    visible: 'visible',
+    fadeIn: 'fade-in',
+    slideIn: 'slide-in'
+  };
+
+  // Handle navbar scroll effect
+  const handleScroll = () => {
+    const scrolled = window.scrollY > 20;
+    elements.header.classList.toggle(CLASSES.scrolled, scrolled);
+    
+    // Update active navigation link based on scroll position
+    const currentSection = Array.from(elements.sections).find(section => {
+      const rect = section.getBoundingClientRect();
+      return rect.top <= 100 && rect.bottom >= 100;
+    });
+
+    if (currentSection) {
+      selectAll('.nav-links a').forEach(link => {
+        const isActive = link.getAttribute('href').slice(1) === currentSection.id;
+        link.classList.toggle(CLASSES.active, isActive);
+      });
     }
-  ];
+  };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Floating Navbar */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <span className="text-2xl font-bold text-gray-800">AS</span>
-            
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-8">
-              {navLinks.map((link) => (
-                <a
-                  key={link}
-                  href={`#${link.toLowerCase()}`}
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
+  // Initialize smooth scrolling
+  const initSmoothScroll = () => {
+    selectAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        e.preventDefault();
+        elements.navLinks.classList.remove(CLASSES.active);
+        
+        const target = select(anchor.getAttribute('href'));
+        if (target) {
+          const headerOffset = elements.header.offsetHeight;
+          const elementPosition = target.offsetTop;
+          const offsetPosition = elementPosition - headerOffset;
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden text-gray-600"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  };
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navLinks.map((link) => (
-                <a
-                  key={link}
-                  href={`#${link.toLowerCase()}`}
-                  className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-      </nav>
+  // Handle mobile menu
+  const initMobileMenu = () => {
+    elements.menuToggle.addEventListener('click', () => {
+      elements.navLinks.classList.toggle(CLASSES.active);
+      elements.menuToggle.classList.toggle(CLASSES.active);
+      
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 
+        elements.navLinks.classList.contains(CLASSES.active) ? 'hidden' : '';
+    });
+  };
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">Anton Smedberg</h1>
-          <p className="text-xl text-gray-600 mb-8">Mobile App Developer | SwiftUI & Kotlin Expert</p>
-          <a
-            href="#projects"
-            className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            View My Work
-          </a>
-        </div>
-      </section>
+  // Initialize section animations
+  const initSectionAnimations = () => {
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add(CLASSES.visible);
+          entry.target.classList.add(CLASSES.fadeIn);
+          sectionObserver.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
 
-      {/* About Section */}
-      <section id="about" className="py-20 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">About Me</h2>
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="w-full md:w-1/2">
-              <img
-                src="/api/placeholder/400/400"
-                alt="Profile"
-                className="rounded-lg shadow-lg w-full"
-              />
-            </div>
-            <div className="w-full md:w-1/2 space-y-4">
-              <p className="text-gray-600">
-                Hello! I'm Anton, a passionate mobile app developer specializing in SwiftUI and Kotlin. 
-                With experience in crafting intuitive and powerful applications, I bring ideas to life 
-                through clean code and stunning design.
-              </p>
-              <p className="text-gray-600">
-                My journey in tech has led me to work on diverse projects, from startup MVPs to 
-                enterprise-level applications. I'm constantly learning and adapting to new technologies 
-                to stay at the forefront of mobile development.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    elements.sections.forEach(section => {
+      section.classList.add('transition-opacity', 'duration-1000', 'opacity-0');
+      sectionObserver.observe(section);
+    });
+  };
 
-      {/* Skills Section */}
-      <section id="skills" className="py-20 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Skills</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {skills.map((skill) => (
-              <div
-                key={skill.name}
-                className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{skill.name}</h3>
-                <p className="text-gray-600">{skill.level}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+  // Initialize skill level animations
+  const initSkillAnimations = () => {
+    const skillObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const level = entry.target.getAttribute('data-level');
+          entry.target.style.width = `${level}%`;
+          entry.target.classList.add(CLASSES.visible);
+          skillObserver.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
 
-      {/* Projects Section */}
-      <section id="projects" className="py-20 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Featured Projects</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <div
-                key={project.title}
-                className="bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-              >
-                <img
-                  src="/api/placeholder/300/200"
-                  alt={project.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{project.title}</h3>
-                  <p className="text-gray-600 mb-4">{project.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+    elements.skillLevels.forEach(skill => {
+      skill.style.width = '0%';
+      skillObserver.observe(skill);
+    });
+  };
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Get In Touch</h2>
-          <div className="flex justify-center space-x-8">
-            <a
-              href="https://github.com/antonsmedberg"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <Github size={24} />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/anton-smedberg"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <Linkedin size={24} />
-            </a>
-            <a
-              href="mailto:contact@example.com"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <Mail size={24} />
-            </a>
-          </div>
-        </div>
-      </section>
+  // Project filtering functionality
+  const initProjectFilters = () => {
+    elements.filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.getAttribute('data-filter');
+        
+        elements.filterButtons.forEach(btn => 
+          btn.classList.toggle(CLASSES.active, btn === button));
 
-      {/* Footer */}
-      <footer className="py-8 bg-gray-900 text-gray-400">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p>&copy; {new Date().getFullYear()} Anton Smedberg. All Rights Reserved.</p>
-        </div>
-      </footer>
-    </div>
-  );
-};
+        elements.projectCards.forEach(card => {
+          const shouldShow = filter === 'all' || card.classList.contains(filter);
+          card.style.opacity = '0';
+          
+          setTimeout(() => {
+            card.style.display = shouldShow ? 'block' : 'none';
+            if (shouldShow) {
+              requestAnimationFrame(() => {
+                card.style.opacity = '1';
+              });
+            }
+          }, 300);
+        });
+      });
+    });
+  };
+
+  // Handle contact form submission with validation
+  const initContactForm = () => {
+    elements.contactForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(elements.contactForm);
+      const submitButton = elements.contactForm.querySelector('button[type="submit"]');
+      
+      try {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
+        
+        const response = await fetch(elements.contactForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          elements.contactForm.reset();
+          showNotification('Message sent successfully!', 'success');
+        } else {
+          throw new Error('Failed to send message');
+        }
+      } catch (error) {
+        showNotification('Failed to send message. Please try again.', 'error');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send Message';
+      }
+    });
+  };
+
+  // Show notification
+  const showNotification = (message, type = 'success') => {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.classList.add('fade-out');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  };
+
+  // Initialize parallax effect
+  const initParallax = () => {
+    const parallaxSections = selectAll('.parallax');
+    
+    window.addEventListener('scroll', () => {
+      requestAnimationFrame(() => {
+        parallaxSections.forEach(section => {
+          const speed = 0.5;
+          const rect = section.getBoundingClientRect();
+          const visible = rect.top < window.innerHeight && rect.bottom > 0;
+          
+          if (visible) {
+            const yPos = -(rect.top * speed);
+            section.style.backgroundPositionY = `${yPos}px`;
+          }
+        });
+      });
+    });
+  };
+
+  // Initialize dark mode toggle
+  const initDarkMode = () => {
+    const darkModeToggle = select('#darkModeToggle');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const setDarkMode = (isDark) => {
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('darkMode', isDark);
+    };
+
+    if (darkModeToggle) {
+      const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+      setDarkMode(savedDarkMode ?? prefersDark.matches);
+
+      darkModeToggle.addEventListener('click', () => {
+        setDarkMode(!document.documentElement.classList.contains('dark'));
+      });
+
+      prefersDark.addEventListener('change', (e) => setDarkMode(e.matches));
+    }
+  };
+
+  // Initialize page load animations
+  const initPageLoadAnimations = () => {
+    document.body.classList.add('loaded');
+    
+    const animateElements = selectAll('.animate-on-load');
+    animateElements.forEach((el, index) => {
+      setTimeout(() => {
+        el.classList.add(CLASSES.visible);
+      }, 100 * index);
+    });
+  };
+
+  // Initialize all features
+  const init = () => {
+    window.addEventListener('scroll', handleScroll);
+    initSmoothScroll();
+    initMobileMenu();
+    initSectionAnimations();
+    initSkillAnimations();
+    initProjectFilters();
+    initContactForm();
+    initParallax();
+    initDarkMode();
+    initPageLoadAnimations();
+    
+    // Initial scroll check
+    handleScroll();
+  };
+
+  // Start initialization
+  init();
+});
 
 export default Portfolio;
