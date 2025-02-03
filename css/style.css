@@ -21,6 +21,11 @@
   --navbar-bg: rgba(255, 255, 255, 0.85);
   --navbar-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   --navbar-border-radius: 50px;
+  
+  /* Global Adjustments */
+  --section-padding: 3rem 0;
+  --card-border-radius: 12px;
+  --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 /* Dark Mode Colors */
@@ -393,13 +398,13 @@ body {
 /* Modern About Section Styles */
 .about-section {
     background-color: var(--bg-secondary);
-    padding: 5rem 0;
+    padding: var(--section-padding);
 }
 
 .about-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    gap: 2rem;
     align-items: center;
 }
 
@@ -409,149 +414,126 @@ body {
 
 .image-wrapper {
     position: relative;
-    border-radius: 20px;
+    border-radius: var(--card-border-radius);
     overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.4s ease;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
 }
 
 .image-wrapper:hover {
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
 
 .about-image img {
     width: 100%;
-    height: 100%;
+    height: 300px;
     object-fit: cover;
-    transition: transform 0.4s ease;
-}
-
-.image-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        135deg, 
-        rgba(37, 99, 235, 0.2), 
-        rgba(59, 130, 246, 0.2)
-    );
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.image-wrapper:hover .image-overlay {
-    opacity: 1;
 }
 
 .about-content {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 .about-text p {
     color: var(--text-secondary);
-    line-height: 1.8;
-    margin-bottom: 1rem;
+    line-height: 1.6;
+    font-size: 0.95rem;
 }
 
 .professional-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .stat-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     background-color: white;
-    padding: 1.5rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 1rem;
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
 }
 
 .stat-icon {
-    width: 60px;
-    height: 60px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #eef2ff;
     color: var(--primary);
-    border-radius: 15px;
-    font-size: 1.8rem;
+    border-radius: 10px;
+    font-size: 1.5rem;
 }
 
 .stat-content h3 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: var(--primary);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .stat-content p {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 /* Modern Skills Section Styles */
 .skills-section {
     background-color: var(--bg-primary);
-    padding: 5rem 0;
+    padding: var(--section-padding);
 }
 
 .skills-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 3rem;
+    gap: 2rem;
 }
 
 .skill-category {
     background-color: white;
-    padding: 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-
-.skill-category:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
 }
 
 .skill-category h3 {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     color: var(--primary);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 .skill-grid {
     display: grid;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .skill-item {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .skill-icon {
-    width: 60px;
-    height: 60px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #eef2ff;
     color: var(--primary);
-    border-radius: 15px;
-    font-size: 1.8rem;
+    border-radius: 10px;
+    font-size: 1.5rem;
 }
 
 .skill-details {
@@ -559,12 +541,13 @@ body {
 }
 
 .skill-details h4 {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     color: var(--text-primary);
+    font-size: 0.95rem;
 }
 
 .skill-bar {
-    height: 8px;
+    height: 6px;
     background-color: #e5e7eb;
     border-radius: 10px;
     overflow: hidden;
@@ -577,6 +560,68 @@ body {
     transition: width 1.5s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
+/* Compact Projects Section */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.project-card {
+    background-color: white;
+    border-radius: var(--card-border-radius);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+}
+
+.project-image {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+
+.project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-content {
+    padding: 1rem;
+}
+
+.project-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.project-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.project-links {
+    display: flex;
+    justify-content: space-between;
+}
+
+.project-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.project-link:hover {
+    color: var(--secondary);
+}
+
 /* Responsive Adjustments */
 @media screen and (max-width: 768px) {
     .about-grid,
@@ -586,6 +631,10 @@ body {
 
     .professional-stats {
         grid-template-columns: 1fr;
+    }
+
+    .section {
+        padding: 2rem 0;
     }
 }
 
