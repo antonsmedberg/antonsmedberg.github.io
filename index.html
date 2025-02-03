@@ -112,71 +112,113 @@
             <div class="hero-shape" aria-hidden="true"></div>
         </section>
 
-        <!-- About -->
-        <section id="about" class="section" aria-labelledby="about-title">
+        <!-- About Section with Modern Design -->
+        <section id="about" class="section about-section reveal" data-animation="revealSlideUp">
             <div class="container">
-                <h2 id="about-title" class="section-title">About Me</h2>
-                <div class="about-content">
-                    <div class="about-text">
-                        <p>Mobile app developer specializing in SwiftUI and Kotlin development. Building elegant, user-friendly applications with clean code and modern design principles.</p>
-                        <div class="stats">
-                            <div class="stat">
-                                <i class="fas fa-code"></i>
-                                <span class="stat-number">4+</span>
-                                <span class="stat-label">Years Experience</span>
-                            </div>
-                            <div class="stat">
-                                <i class="fas fa-laptop-code"></i>
-                                <span class="stat-number">20+</span>
-                                <span class="stat-label">Projects</span>
-                            </div>
-                            <div class="stat">
-                                <i class="fas fa-smile"></i>
-                                <span class="stat-number">15+</span>
-                                <span class="stat-label">Happy Clients</span>
-                            </div>
+                <div class="about-grid">
+                    <div class="about-image parallax" data-speed="0.1">
+                        <div class="image-wrapper">
+                            <img src="path/to/professional-headshot.jpg" alt="Anton Smedberg" loading="lazy">
+                            <div class="image-overlay"></div>
                         </div>
                     </div>
-                    <div class="about-image">
-                        <img src="/api/placeholder/400/400" alt="Anton Smedberg" loading="lazy">
+                    <div class="about-content">
+                        <h2 class="section-title">About Me</h2>
+                        <div class="about-text">
+                            <p>I'm a passionate mobile app developer with a keen eye for creating intuitive, elegant digital experiences. Specializing in iOS and Android development, I transform complex problems into simple, user-friendly solutions.</p>
+                            <p>My approach combines technical expertise with design thinking, ensuring that every app I create not only functions flawlessly but also provides an exceptional user experience.</p>
+                        </div>
+                        <div class="professional-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>4+ Years</h3>
+                                    <p>Development Experience</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>20+</h3>
+                                    <p>Completed Projects</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>15+</h3>
+                                    <p>Satisfied Clients</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Skills -->
-        <section id="skills" class="section bg-light" aria-labelledby="skills-title">
+        <!-- Skills Section with Modern, Interactive Design -->
+        <section id="skills" class="section skills-section reveal" data-animation="revealSlideUp">
             <div class="container">
-                <h2 id="skills-title" class="section-title">Skills</h2>
-                <div class="skills-grid">
-                    <div class="skill-card">
-                        <div class="skill-icon">
-                            <i class="fab fa-swift"></i>
-                        </div>
-                        <h3>SwiftUI</h3>
-                        <p>Building modern iOS applications with the latest frameworks</p>
-                        <div class="skill-bar">
-                            <div class="skill-progress" data-level="90"></div>
-                        </div>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">
-                            <i class="fab fa-android"></i>
-                        </div>
-                        <h3>Kotlin</h3>
-                        <p>Developing robust Android applications</p>
-                        <div class="skill-bar">
-                            <div class="skill-progress" data-level="85"></div>
-                        </div>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
+                <h2 class="section-title">My Skills</h2>
+                <div class="skills-container">
+                    <div class="skill-category">
                         <h3>Mobile Development</h3>
-                        <p>Cross-platform expertise and native development</p>
-                        <div class="skill-bar">
-                            <div class="skill-progress" data-level="95"></div>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <div class="skill-icon">
+                                    <i class="fab fa-swift"></i>
+                                </div>
+                                <div class="skill-details">
+                                    <h4>SwiftUI</h4>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" data-skill-level="90"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-icon">
+                                    <i class="fab fa-android"></i>
+                                </div>
+                                <div class="skill-details">
+                                    <h4>Kotlin</h4>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" data-skill-level="85"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Programming & Tools</h3>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <div class="skill-icon">
+                                    <i class="fab fa-git"></i>
+                                </div>
+                                <div class="skill-details">
+                                    <h4>Git & Version Control</h4>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" data-skill-level="95"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="skill-details">
+                                    <h4>Firebase</h4>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" data-skill-level="80"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
