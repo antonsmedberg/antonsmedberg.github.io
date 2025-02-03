@@ -281,4 +281,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update copyright year
     const yearEl = select('#year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // Skill Bar Animation
+    const animateSkillBars = () => {
+        const skillItems = document.querySelectorAll('.skill-progress');
+        
+        skillItems.forEach(skillBar => {
+            const skillLevel = skillBar.getAttribute('data-skill-level');
+            
+            // Create Intersection Observer for each skill bar
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        skillBar.style.width = `${skillLevel}%`;
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            observer.observe(skillBar);
+        });
+    };
+
+    animateSkillBars();
 });
