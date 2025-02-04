@@ -1,5 +1,8 @@
-/* --- Core Variables --- */
+/* ============================
+   Globala variabler & Reset
+=============================== */
 :root {
+  /* Färgvariabler */
   --primary-color: #3B82F6;
   --secondary-color: #6366F1;
   --accent-color: #60A5FA;
@@ -8,29 +11,29 @@
   --bg-dark: #0F172A;
   --bg-light: #F8FAFC;
   --border-light: rgba(255, 255, 255, 0.1);
+  
+  /* Storleksvariabler */
   --max-width: 1280px;
   --navbar-width: min(95%, 1100px);
   --menu-width: min(90vw, 400px);
 }
 
-/* --- Reset & Base Styles --- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* --- Basstil för kropp och global layout --- */
+/* Basstilar för kroppen */
 body {
   font-family: 'Poppins', sans-serif;
   background: var(--bg-dark);
   color: var(--text-light);
-  min-height: 100vh;
   line-height: 1.6;
   text-rendering: optimizeLegibility;
 }
 
-/* Utility-klass för full höjd */
+/* Hjälpklass för full höjd */
 .min-h-screen {
   min-height: 100vh;
 }
@@ -40,14 +43,17 @@ html {
   scroll-behavior: smooth;
 }
 
-/* --- Header & Navigation --- */
-/* Fast header med fast position */
+/* ============================
+   Header & Navigation
+=============================== */
+
+/* Fast header med genomskinlig bakgrund */
 .fixed-header {
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 100;
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
   padding: 1rem 0;
@@ -56,7 +62,7 @@ html {
   transition: transform 0.3s ease;
 }
 
-/* Annonsremsa */
+/* Annonsremsa högst upp */
 .announcement-bar {
   background: var(--secondary-color);
   color: var(--text-light);
@@ -66,7 +72,7 @@ html {
   transition: height 0.3s, opacity 0.3s;
 }
 
-.announcement-bar p {
+.announcement-content p {
   padding: 0.5rem;
   font-size: 0.9rem;
 }
@@ -81,20 +87,19 @@ html {
   padding: 0 2rem;
 }
 
-/* Innehåll i navigationsbaren */
+/* Innehåll i navigationen */
 .nav-content {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-/* Logotyp */
+/* Logotypstilar */
 .logo {
   display: flex;
   align-items: center;
   gap: 0.3rem;
 }
-
 .logo-text {
   font-size: 1.8rem;
   font-weight: 700;
@@ -103,22 +108,23 @@ html {
   color: transparent;
 }
 
-/* Hjälpklass för dölja element */
-.hidden {
-  display: none;
+/* Liten punkt vid logotypen */
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  align-self: center;
 }
 
-/* Sociala länkar i headern */
+/* Sociala länkar med tooltip */
 .social-links a {
   color: var(--text-light);
-  margin-left: 0.5rem;
   position: relative;
   text-decoration: none;
+  margin-left: 0.5rem;
 }
-
 .social-links a .tooltip {
-  visibility: hidden;
-  opacity: 0;
   position: absolute;
   bottom: -1.5rem;
   left: 50%;
@@ -128,11 +134,11 @@ html {
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   font-size: 0.7rem;
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.3s;
 }
-
 .social-links a:hover .tooltip {
-  visibility: visible;
   opacity: 1;
 }
 
@@ -141,6 +147,7 @@ html {
   width: 3rem;
   height: 3rem;
   background: var(--primary-color);
+  border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -148,15 +155,24 @@ html {
   cursor: pointer;
   transition: background 0.3s;
   box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-  border: none;
 }
-
 .menu-button:hover {
   background: var(--secondary-color);
 }
+.menu-button i {
+  font-size: 1.5rem;
+  color: #fff;
+  transition: transform 0.3s;
+}
+.hidden {
+  display: none;
+}
 
-/* --- Menyöverlägg och sidomeny --- */
-/* Menyöverlägg (bakgrund när menyn är öppen) */
+/* ============================
+   Sidomeny & Överlägg
+=============================== */
+
+/* Bakgrundsöverlägg när menyn är aktiv */
 .menu-overlay {
   position: fixed;
   top: 0;
@@ -169,14 +185,12 @@ html {
   transition: opacity 0.3s ease;
   z-index: 95;
 }
-
-/* När aktiv – JS bör toggla .active */
 .menu-overlay.active {
   opacity: 1;
   pointer-events: all;
 }
 
-/* Sidomeny (inaktiverad till höger) */
+/* Sidomeny – glider in från höger */
 .menu-content {
   position: fixed;
   top: 0;
@@ -185,18 +199,17 @@ html {
   height: 100%;
   background: var(--bg-dark);
   color: var(--text-light);
-  padding: 1rem;
+  padding: 1.5rem;
   z-index: 100;
   transition: right 0.3s ease;
   overflow-y: auto;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
 }
-
-/* Aktivt tillstånd för meny */
 .menu-content.active {
   right: 0;
 }
 
-/* Menyhöghuvud */
+/* Menyhuvud */
 .menu-header {
   display: flex;
   justify-content: space-between;
@@ -205,12 +218,10 @@ html {
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
-
 .menu-title {
   font-size: 1.5rem;
   font-weight: 600;
 }
-
 .menu-close {
   background: transparent;
   border: none;
@@ -219,14 +230,18 @@ html {
   cursor: pointer;
 }
 
-/* Grid för menysektioner */
+/* Menysektionsgrid */
 .sections-grid {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-/* Sektion-knappar */
+/* Sektion-knappar och innehåll */
+.section {
+  display: flex;
+  flex-direction: column;
+}
 .section-button {
   width: 100%;
   background: transparent;
@@ -241,23 +256,19 @@ html {
   cursor: pointer;
   transition: background 0.3s;
 }
-
 .section-button:hover {
   background: rgba(255, 255, 255, 0.1);
 }
-
 .section-button span {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-
-/* Ikon för sektion */
 .section-icon {
   font-size: 1.2rem;
 }
 
-/* Innehåll i en sektion (kollapsbart) */
+/* Kollapsbart innehåll för sektionerna */
 .section-content {
   max-height: 0;
   overflow: hidden;
@@ -269,7 +280,6 @@ html {
   border-left: 2px solid var(--primary-color);
   padding-left: 0.5rem;
 }
-
 .section-content button {
   background: transparent;
   border: none;
@@ -279,19 +289,17 @@ html {
   cursor: pointer;
   transition: color 0.3s;
 }
-
 .section-content button:hover {
   color: var(--accent-color);
 }
 
-/* Kontaktsektion i menyn */
+/* Kontaktsektion i sidomenyn */
 .contact-section {
   margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
 .contact-btn,
 .download-btn {
   width: 100%;
@@ -307,13 +315,12 @@ html {
   gap: 0.5rem;
   transition: background 0.3s;
 }
-
 .contact-btn:hover,
 .download-btn:hover {
   background: var(--secondary-color);
 }
 
-/* Footer – sociala länkar i menyn */
+/* Footer-länkar i sidomenyn */
 .social-links-footer {
   margin-top: 2rem;
   display: flex;
@@ -322,7 +329,6 @@ html {
   border-top: 1px solid var(--border-light);
   padding-top: 1rem;
 }
-
 .social-links-footer a {
   color: var(--text-light);
   text-decoration: none;
@@ -331,22 +337,21 @@ html {
   gap: 0.5rem;
   transition: color 0.3s;
 }
-
 .social-links-footer a:hover {
   color: var(--accent-color);
 }
 
-/* --- Huvudinnehåll --- */
-/* Hero-sektion */
+/* ============================
+   Hero-sektion
+=============================== */
 .hero-section {
   position: relative;
   text-align: center;
   padding: 6rem 1rem 4rem;
   max-width: var(--max-width);
   width: 100%;
-  margin-top: 80px; /* Avstånd från fast header */
+  margin-top: 80px; /* Ger utrymme under headern */
 }
-
 .hero-image {
   width: 100%;
   max-height: 500px;
@@ -355,7 +360,6 @@ html {
   filter: brightness(85%);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
-
 .hero-overlay {
   position: absolute;
   top: 0;
@@ -365,7 +369,6 @@ html {
   background: rgba(15, 23, 42, 0.4);
   border-radius: 15px;
 }
-
 .hero-content {
   position: absolute;
   top: 50%;
@@ -374,43 +377,39 @@ html {
   color: var(--text-light);
   padding: 1rem;
 }
-
 .hero-content h2 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
 }
-
 .hero-content p {
   font-size: 1.1rem;
   margin-bottom: 1.5rem;
 }
-
 .cta-button {
   background: var(--primary-color);
-  color: white;
+  color: #fff;
   padding: 1rem 2rem;
   font-size: 1.2rem;
   font-weight: 600;
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.3s;
+  border: none;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border: none;
 }
-
 .cta-button i {
   font-size: 1.2rem;
 }
-
 .cta-button:hover {
   background: var(--secondary-color);
 }
 
-/* --- Projektsektionen --- */
-/* Rutnät för projekt */
+/* ============================
+   Projektsektion
+=============================== */
 .main-projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -419,8 +418,6 @@ html {
   max-width: var(--max-width);
   width: 100%;
 }
-
-/* Projektkort */
 .project-item {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
@@ -428,22 +425,23 @@ html {
   position: relative;
   cursor: pointer;
   transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
 .project-item:hover {
   transform: translateY(-5px);
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
-
-/* Bildbehållare för projekt */
+/* Bild och extern länk */
 .project-image-wrapper {
   position: relative;
   overflow: hidden;
-  border-radius: inherit;
 }
-
-/* Ikon för extern länk */
+.project-image-wrapper img {
+  width: 100%;
+  display: block;
+  transition: transform 0.3s;
+}
 .project-external-link {
   position: absolute;
   top: 10px;
@@ -452,47 +450,40 @@ html {
   padding: 0.5rem;
   border-radius: 50%;
   transition: transform 0.3s;
+  z-index: 2;
 }
-
 .project-external-link i {
-  color: white;
+  color: #fff;
   font-size: 1rem;
 }
-
-/* Överlägg med projektinformation */
+/* Projektinfo överlagring */
 .project-info {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.85);
   color: var(--text-light);
   padding: 1rem;
   transform: translateY(100%);
   transition: transform 0.3s;
 }
-
 .project-item:hover .project-info {
   transform: translateY(0);
 }
-
 .project-info h3 {
   margin-bottom: 0.5rem;
   font-size: 1.2rem;
 }
-
 .project-info p {
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
-
-/* Länkar inom projektinfo */
 .project-links {
   display: flex;
   gap: 1rem;
   margin-top: 0.5rem;
 }
-
 .project-link {
   color: var(--accent-color);
   text-decoration: none;
@@ -502,7 +493,6 @@ html {
   gap: 0.3rem;
   transition: color 0.3s;
 }
-
 .project-link:hover {
   color: var(--secondary-color);
 }
@@ -516,7 +506,6 @@ html {
   animation: ripple-effect 0.6s linear;
   pointer-events: none;
 }
-
 @keyframes ripple-effect {
   to {
     transform: scale(4);
@@ -524,7 +513,10 @@ html {
   }
 }
 
-/* --- Flytande Kontaktknapp --- */
+/* ============================
+   Flytande Kontaktknapp & Modal
+=============================== */
+/* Flytande knapp längst ner till höger */
 .contact-floating-button {
   position: fixed;
   bottom: 2rem;
@@ -541,11 +533,9 @@ html {
   z-index: 110;
   transition: transform 0.3s;
 }
-
 .contact-floating-button:hover {
   transform: scale(1.1);
 }
-
 /* Tooltip för kontaktknappen */
 .contact-floating-button .tooltip {
   position: absolute;
@@ -562,19 +552,18 @@ html {
   pointer-events: none;
   transition: opacity 0.3s;
 }
-
 .contact-floating-button:hover .tooltip {
   opacity: 1;
 }
 
-/* --- Kontaktmodal --- */
+/* Kontaktmodal */
 .contact-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -583,12 +572,10 @@ html {
   transition: opacity 0.3s ease;
   z-index: 120;
 }
-
 .contact-modal.active {
   opacity: 1;
   visibility: visible;
 }
-
 .modal-content {
   position: relative;
   background: var(--bg-light);
@@ -599,7 +586,6 @@ html {
   width: 90%;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
-
 .close-modal {
   position: absolute;
   top: 0.5rem;
@@ -610,25 +596,24 @@ html {
   cursor: pointer;
 }
 
-/* Formulär för kontaktmodal */
+/* Formulärstilar i modal */
 #contact-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: 1rem;
 }
-
-#contact-form input,
-#contact-form textarea {
+#contact-form .form-group input,
+#contact-form .form-group textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
 }
-
 #contact-form button[type="submit"] {
   background: var(--primary-color);
-  color: white;
+  color: #fff;
   padding: 0.75rem;
   border: none;
   border-radius: 4px;
@@ -636,12 +621,13 @@ html {
   cursor: pointer;
   transition: background 0.3s;
 }
-
 #contact-form button[type="submit"]:hover {
   background: var(--secondary-color);
 }
 
-/* --- Responsiva stilar --- */
+/* ============================
+   Responsiva justeringar
+=============================== */
 @media (max-width: 768px) {
   .nav-container {
     flex-direction: column;
