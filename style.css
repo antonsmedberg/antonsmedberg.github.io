@@ -62,6 +62,27 @@ html {
     color: transparent;
 }
 
+.menu-button {
+    width: 3rem;
+    height: 3rem;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.menu-button i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.menu-button:hover {
+    background: var(--secondary-color);
+}
+
 /* Hero Section */
 .hero-section {
     position: relative;
@@ -76,7 +97,8 @@ html {
     max-height: 400px;
     object-fit: cover;
     border-radius: 12px;
-    filter: brightness(80%);
+    filter: brightness(90%);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .hero-content {
@@ -88,7 +110,7 @@ html {
 }
 
 .hero-content h2 {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color: var(--text-light);
 }
@@ -96,12 +118,19 @@ html {
 .cta-button {
     background: var(--primary-color);
     color: white;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cta-button i {
+    font-size: 1.2rem;
 }
 
 .cta-button:hover {
@@ -111,24 +140,31 @@ html {
 /* Projects Grid */
 .main-projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    padding: 2rem 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 3rem 1rem;
     max-width: var(--max-width);
     margin: 0 auto;
 }
 
 .project-item {
     background: rgba(255, 255, 255, 0.05);
-    padding: 1rem;
+    padding: 1.5rem;
     border-radius: 12px;
     text-align: center;
-    transition: transform 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .project-item:hover {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.project-item i {
+    font-size: 2rem;
+    color: var(--accent-color);
 }
 
 /* Contact Button */
@@ -147,60 +183,13 @@ html {
     transition: 0.3s;
 }
 
+.contact-floating-button i {
+    font-size: 1.5rem;
+    color: white;
+}
+
 .contact-floating-button:hover {
     transform: translateY(-3px);
-}
-
-/* Contact Modal */
-.contact-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s;
-}
-
-.contact-modal.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background: var(--bg-dark);
-    padding: 2rem;
-    border-radius: 8px;
-    text-align: center;
-    width: 90%;
-    max-width: 400px;
-}
-
-.modal-content input,
-.modal-content textarea {
-    width: 100%;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border: 1px solid var(--border-light);
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border-radius: 6px;
-}
-
-.modal-content button {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.modal-content button:hover {
-    background: var(--secondary-color);
 }
 
 /* Responsive Fixes */
@@ -210,6 +199,6 @@ html {
         gap: 1rem;
     }
     .hero-content h2 {
-        font-size: 1.5rem;
+        font-size: 2rem;
     }
 }
