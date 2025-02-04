@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="John Doe - Full Stack Developer Portfolio">
     <title>John Doe - Portfolio</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -15,7 +14,7 @@
             <!-- Announcement Bar -->
             <div id="announcement-bar" class="announcement-bar">
                 <div class="announcement-content">
-                    <p><i class="fas fa-bolt"></i> Available for new opportunities</p>
+                    <p>Available for new opportunities</p>
                 </div>
             </div>
 
@@ -27,100 +26,96 @@
                         <i class="fas fa-times close-icon hidden"></i>
                     </button>
                     
-                    <h1 class="logo">
-                        <span class="logo-text">John Doe</span>
-                        <span class="logo-dot"></span>
-                    </h1>
+                    <h1 class="logo">John Doe</h1>
                     
                     <div class="social-links">
-                        <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
                             <i class="fab fa-github"></i>
-                            <span class="tooltip">GitHub</span>
                         </a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
                             <i class="fab fa-linkedin"></i>
-                            <span class="tooltip">LinkedIn</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- Menu System -->
-                <div class="menu-overlay"></div>
-
+                <!-- Menu Content -->
                 <div id="menu-content" class="menu-content">
-                    <div class="menu-header">
-                        <span class="menu-title">Menu</span>
-                        <button class="menu-close">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-
                     <!-- Sections -->
                     <div class="sections-grid">
                         <div class="section">
                             <button class="section-button" data-section="skills">
-                                <span>
-                                    <i class="fas fa-code section-icon"></i>
-                                    <span>SKILLS</span>
-                                </span>
+                                <span>SKILLS</span>
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                             <div class="section-content" id="skills-content">
-                                <button><i class="fas fa-laptop-code"></i> Frontend Development</button>
-                                <button><i class="fas fa-server"></i> Backend Development</button>
-                                <button><i class="fas fa-cloud"></i> DevOps</button>
-                                <button><i class="fas fa-mobile-alt"></i> Mobile Development</button>
+                                <button>Frontend Development</button>
+                                <button>Backend Development</button>
+                                <button>DevOps</button>
+                                <button>Mobile Development</button>
                             </div>
                         </div>
 
                         <div class="section">
                             <button class="section-button" data-section="experience">
-                                <span>
-                                    <i class="fas fa-briefcase section-icon"></i>
-                                    <span>EXPERIENCE</span>
-                                </span>
+                                <span>EXPERIENCE</span>
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                             <div class="section-content" id="experience-content">
-                                <button><i class="fas fa-building"></i> Senior Developer at TechCorp</button>
-                                <button><i class="fas fa-rocket"></i> Lead Engineer at StartupX</button>
-                                <button><i class="fas fa-laptop"></i> Full-Stack Developer at WebCo</button>
+                                <button>Senior Developer at TechCorp</button>
+                                <button>Lead Engineer at StartupX</button>
+                                <button>Full-Stack Developer at WebCo</button>
                             </div>
                         </div>
 
                         <div class="section">
                             <button class="section-button" data-section="education">
-                                <span>
-                                    <i class="fas fa-graduation-cap section-icon"></i>
-                                    <span>EDUCATION</span>
-                                </span>
+                                <span>EDUCATION</span>
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                             <div class="section-content" id="education-content">
-                                <button><i class="fas fa-university"></i> Master in Computer Science</button>
-                                <button><i class="fas fa-code-branch"></i> Bachelor in Software Engineering</button>
-                                <button><i class="fas fa-certificate"></i> Technical Certifications</button>
+                                <button>Master in Computer Science</button>
+                                <button>Bachelor in Software Engineering</button>
+                                <button>Technical Certifications</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Featured Projects -->
+                    <div class="featured-projects">
+                        <h3>FEATURED PROJECTS</h3>
+                        <div class="projects-grid">
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="/api/placeholder/400/300" alt="E-Commerce Platform">
+                                    <div class="project-overlay">
+                                        <span class="project-tag">REACT & NODE.JS</span>
+                                    </div>
+                                </div>
+                                <h4>E-Commerce Platform</h4>
+                            </div>
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="/api/placeholder/400/300" alt="AI-Powered Analytics">
+                                    <div class="project-overlay">
+                                        <span class="project-tag">PYTHON & TENSORFLOW</span>
+                                    </div>
+                                </div>
+                                <h4>AI-Powered Analytics</h4>
                             </div>
                         </div>
                     </div>
 
                     <!-- Contact Section -->
                     <div class="contact-section">
-                        <button class="contact-btn">
-                            <i class="fas fa-envelope"></i>
-                            <span>CONTACT ME</span>
-                        </button>
-                        <button class="download-btn">
-                            <i class="fas fa-download"></i>
-                            <span>DOWNLOAD CV</span>
-                        </button>
+                        <button class="contact-btn">CONTACT ME</button>
+                        <button class="download-btn">DOWNLOAD CV</button>
                     </div>
 
                     <!-- Footer Social Links -->
                     <div class="social-links-footer">
-                        <a href="#"><i class="fas fa-envelope"></i> <span>Email</span></a>
-                        <a href="#"><i class="fab fa-linkedin"></i> <span>LinkedIn</span></a>
-                        <a href="#"><i class="fab fa-github"></i> <span>GitHub</span></a>
+                        <a href="#" aria-label="Email">Email</a>
+                        <a href="#" aria-label="LinkedIn">LinkedIn</a>
+                        <a href="#" aria-label="GitHub">GitHub</a>
                     </div>
                 </div>
             </nav>
@@ -135,10 +130,7 @@
                 <div class="hero-content">
                     <h2>Full Stack Developer</h2>
                     <p>Specialized in building scalable web applications with modern technologies</p>
-                    <button class="cta-button">
-                        <span>VIEW PROJECTS</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <button class="cta-button">VIEW PROJECTS</button>
                 </div>
             </section>
 
@@ -153,47 +145,52 @@
                         <div class="project-info">
                             <h3>Project Title</h3>
                             <p>React • Node.js • MongoDB</p>
-                            <div class="project-links">
-                                <a href="#" class="project-link"><i class="fab fa-github"></i> View Code</a>
-                                <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Add more project items here -->
+                <div class="project-item">
+                    <div class="project-image-wrapper">
+                        <img src="/api/placeholder/400/500" alt="Project 2">
+                        <div class="project-external-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <h3>Project Title</h3>
+                            <p>React • Node.js • MongoDB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-item">
+                    <div class="project-image-wrapper">
+                        <img src="/api/placeholder/400/500" alt="Project 3">
+                        <div class="project-external-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <h3>Project Title</h3>
+                            <p>React • Node.js • MongoDB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-item">
+                    <div class="project-image-wrapper">
+                        <img src="/api/placeholder/400/500" alt="Project 4">
+                        <div class="project-external-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <h3>Project Title</h3>
+                            <p>React • Node.js • MongoDB</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
 
         <!-- Contact Button -->
-        <button class="contact-floating-button">
+        <button class="contact-floating-button" aria-label="Contact">
             <i class="fas fa-envelope"></i>
-            <span class="tooltip">Contact Me</span>
         </button>
-
-        <!-- Contact Modal -->
-        <div class="contact-modal">
-            <div class="modal-content">
-                <button class="close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-                <h2><i class="fas fa-paper-plane"></i> Get in Touch</h2>
-                <form id="contact-form">
-                    <div class="form-group">
-                        <input type="text" placeholder="Your Name" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" placeholder="Your Email" required>
-                    </div>
-                    <div class="form-group">
-                        <textarea placeholder="Your Message" required></textarea>
-                    </div>
-                    <button type="submit">
-                        <i class="fas fa-paper-plane"></i>
-                        Send Message
-                    </button>
-                </form>
-            </div>
-        </div>
     </div>
 
     <script src="main.js"></script>
