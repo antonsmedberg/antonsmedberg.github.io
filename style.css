@@ -1,4 +1,4 @@
-/* ==== BASE STYLES ==== */
+/* === BASE STYLES === */
 :root {
     --blue-400: #60A5FA;
     --blue-500: #3B82F6;
@@ -21,7 +21,7 @@ body {
     min-height: 100vh;
 }
 
-/* === HEADER === */
+/* === FIX HEADER === */
 .fixed-header {
     position: fixed;
     top: 0;
@@ -49,7 +49,7 @@ body {
     width: 100%;
     height: 28rem;
     object-fit: cover;
-    filter: brightness(0.75); /* Improves text readability */
+    filter: brightness(0.75); 
 }
 
 .hero-overlay {
@@ -68,118 +68,32 @@ body {
     padding: 2rem;
 }
 
-.hero-content h2 {
-    font-size: 2.8rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-}
-
-.hero-content p {
-    font-size: 1.2rem;
-    max-width: 36rem;
-    margin: 0 auto 1.5rem;
-}
-
-/* Call-to-Action Button */
-.cta-button {
-    background: var(--blue-400);
-    color: white;
-    padding: 0.75rem 2rem;
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.cta-button:hover {
-    background: var(--blue-500);
-}
-
-/* === SECTIONS GRID FIX === */
+/* === SECTION GRID FIX === */
 .sections-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ensures responsiveness */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
     padding: 2rem;
-    margin-top: 2rem;
 }
 
-.section {
-    background: rgba(30, 41, 59, 0.8);
-    padding: 1.5rem;
-    border-radius: 10px;
-    text-align: center;
-    transition: transform 0.3s ease;
-}
-
-.section:hover {
-    transform: translateY(-5px);
-    background: rgba(30, 41, 59, 0.9);
-}
-
-.section-button {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 500;
-}
-
-.section-button i {
-    transition: transform 0.3s ease;
-    color: var(--blue-400);
-}
-
-/* Section Expand Animation */
+/* Fix Section Button */
 .section-content {
     display: none;
-    padding-top: 0.5rem;
 }
 
 .section-button.active + .section-content {
     display: block;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 /* === PROJECT GRID FIX === */
 .main-projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Auto-adjust */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
-    margin-top: 3rem;
     padding: 1rem;
 }
 
-.project-item {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    border-radius: 10px;
-    transition: transform 0.3s ease;
-}
-
-.project-item:hover {
-    transform: scale(1.05);
-}
-
-.project-image-wrapper img {
-    width: 100%;
-    height: 14rem;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-/* === CONTACT FLOATING BUTTON === */
+/* === FIX CONTACT BUTTON === */
 .contact-floating-button {
     position: fixed;
     bottom: 1.5rem;
@@ -196,12 +110,10 @@ body {
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    z-index: 50;
 }
 
 .contact-floating-button:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* === RESPONSIVE FIXES === */
@@ -216,28 +128,5 @@ body {
 
     .main-projects-grid {
         grid-template-columns: 1fr;
-    }
-
-    .hero-image {
-        height: 22rem;
-    }
-
-    .hero-content {
-        bottom: 12%;
-    }
-}
-
-@media (max-width: 640px) {
-    .hero-content {
-        padding: 1.5rem;
-    }
-
-    .hero-image {
-        height: 18rem;
-    }
-
-    .cta-button {
-        width: 100%;
-        padding: 0.5rem;
     }
 }
