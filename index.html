@@ -3,153 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anton Smedberg - Full Stack Developer Portfolio</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Professional portfolio of Anton Smedberg, a Full Stack Developer specializing in modern web technologies like React, Node.js, and Python.">
-    <meta name="keywords" content="Anton Smedberg, Full Stack Developer, Web Development, React, Node.js, Python, Software Engineer">
-    <meta name="author" content="Anton Smedberg">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://antonsmedberg.github.io">
-    <meta property="og:title" content="Anton Smedberg - Full Stack Developer">
-    <meta property="og:description" content="Professional portfolio showcasing web development skills and projects">
-    <meta property="og:image" content="https://via.placeholder.com/1200x630">
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://antonsmedberg.github.io">
-    <meta name="twitter:title" content="Anton Smedberg - Full Stack Developer">
-    <meta name="twitter:description" content="Professional portfolio showcasing web development skills and projects">
-    <meta name="twitter:image" content="https://via.placeholder.com/1200x630">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
-
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/lucide-icons@0.279.0/dist/umd/lucide.min.js"></script>
+    <title>John Doe - Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white font-inter min-h-screen" aria-lang="en">
-    <div id="app">
-        <!-- Accessibility Skip Link -->
-        <a href="#main-content" class="fixed top-0 left-0 bg-blue-500 text-white p-2 transform -translate-y-full focus:translate-y-0 z-50">
-            Skip to main content
-        </a>
-
-        <!-- Header with Navigation -->
-        <header id="main-header" class="fixed top-0 left-0 right-0 z-50 transition-transform duration-300">
+<body>
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header id="main-header" class="fixed-header">
             <!-- Announcement Bar -->
-            <div id="announcement-bar" class="bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300">
-                <p class="text-white text-center py-2 px-4 text-sm font-medium">
-                    Available for new opportunities
-                </p>
+            <div id="announcement-bar" class="announcement-bar">
+                <div class="announcement-content">
+                    <p>Available for new opportunities</p>
+                </div>
             </div>
 
             <!-- Navigation -->
-            <div class="px-4 pt-4">
-                <nav class="max-w-4xl mx-auto bg-slate-800/90 backdrop-blur-lg rounded-2xl shadow-lg">
-                    <div class="flex items-center justify-between px-6 py-4">
-                        <button id="menu-toggle" class="relative w-8 h-8 flex items-center justify-center">
-                            <div id="menu-icon-open" class="transition-all duration-300">
-                                <i data-lucide="menu" class="text-slate-400 hover:text-white"></i>
+            <nav class="nav-container">
+                <div class="nav-content">
+                    <button id="menu-toggle" class="menu-button" aria-label="Toggle Menu">
+                        <i class="fas fa-bars menu-icon"></i>
+                        <i class="fas fa-times close-icon hidden"></i>
+                    </button>
+                    
+                    <h1 class="logo">John Doe</h1>
+                    
+                    <div class="social-links">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Menu Content -->
+                <div id="menu-content" class="menu-content">
+                    <!-- Sections -->
+                    <div class="sections-grid">
+                        <div class="section">
+                            <button class="section-button" data-section="skills">
+                                <span>SKILLS</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <div class="section-content" id="skills-content">
+                                <button>Frontend Development</button>
+                                <button>Backend Development</button>
+                                <button>DevOps</button>
+                                <button>Mobile Development</button>
                             </div>
-                            <div id="menu-icon-close" class="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-300">
-                                <i data-lucide="x" class="text-slate-400 hover:text-white"></i>
+                        </div>
+
+                        <div class="section">
+                            <button class="section-button" data-section="experience">
+                                <span>EXPERIENCE</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <div class="section-content" id="experience-content">
+                                <button>Senior Developer at TechCorp</button>
+                                <button>Lead Engineer at StartupX</button>
+                                <button>Full-Stack Developer at WebCo</button>
                             </div>
-                        </button>
-                        
-                        <h1 class="text-2xl font-bold">
-                            <span class="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                                Anton Smedberg
-                            </span>
-                        </h1>
-                        
-                        <div class="flex space-x-4">
-                            <a href="https://github.com/antonsmedberg" target="_blank" rel="noopener noreferrer">
-                                <i data-lucide="github" class="text-slate-400 hover:text-white transition-colors"></i>
-                            </a>
-                            <a href="https://linkedin.com/in/antonsmedberg" target="_blank" rel="noopener noreferrer">
-                                <i data-lucide="linkedin" class="text-slate-400 hover:text-white transition-colors"></i>
-                            </a>
+                        </div>
+
+                        <div class="section">
+                            <button class="section-button" data-section="education">
+                                <span>EDUCATION</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <div class="section-content" id="education-content">
+                                <button>Master in Computer Science</button>
+                                <button>Bachelor in Software Engineering</button>
+                                <button>Technical Certifications</button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Mobile Menu Content -->
-                    <div id="mobile-menu" class="overflow-hidden max-h-0 opacity-0 transition-all duration-500 ease-out">
-                        <div class="px-6 pb-6 space-y-8">
-                            <!-- Sections -->
-                            <div class="grid gap-4" id="sections-container">
-                                <!-- Sections will be dynamically populated by JS -->
-                            </div>
-
-                            <!-- Featured Projects -->
-                            <div id="projects-container">
-                                <h3 class="text-blue-500 text-sm font-medium mb-4">FEATURED PROJECTS</h3>
-                                <div class="grid grid-cols-2 gap-4" id="projects-grid">
-                                    <!-- Projects will be dynamically populated by JS -->
+                    <!-- Featured Projects -->
+                    <div class="featured-projects">
+                        <h3>FEATURED PROJECTS</h3>
+                        <div class="projects-grid">
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="/api/placeholder/400/300" alt="E-Commerce Platform">
+                                    <div class="project-overlay">
+                                        <span class="project-tag">REACT & NODE.JS</span>
+                                    </div>
                                 </div>
+                                <h4>E-Commerce Platform</h4>
                             </div>
-
-                            <!-- Contact Section -->
-                            <div class="border-t border-slate-700 pt-6 space-y-4">
-                                <button class="w-full text-left text-lg font-medium text-white hover:text-blue-400 transition-colors">
-                                    CONTACT ME
-                                </button>
-                                <button class="w-full text-left text-lg font-medium text-white hover:text-blue-400 transition-colors">
-                                    DOWNLOAD CV
-                                </button>
-                            </div>
-
-                            <!-- Social Links -->
-                            <div class="flex justify-center space-x-8 pt-6 border-t border-slate-700">
-                                <a href="#" class="text-slate-400 hover:text-white transition-colors text-sm">Email</a>
-                                <a href="#" class="text-slate-400 hover:text-white transition-colors text-sm">LinkedIn</a>
-                                <a href="#" class="text-slate-400 hover:text-white transition-colors text-sm">GitHub</a>
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="/api/placeholder/400/300" alt="AI-Powered Analytics">
+                                    <div class="project-overlay">
+                                        <span class="project-tag">PYTHON & TENSORFLOW</span>
+                                    </div>
+                                </div>
+                                <h4>AI-Powered Analytics</h4>
                             </div>
                         </div>
                     </div>
-                </nav>
-            </div>
+
+                    <!-- Contact Section -->
+                    <div class="contact-section">
+                        <button class="contact-btn">CONTACT ME</button>
+                        <button class="download-btn">DOWNLOAD CV</button>
+                    </div>
+
+                    <!-- Footer Social Links -->
+                    <div class="social-links-footer">
+                        <a href="#" aria-label="Email">Email</a>
+                        <a href="#" aria-label="LinkedIn">LinkedIn</a>
+                        <a href="#" aria-label="GitHub">GitHub</a>
+                    </div>
+                </div>
+            </nav>
         </header>
 
         <!-- Main Content -->
-        <main id="main-content" class="pt-32 px-4 pb-20 transition-all duration-300">
-            <div class="max-w-4xl mx-auto space-y-8">
-                <!-- Hero Section -->
-                <section class="relative rounded-3xl overflow-hidden">
-                    <img src="https://via.placeholder.com/800x600" alt="Profile Banner" class="w-full h-96 object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                    <div class="absolute bottom-0 left-0 right-0 p-8">
-                        <h2 class="text-4xl font-bold text-white mb-4">Full Stack Developer</h2>
-                        <p class="text-slate-300 mb-6 text-lg max-w-xl">
-                            Specialized in building scalable web applications with modern technologies
-                        </p>
-                        <button class="bg-white text-slate-900 px-8 py-3 rounded-full hover:bg-blue-50 transition-colors">
-                            VIEW PROJECTS
-                        </button>
-                    </div>
-                </section>
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <img src="/api/placeholder/800/600" alt="Profile Banner" class="hero-image">
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <h2>Full Stack Developer</h2>
+                    <p>Specialized in building scalable web applications with modern technologies</p>
+                    <button class="cta-button">VIEW PROJECTS</button>
+                </div>
+            </section>
 
-                <!-- Project Grid -->
-                <div class="grid grid-cols-2 gap-6" id="main-projects-grid">
-                    <!-- Projects will be dynamically populated by JS -->
+            <!-- Project Grid -->
+            <div class="main-projects-grid">
+                <div class="project-item">
+                    <div class="project-image-wrapper">
+                        <img src="/api/placeholder/400/500" alt="Project 1">
+                        <div class="project-external-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <h3>Project Title</h3>
+                            <p>React • Node.js • MongoDB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-item">
+                    <div class="project-image-wrapper">
+                        <img src="/api/placeholder/400/500" alt="Project 2">
+                        <div class="project-external-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <h3>Project Title</h3>
+                            <p>React • Node.js • MongoDB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-item">
+                    <div class="project-image-wrapper">
+                        <img src="/api/placeholder/400/500" alt="Project 3">
+                        <div class="project-external-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <h3>Project Title</h3>
+                            <p>React • Node.js • MongoDB</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-item">
+                    <div class="project-image-wrapper">
+                        <img src="/api/placeholder/400/500" alt="Project 4">
+                        <div class="project-external-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div class="project-info">
+                            <h3>Project Title</h3>
+                            <p>React • Node.js • MongoDB</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
 
         <!-- Contact Button -->
-        <button class="fixed bottom-6 right-6 bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 group">
-            <i data-lucide="mail" class="group-hover:scale-110 transition-transform duration-300"></i>
+        <button class="contact-floating-button" aria-label="Contact">
+            <i class="fas fa-envelope"></i>
         </button>
     </div>
 
-    <script src="js/main.js" defer></script>
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
-    </script>
+    <script src="main.js"></script>
 </body>
 </html>
