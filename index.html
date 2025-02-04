@@ -24,7 +24,7 @@
                 <div class="nav-content">
                     <button id="menu-toggle" class="menu-button" aria-label="Toggle Menu">
                         <i class="fas fa-bars menu-icon"></i>
-                        <i class="fas fa-times close-icon"></i>
+                        <i class="fas fa-times close-icon hidden"></i>
                     </button>
                     
                     <h1 class="logo">
@@ -33,25 +33,24 @@
                     </h1>
                     
                     <div class="social-links">
-                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer">
                             <i class="fab fa-github"></i>
                             <span class="tooltip">GitHub</span>
                         </a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
                             <i class="fab fa-linkedin"></i>
                             <span class="tooltip">LinkedIn</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- Menu Overlay -->
+                <!-- Menu System -->
                 <div class="menu-overlay"></div>
 
-                <!-- Menu Content -->
                 <div id="menu-content" class="menu-content">
                     <div class="menu-header">
                         <span class="menu-title">Menu</span>
-                        <button class="menu-close" aria-label="Close Menu">
+                        <button class="menu-close">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -62,15 +61,15 @@
                             <button class="section-button" data-section="skills">
                                 <span>
                                     <i class="fas fa-code section-icon"></i>
-                                    SKILLS
+                                    <span>SKILLS</span>
                                 </span>
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                             <div class="section-content" id="skills-content">
-                                <button><i class="fas fa-laptop-code"></i>Frontend Development</button>
-                                <button><i class="fas fa-server"></i>Backend Development</button>
-                                <button><i class="fas fa-cloud"></i>DevOps</button>
-                                <button><i class="fas fa-mobile-alt"></i>Mobile Development</button>
+                                <button><i class="fas fa-laptop-code"></i> Frontend Development</button>
+                                <button><i class="fas fa-server"></i> Backend Development</button>
+                                <button><i class="fas fa-cloud"></i> DevOps</button>
+                                <button><i class="fas fa-mobile-alt"></i> Mobile Development</button>
                             </div>
                         </div>
 
@@ -78,14 +77,14 @@
                             <button class="section-button" data-section="experience">
                                 <span>
                                     <i class="fas fa-briefcase section-icon"></i>
-                                    EXPERIENCE
+                                    <span>EXPERIENCE</span>
                                 </span>
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                             <div class="section-content" id="experience-content">
-                                <button><i class="fas fa-building"></i>Senior Developer at TechCorp</button>
-                                <button><i class="fas fa-rocket"></i>Lead Engineer at StartupX</button>
-                                <button><i class="fas fa-laptop"></i>Full-Stack Developer at WebCo</button>
+                                <button><i class="fas fa-building"></i> Senior Developer at TechCorp</button>
+                                <button><i class="fas fa-rocket"></i> Lead Engineer at StartupX</button>
+                                <button><i class="fas fa-laptop"></i> Full-Stack Developer at WebCo</button>
                             </div>
                         </div>
 
@@ -93,41 +92,14 @@
                             <button class="section-button" data-section="education">
                                 <span>
                                     <i class="fas fa-graduation-cap section-icon"></i>
-                                    EDUCATION
+                                    <span>EDUCATION</span>
                                 </span>
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                             <div class="section-content" id="education-content">
-                                <button><i class="fas fa-university"></i>Master in Computer Science</button>
-                                <button><i class="fas fa-code-branch"></i>Bachelor in Software Engineering</button>
-                                <button><i class="fas fa-certificate"></i>Technical Certifications</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Featured Projects -->
-                    <div class="featured-projects">
-                        <h3><i class="fas fa-star"></i> FEATURED PROJECTS</h3>
-                        <div class="projects-grid">
-                            <div class="project-card">
-                                <div class="project-image-container">
-                                    <img src="/api/placeholder/400/300" alt="E-Commerce Platform">
-                                    <div class="project-overlay">
-                                        <span class="project-tag">REACT & NODE.JS</span>
-                                    </div>
-                                </div>
-                                <h4>E-Commerce Platform</h4>
-                                <p class="project-description">Modern e-commerce solution with real-time features</p>
-                            </div>
-                            <div class="project-card">
-                                <div class="project-image-container">
-                                    <img src="/api/placeholder/400/300" alt="AI-Powered Analytics">
-                                    <div class="project-overlay">
-                                        <span class="project-tag">PYTHON & TENSORFLOW</span>
-                                    </div>
-                                </div>
-                                <h4>AI-Powered Analytics</h4>
-                                <p class="project-description">Advanced analytics platform with ML capabilities</p>
+                                <button><i class="fas fa-university"></i> Master in Computer Science</button>
+                                <button><i class="fas fa-code-branch"></i> Bachelor in Software Engineering</button>
+                                <button><i class="fas fa-certificate"></i> Technical Certifications</button>
                             </div>
                         </div>
                     </div>
@@ -136,28 +108,19 @@
                     <div class="contact-section">
                         <button class="contact-btn">
                             <i class="fas fa-envelope"></i>
-                            CONTACT ME
+                            <span>CONTACT ME</span>
                         </button>
                         <button class="download-btn">
                             <i class="fas fa-download"></i>
-                            DOWNLOAD CV
+                            <span>DOWNLOAD CV</span>
                         </button>
                     </div>
 
                     <!-- Footer Social Links -->
                     <div class="social-links-footer">
-                        <a href="#" aria-label="Email">
-                            <i class="fas fa-envelope"></i>
-                            <span>Email</span>
-                        </a>
-                        <a href="#" aria-label="LinkedIn">
-                            <i class="fab fa-linkedin"></i>
-                            <span>LinkedIn</span>
-                        </a>
-                        <a href="#" aria-label="GitHub">
-                            <i class="fab fa-github"></i>
-                            <span>GitHub</span>
-                        </a>
+                        <a href="#"><i class="fas fa-envelope"></i> <span>Email</span></a>
+                        <a href="#"><i class="fab fa-linkedin"></i> <span>LinkedIn</span></a>
+                        <a href="#"><i class="fab fa-github"></i> <span>GitHub</span></a>
                     </div>
                 </div>
             </nav>
@@ -170,14 +133,12 @@
                 <img src="/api/placeholder/800/600" alt="Profile Banner" class="hero-image">
                 <div class="hero-overlay"></div>
                 <div class="hero-content">
-                    <div class="hero-text">
-                        <h2>Full Stack Developer</h2>
-                        <p>Specialized in building scalable web applications with modern technologies</p>
-                        <button class="cta-button">
-                            <span>VIEW PROJECTS</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
+                    <h2>Full Stack Developer</h2>
+                    <p>Specialized in building scalable web applications with modern technologies</p>
+                    <button class="cta-button">
+                        <span>VIEW PROJECTS</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
             </section>
 
@@ -199,12 +160,12 @@
                         </div>
                     </div>
                 </div>
-                <!-- Repeat for other project items -->
+                <!-- Add more project items here -->
             </div>
         </main>
 
         <!-- Contact Button -->
-        <button class="contact-floating-button" aria-label="Contact">
+        <button class="contact-floating-button">
             <i class="fas fa-envelope"></i>
             <span class="tooltip">Contact Me</span>
         </button>
@@ -212,7 +173,7 @@
         <!-- Contact Modal -->
         <div class="contact-modal">
             <div class="modal-content">
-                <button class="close-modal" aria-label="Close Modal">
+                <button class="close-modal">
                     <i class="fas fa-times"></i>
                 </button>
                 <h2><i class="fas fa-paper-plane"></i> Get in Touch</h2>
