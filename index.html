@@ -1,184 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-  <meta name="description" content="Anton Smedberg - Mobile App Developer Portfolio">
-  <meta name="keywords" content="Mobile App Developer, iOS, Android, SwiftUI, Kotlin">
-  <meta name="author" content="Anton Smedberg">
-  <title>Anton Smedberg | Mobile App Developer</title>
-
-  <!-- Preconnect & Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="site-header">
-    <div class="announcement-bar">
-      <div class="container">
-        <p>👋 Currently available for freelance projects</p>
-      </div>
-    </div>
-    <nav class="navbar">
-      <div class="container navbar-container">
-        <a href="#home" class="navbar-brand">AS</a>
-        <button class="mobile-menu-toggle" aria-label="Toggle navigation">
-          <div class="menu-icon">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </button>
-        <ul class="navbar-menu">
-          <li><a href="#about" class="nav-link">About</a></li>
-          <li><a href="#skills" class="nav-link">Skills</a></li>
-          <li><a href="#projects" class="nav-link">Projects</a></li>
-          <li><a href="#contact" class="nav-link">Contact</a></li>
-        </ul>
-      </div>
-    </nav>
-  </header>
 
-  <!-- Main Content -->
-  <main>
+    <!-- Header with Navigation -->
+    <header id="header">
+        <div class="announcement" id="announcement">
+            Available for new opportunities
+        </div>
+        <nav class="navbar">
+            <button id="menuToggle" class="menu-btn">☰</button>
+            <h1 class="logo">John Doe</h1>
+            <div class="social-links">
+                <a href="https://github.com" target="_blank">GitHub</a>
+                <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+            </div>
+        </nav>
+        <div class="menu-content" id="menuContent">
+            <ul>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#education">Education</a></li>
+            </ul>
+        </div>
+    </header>
+
     <!-- Hero Section -->
-    <section id="home" class="hero">
-      <div class="hero-overlay"></div>
-      <div class="container hero-content">
-        <h1 class="hero-title">Anton Smedberg</h1>
-        <p class="hero-subtitle">Mobile App Developer</p>
-        <div class="hero-cta">
-          <a href="#projects" class="btn btn-primary">View Projects</a>
-          <a href="#contact" class="btn btn-secondary">Contact Me</a>
+    <section class="hero">
+        <img src="https://via.placeholder.com/800x400" alt="Profile Banner">
+        <div class="hero-content">
+            <h2>Full Stack Developer</h2>
+            <p>Specialized in building scalable web applications with modern technologies</p>
+            <button>View Projects</button>
         </div>
-      </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="section about-section">
-      <div class="container">
-        <h2 class="section-title">About Me</h2>
-        <div class="about-content">
-          <p>
-            I specialize in iOS and Android development, creating intuitive, elegant solutions that transform complex problems into user-friendly experiences.
-          </p>
-          <div class="stats">
-            <div class="stat">
-              <span class="stat-number">4+</span>
-              <span class="stat-label">Years Experience</span>
-            </div>
-            <div class="stat">
-              <span class="stat-number">20+</span>
-              <span class="stat-label">Projects Completed</span>
-            </div>
-            <div class="stat">
-              <span class="stat-number">15+</span>
-              <span class="stat-label">Happy Clients</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Skills, Experience, Education -->
+    <section id="skills" class="content-section">
+        <h3>Skills</h3>
+        <ul>
+            <li>Frontend Development</li>
+            <li>Backend Development</li>
+            <li>DevOps</li>
+            <li>Mobile Development</li>
+        </ul>
     </section>
 
-    <!-- Skills Section -->
-    <section id="skills" class="section skills-section">
-      <div class="container">
-        <h2 class="section-title">My Skills</h2>
-        <div class="skills-grid">
-          <div class="skill">
-            <h3>SwiftUI</h3>
-            <div class="skill-bar">
-              <div class="skill-fill" style="width: 90%;"></div>
-            </div>
-            <span class="skill-percentage">90%</span>
-          </div>
-          <div class="skill">
-            <h3>Kotlin</h3>
-            <div class="skill-bar">
-              <div class="skill-fill" style="width: 85%;"></div>
-            </div>
-            <span class="skill-percentage">85%</span>
-          </div>
-        </div>
-      </div>
+    <section id="experience" class="content-section">
+        <h3>Experience</h3>
+        <ul>
+            <li>Senior Developer at TechCorp</li>
+            <li>Lead Engineer at StartupX</li>
+            <li>Full-Stack Developer at WebCo</li>
+        </ul>
     </section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="section projects-section">
-      <div class="container">
-        <h2 class="section-title">Featured Projects</h2>
-        <div class="projects-grid">
-          <article class="project-card">
-            <div class="project-image">
-              <img src="https://via.placeholder.com/400x300" alt="SwiftTask Pro">
-            </div>
-            <div class="project-info">
-              <h3>SwiftTask Pro</h3>
-              <p>Task management app with cloud synchronization.</p>
-              <div class="project-links">
-                <a href="#" class="btn btn-small btn-primary">View Project</a>
-                <a href="#" class="btn btn-small btn-outline">GitHub</a>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
+    <section id="education" class="content-section">
+        <h3>Education</h3>
+        <ul>
+            <li>Master in Computer Science</li>
+            <li>Bachelor in Software Engineering</li>
+            <li>Technical Certifications</li>
+        </ul>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="section contact-section">
-      <div class="container">
-        <h2 class="section-title">Get in Touch</h2>
-        <div class="contact-content">
-          <div class="contact-info">
-            <h3>Let's talk about your project</h3>
-            <p>Feel free to reach out if you're looking for a developer, have a question, or just want to connect.</p>
-            <div class="contact-links">
-              <a href="mailto:contact@example.com" class="contact-link"><i class="fas fa-envelope"></i> contact@example.com</a>
-              <a href="https://github.com/username" class="contact-link"><i class="fab fa-github"></i> GitHub</a>
-              <a href="https://linkedin.com/in/username" class="contact-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+    <!-- Featured Projects -->
+    <section class="projects">
+        <h3>Featured Projects</h3>
+        <div class="project-list">
+            <div class="project">
+                <img src="https://via.placeholder.com/400x300" alt="E-Commerce Platform">
+                <h4>E-Commerce Platform</h4>
+                <p>React & Node.js</p>
             </div>
-          </div>
-          <form class="contact-form">
-            <div class="form-group">
-              <input type="text" name="name" placeholder="Your Name" required>
+            <div class="project">
+                <img src="https://via.placeholder.com/400x300" alt="AI Analytics">
+                <h4>AI-Powered Analytics</h4>
+                <p>Python & TensorFlow</p>
             </div>
-            <div class="form-group">
-              <input type="email" name="email" placeholder="Your Email" required>
-            </div>
-            <div class="form-group">
-              <textarea name="message" placeholder="Your Message" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              Send Message <i class="fas fa-paper-plane"></i>
-            </button>
-          </form>
         </div>
-      </div>
     </section>
-  </main>
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-content">
-        <p>&copy; 2024 Anton Smedberg. All rights reserved.</p>
-        <div class="social-links">
-          <a href="#"><i class="fab fa-linkedin"></i></a>
-          <a href="#"><i class="fab fa-github"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-        </div>
-      </div>
-    </div>
-  </footer>
+    <!-- Contact -->
+    <section class="contact">
+        <h3>Contact Me</h3>
+        <button>Email Me</button>
+    </section>
 
-  <!-- Scripts -->
-  <script src="js/main.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
