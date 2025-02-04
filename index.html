@@ -3,196 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>John Doe - Portfolio</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>Your Name - Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="min-h-screen">
-        <!-- Header -->
-        <header id="main-header" class="fixed-header">
-            <!-- Announcement Bar -->
-            <div id="announcement-bar" class="announcement-bar">
-                <div class="announcement-content">
-                    <p>Available for new opportunities</p>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">Your Name</div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#projects" class="nav-link">Projects</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section home">
+        <div class="home-content">
+            <h1>Hi, I'm <span class="highlight">Your Name</span></h1>
+            <p>A Web Developer | Designer | Creative Thinker</p>
+            <div class="social-links">
+                <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+            </div>
+            <a href="#projects" class="btn btn-primary">View My Work</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section about">
+        <div class="section-container">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="/api/placeholder/400/400" alt="Your Profile">
+                </div>
+                <div class="about-text">
+                    <p>Hello! I'm a passionate web developer with a love for creating intuitive and beautiful digital experiences. I specialize in front-end development and have a keen eye for design.</p>
+                    <div class="skills">
+                        <h3>My Skills</h3>
+                        <div class="skill-tags">
+                            <span class="skill-tag">HTML5</span>
+                            <span class="skill-tag">CSS3</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">Node.js</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-secondary">Download Resume</a>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Navigation -->
-            <nav class="nav-container">
-                <div class="nav-content">
-                    <button id="menu-toggle" class="menu-button" aria-label="Toggle Menu">
-                        <i class="fas fa-bars menu-icon"></i>
-                        <i class="fas fa-times close-icon hidden"></i>
-                    </button>
-                    
-                    <h1 class="logo">John Doe</h1>
-                    
-                    <div class="social-links">
-                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
-                            <i class="fab fa-github"></i>
-                        </a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
-                            <i class="fab fa-linkedin"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Menu Content -->
-                <div id="menu-content" class="menu-content">
-                    <!-- Sections -->
-                    <div class="sections-grid">
-                        <div class="section">
-                            <button class="section-button" data-section="skills">
-                                <span>SKILLS</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                            <div class="section-content" id="skills-content">
-                                <button>Frontend Development</button>
-                                <button>Backend Development</button>
-                                <button>DevOps</button>
-                                <button>Mobile Development</button>
-                            </div>
-                        </div>
-
-                        <div class="section">
-                            <button class="section-button" data-section="experience">
-                                <span>EXPERIENCE</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                            <div class="section-content" id="experience-content">
-                                <button>Senior Developer at TechCorp</button>
-                                <button>Lead Engineer at StartupX</button>
-                                <button>Full-Stack Developer at WebCo</button>
-                            </div>
-                        </div>
-
-                        <div class="section">
-                            <button class="section-button" data-section="education">
-                                <span>EDUCATION</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                            <div class="section-content" id="education-content">
-                                <button>Master in Computer Science</button>
-                                <button>Bachelor in Software Engineering</button>
-                                <button>Technical Certifications</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Featured Projects -->
-                    <div class="featured-projects">
-                        <h3>FEATURED PROJECTS</h3>
-                        <div class="projects-grid">
-                            <div class="project-card">
-                                <div class="project-image-container">
-                                    <img src="/api/placeholder/400/300" alt="E-Commerce Platform">
-                                    <div class="project-overlay">
-                                        <span class="project-tag">REACT & NODE.JS</span>
-                                    </div>
-                                </div>
-                                <h4>E-Commerce Platform</h4>
-                            </div>
-                            <div class="project-card">
-                                <div class="project-image-container">
-                                    <img src="/api/placeholder/400/300" alt="AI-Powered Analytics">
-                                    <div class="project-overlay">
-                                        <span class="project-tag">PYTHON & TENSORFLOW</span>
-                                    </div>
-                                </div>
-                                <h4>AI-Powered Analytics</h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact Section -->
-                    <div class="contact-section">
-                        <button class="contact-btn">CONTACT ME</button>
-                        <button class="download-btn">DOWNLOAD CV</button>
-                    </div>
-
-                    <!-- Footer Social Links -->
-                    <div class="social-links-footer">
-                        <a href="#" aria-label="Email">Email</a>
-                        <a href="#" aria-label="LinkedIn">LinkedIn</a>
-                        <a href="#" aria-label="GitHub">GitHub</a>
-                    </div>
-                </div>
-            </nav>
-        </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Hero Section -->
-            <section class="hero-section">
-                <img src="/api/placeholder/800/600" alt="Profile Banner" class="hero-image">
-                <div class="hero-overlay"></div>
-                <div class="hero-content">
-                    <h2>Full Stack Developer</h2>
-                    <p>Specialized in building scalable web applications with modern technologies</p>
-                    <button class="cta-button">VIEW PROJECTS</button>
-                </div>
-            </section>
-
-            <!-- Project Grid -->
-            <div class="main-projects-grid">
-                <div class="project-item">
-                    <div class="project-image-wrapper">
-                        <img src="/api/placeholder/400/500" alt="Project 1">
-                        <div class="project-external-link">
-                            <i class="fas fa-external-link-alt"></i>
-                        </div>
-                        <div class="project-info">
-                            <h3>Project Title</h3>
-                            <p>React • Node.js • MongoDB</p>
+    <!-- Projects Section -->
+    <section id="projects" class="section projects">
+        <div class="section-container">
+            <h2 class="section-title">My Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <img src="/api/placeholder/400/300" alt="Project 1">
+                    <div class="project-info">
+                        <h3>Project One</h3>
+                        <p>A brief description of the project and technologies used.</p>
+                        <div class="project-links">
+                            <a href="#" class="btn btn-small">View Project</a>
+                            <a href="#" class="btn btn-small btn-outline">GitHub</a>
                         </div>
                     </div>
                 </div>
-                <div class="project-item">
-                    <div class="project-image-wrapper">
-                        <img src="/api/placeholder/400/500" alt="Project 2">
-                        <div class="project-external-link">
-                            <i class="fas fa-external-link-alt"></i>
-                        </div>
-                        <div class="project-info">
-                            <h3>Project Title</h3>
-                            <p>React • Node.js • MongoDB</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="project-item">
-                    <div class="project-image-wrapper">
-                        <img src="/api/placeholder/400/500" alt="Project 3">
-                        <div class="project-external-link">
-                            <i class="fas fa-external-link-alt"></i>
-                        </div>
-                        <div class="project-info">
-                            <h3>Project Title</h3>
-                            <p>React • Node.js • MongoDB</p>
+                <div class="project-card">
+                    <img src="/api/placeholder/400/300" alt="Project 2">
+                    <div class="project-info">
+                        <h3>Project Two</h3>
+                        <p>A brief description of the project and technologies used.</p>
+                        <div class="project-links">
+                            <a href="#" class="btn btn-small">View Project</a>
+                            <a href="#" class="btn btn-small btn-outline">GitHub</a>
                         </div>
                     </div>
                 </div>
-                <div class="project-item">
-                    <div class="project-image-wrapper">
-                        <img src="/api/placeholder/400/500" alt="Project 4">
-                        <div class="project-external-link">
-                            <i class="fas fa-external-link-alt"></i>
-                        </div>
-                        <div class="project-info">
-                            <h3>Project Title</h3>
-                            <p>React • Node.js • MongoDB</p>
+                <div class="project-card">
+                    <img src="/api/placeholder/400/300" alt="Project 3">
+                    <div class="project-info">
+                        <h3>Project Three</h3>
+                        <p>A brief description of the project and technologies used.</p>
+                        <div class="project-links">
+                            <a href="#" class="btn btn-small">View Project</a>
+                            <a href="#" class="btn btn-small btn-outline">GitHub</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
+    </section>
 
-        <!-- Contact Button -->
-        <button class="contact-floating-button" aria-label="Contact">
-            <i class="fas fa-envelope"></i>
-        </button>
-    </div>
+    <!-- Contact Section -->
+    <section id="contact" class="section contact">
+        <div class="section-container">
+            <h2 class="section-title">Contact Me</h2>
+            <form class="contact-form">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Your Email" required>
+                <textarea placeholder="Your Message" required></textarea>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+    </section>
 
-    <script src="main.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Your Name. All Rights Reserved.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
