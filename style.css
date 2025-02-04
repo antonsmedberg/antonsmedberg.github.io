@@ -27,6 +27,9 @@ body {
     min-height: 100vh;
     line-height: 1.6;
     text-rendering: optimizeLegibility;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Smooth Scroll */
@@ -37,17 +40,20 @@ html {
 /* Header & Navigation */
 .fixed-header {
     position: fixed;
+    top: 0;
     width: 100%;
     z-index: 100;
     background: rgba(15, 23, 42, 0.9);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-light);
     padding: 1rem 0;
+    display: flex;
+    justify-content: center;
 }
 
 .nav-container {
     max-width: var(--navbar-width);
-    margin: 0 auto;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -87,11 +93,10 @@ html {
 
 /* Hero Section */
 .hero-section {
-    position: relative;
     text-align: center;
-    padding: 6rem 1rem;
+    padding: 6rem 1rem 4rem;
     max-width: var(--max-width);
-    margin: 0 auto;
+    width: 100%;
 }
 
 .hero-image {
@@ -104,15 +109,12 @@ html {
 }
 
 .hero-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin-top: -4rem;
     text-align: center;
 }
 
 .hero-content h2 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color: var(--text-light);
 }
@@ -120,7 +122,7 @@ html {
 .cta-button {
     background: var(--primary-color);
     color: white;
-    padding: 1.2rem 2.5rem;
+    padding: 1rem 2rem;
     font-size: 1.2rem;
     font-weight: 600;
     border-radius: 10px;
@@ -128,8 +130,7 @@ html {
     transition: 0.3s;
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
-    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    gap: 0.5rem;
 }
 
 .cta-button i {
@@ -144,56 +145,30 @@ html {
 .main-projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2.5rem;
-    padding: 4rem 2rem;
+    gap: 2rem;
+    padding: 4rem 1rem;
     max-width: var(--max-width);
-    margin: 0 auto;
+    width: 100%;
 }
 
 .project-item {
     background: rgba(255, 255, 255, 0.08);
-    padding: 2rem;
-    border-radius: 15px;
+    padding: 1.5rem;
+    border-radius: 12px;
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .project-item:hover {
-    transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 .project-item i {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--accent-color);
-}
-
-/* Contact Button */
-.contact-floating-button {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 50%;
-    width: 4rem;
-    height: 4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.3s;
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
-}
-
-.contact-floating-button i {
-    font-size: 1.8rem;
-    color: white;
-}
-
-.contact-floating-button:hover {
-    transform: translateY(-4px);
 }
 
 /* Responsive Fixes */
@@ -203,8 +178,9 @@ html {
         gap: 1.5rem;
     }
     .hero-content h2 {
-        font-size: 2.5rem;
+        font-size: 2rem;
+    }
+    .main-projects-grid {
+        grid-template-columns: 1fr;
     }
 }
-
-
