@@ -1,289 +1,113 @@
-/* ===================================================================
-   style.css - Premium & Professional Portfolio Styles
-   =================================================================== */
-
-/* --------------------------- */
-/* 🎨 Global Reset & Base Styles */
-/* --------------------------- */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
 body {
-  font-family: 'Inter', sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background: #f5f7fa;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: white;
 }
 
-/* --------------------------- */
-/* 🎨 Global Variables */
-/* --------------------------- */
-:root {
-  --primary-color: #007bff;
-  --secondary-color: #6c757d;
-  --light-color: #ffffff;
-  --dark-color: #222831;
-  --accent-color: #e83e8c;
-  --transition-speed: 0.3s;
-  --max-width: 1200px;
-}
-
-/* --------------------------- */
-/* 🎯 General Containers & Layout */
-/* --------------------------- */
-.container {
-  width: 90%;
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 2rem 0;
-}
-
-/* --------------------------- */
-/* 📢 Announcement Bar */
-/* --------------------------- */
-.announcement-bar {
-  background: var(--primary-color);
-  color: #fff;
-  text-align: center;
-  padding: 0.7rem 0;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-/* --------------------------- */
-/* 🏠 Header & Navigation */
-/* --------------------------- */
-.site-header {
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  transition: background var(--transition-speed);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+/* Header */
+header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    background: rgba(20, 20, 20, 0.9);
+    padding: 10px;
+    transition: transform 0.3s;
 }
 
 .navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-}
-
-.navbar-brand {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--dark-color);
-  text-decoration: none;
-}
-
-.navbar-menu {
-  list-style: none;
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: var(--dark-color);
-  font-weight: 500;
-  position: relative;
-  transition: color var(--transition-speed);
-}
-
-.nav-link::after {
-  content: "";
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0%;
-  height: 2px;
-  background: var(--primary-color);
-  transition: width var(--transition-speed);
-}
-
-.nav-link:hover::after,
-.nav-link.active::after {
-  width: 100%;
-}
-
-/* 📱 Mobile Menu */
-.mobile-menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.menu-icon {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.menu-icon span {
-  display: block;
-  width: 25px;
-  height: 3px;
-  background: var(--dark-color);
-  border-radius: 2px;
-}
-
-/* 📱 Mobile Navigation */
-@media (max-width: 768px) {
-  .navbar-menu {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    height: 100vh;
-    width: 70%;
-    background: var(--light-color);
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 2rem;
-    transition: right var(--transition-speed);
-  }
-  .navbar-menu.active {
-    right: 0;
-  }
-  .mobile-menu-toggle {
-    display: block;
-  }
+    padding: 0 20px;
 }
 
-/* --------------------------- */
-/* 🚀 Hero Section */
-/* --------------------------- */
-.hero {
-  position: relative;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  text-align: center;
+.menu-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
 }
 
-.hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
-}
-
-.hero-title {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-}
-
-.hero-subtitle {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-/* --------------------------- */
-/* 🛠️ Skills Section */
-/* --------------------------- */
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  justify-items: center;
-}
-
-.skill {
-  width: 100%;
-  max-width: 300px;
-  text-align: center;
-}
-
-.skill-bar {
-  background: #e0e0e0;
-  border-radius: 5px;
-  overflow: hidden;
-  height: 10px;
-  margin-bottom: 0.5rem;
-}
-
-.skill-fill {
-  background: var(--primary-color);
-  height: 100%;
-  transition: width 1s ease-in-out;
-}
-
-/* --------------------------- */
-/* 📌 Project Cards */
-/* --------------------------- */
-.project-card {
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform var(--transition-speed);
-}
-
-.project-card:hover {
-  transform: translateY(-5px);
-}
-
-/* --------------------------- */
-/* 📩 Contact Section */
-/* --------------------------- */
-.contact-form {
-  background: var(--light-color);
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* --------------------------- */
-/* 🔹 Footer */
-/* --------------------------- */
-.site-footer {
-  background: var(--dark-color);
-  color: #fff;
-  padding: 2rem 0;
-  text-align: center;
+.logo {
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .social-links a {
-  color: #fff;
-  font-size: 1.5rem;
-  transition: color var(--transition-speed);
+    margin-left: 10px;
+    color: white;
+    text-decoration: none;
 }
 
-.social-links a:hover {
-  color: var(--primary-color);
+/* Hidden menu */
+.menu-content {
+    display: none;
+    background: #222;
+    padding: 10px;
+    position: absolute;
+    width: 100%;
+    top: 50px;
+    left: 0;
 }
 
-/* --------------------------- */
-/* 🌟 Animation Effects */
-/* --------------------------- */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.menu-content ul {
+    list-style: none;
+    padding: 0;
 }
 
-.fade-in {
-  animation: fadeInUp 0.8s ease-out;
+.menu-content ul li {
+    padding: 10px;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    text-align: center;
+    margin-top: 80px;
+}
+
+.hero img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.hero-content {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Sections */
+.content-section {
+    padding: 20px;
+}
+
+.projects {
+    padding: 20px;
+}
+
+.project-list {
+    display: flex;
+    gap: 10px;
+}
+
+.project {
+    background: #222;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.project img {
+    width: 100%;
+}
+
+/* Contact */
+.contact {
+    text-align: center;
+    padding: 20px;
 }
