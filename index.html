@@ -3,96 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio</title>
+    <title>Anton Smedberg - Full Stack Developer Portfolio</title>
+    <meta name="description" content="Portfolio of Anton Smedberg, a Full Stack Developer specializing in modern web technologies">
+    <link rel="preload" href="css/style.css" as="style">
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Header with Navigation -->
-    <header id="header">
+    <header id="header" role="banner">
         <div class="announcement" id="announcement">
             Available for new opportunities
         </div>
-        <nav class="navbar">
-            <button id="menuToggle" class="menu-btn">☰</button>
-            <h1 class="logo">John Doe</h1>
+        <nav class="navbar" role="navigation">
+            <button id="menuToggle" class="menu-btn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+            <h1 class="logo">Anton Smedberg</h1>
             <div class="social-links">
-                <a href="https://github.com" target="_blank">GitHub</a>
-                <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+                <a href="https://github.com/antonsmedberg" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">GitHub</a>
+                <a href="https://linkedin.com/in/antonsmedberg" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">LinkedIn</a>
             </div>
         </nav>
-        <div class="menu-content" id="menuContent">
+        <div class="menu-content" id="menuContent" role="menu">
             <ul>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#experience">Experience</a></li>
-                <li><a href="#education">Education</a></li>
+                <li role="none"><a href="#skills" role="menuitem">Skills</a></li>
+                <li role="none"><a href="#experience" role="menuitem">Experience</a></li>
+                <li role="none"><a href="#education" role="menuitem">Education</a></li>
             </ul>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <img src="https://via.placeholder.com/800x400" alt="Profile Banner">
-        <div class="hero-content">
-            <h2>Full Stack Developer</h2>
-            <p>Specialized in building scalable web applications with modern technologies</p>
-            <button>View Projects</button>
-        </div>
-    </section>
-
-    <!-- Skills, Experience, Education -->
-    <section id="skills" class="content-section">
-        <h3>Skills</h3>
-        <ul>
-            <li>Frontend Development</li>
-            <li>Backend Development</li>
-            <li>DevOps</li>
-            <li>Mobile Development</li>
-        </ul>
-    </section>
-
-    <section id="experience" class="content-section">
-        <h3>Experience</h3>
-        <ul>
-            <li>Senior Developer at TechCorp</li>
-            <li>Lead Engineer at StartupX</li>
-            <li>Full-Stack Developer at WebCo</li>
-        </ul>
-    </section>
-
-    <section id="education" class="content-section">
-        <h3>Education</h3>
-        <ul>
-            <li>Master in Computer Science</li>
-            <li>Bachelor in Software Engineering</li>
-            <li>Technical Certifications</li>
-        </ul>
-    </section>
-
-    <!-- Featured Projects -->
-    <section class="projects">
-        <h3>Featured Projects</h3>
-        <div class="project-list">
-            <div class="project">
-                <img src="https://via.placeholder.com/400x300" alt="E-Commerce Platform">
-                <h4>E-Commerce Platform</h4>
-                <p>React & Node.js</p>
+    <main id="main-content" role="main">
+        <section class="hero" aria-labelledby="hero-title">
+            <img src="https://via.placeholder.com/1920x1080" alt="Professional workspace with coding setup" loading="lazy">
+            <div class="hero-content">
+                <h2 id="hero-title">Full Stack Developer</h2>
+                <p>Specialized in building scalable web applications with modern technologies</p>
+                <button aria-label="View Projects">View Projects</button>
             </div>
-            <div class="project">
-                <img src="https://via.placeholder.com/400x300" alt="AI Analytics">
-                <h4>AI-Powered Analytics</h4>
-                <p>Python & TensorFlow</p>
+        </section>
+
+        <section id="skills" class="content-section" aria-labelledby="skills-title">
+            <div class="container">
+                <h3 id="skills-title">Skills</h3>
+                <ul>
+                    <li>Frontend Development (React, Vue.js)</li>
+                    <li>Backend Development (Node.js, Python)</li>
+                    <li>Cloud & DevOps (AWS, Docker)</li>
+                    <li>Mobile Development (React Native)</li>
+                </ul>
             </div>
+        </section>
+
+        <section id="experience" class="content-section" aria-labelledby="experience-title">
+            <div class="container">
+                <h3 id="experience-title">Experience</h3>
+                <ul>
+                    <li>Senior Developer at TechCorp</li>
+                    <li>Lead Engineer at StartupX</li>
+                    <li>Full-Stack Developer at WebCo</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="education" class="content-section" aria-labelledby="education-title">
+            <div class="container">
+                <h3 id="education-title">Education</h3>
+                <ul>
+                    <li>Master in Computer Science</li>
+                    <li>Bachelor in Software Engineering</li>
+                    <li>Technical Certifications</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="projects" aria-labelledby="projects-title">
+            <div class="container">
+                <h3 id="projects-title">Featured Projects</h3>
+                <div class="project-list">
+                    <article class="project">
+                        <img src="https://via.placeholder.com/800x600" alt="E-Commerce Platform Screenshot" loading="lazy">
+                        <div class="project-info">
+                            <h4>E-Commerce Platform</h4>
+                            <p>React & Node.js</p>
+                        </div>
+                    </article>
+                    <article class="project">
+                        <img src="https://via.placeholder.com/800x600" alt="AI Analytics Dashboard Screenshot" loading="lazy">
+                        <div class="project-info">
+                            <h4>AI-Powered Analytics</h4>
+                            <p>Python & TensorFlow</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact" aria-labelledby="contact-title">
+            <div class="container">
+                <h3 id="contact-title">Contact Me</h3>
+                <button aria-label="Send an email">Email Me</button>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="container">
+            <p>&copy; 2024 Anton Smedberg. All rights reserved.</p>
         </div>
-    </section>
+    </footer>
 
-    <!-- Contact -->
-    <section class="contact">
-        <h3>Contact Me</h3>
-        <button>Email Me</button>
-    </section>
-
-  <!-- Scripts -->
-  <script src="js/main.js"></script>
+    <script src="js/main.js" defer></script>
 </body>
 </html>
