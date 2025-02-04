@@ -1,4 +1,4 @@
-/* Base Styles */
+/* ==== BASE STYLES ==== */
 :root {
     --blue-400: #60A5FA;
     --blue-500: #3B82F6;
@@ -33,7 +33,7 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* === HERO SECTION === */
+/* === HERO SECTION FIX === */
 .hero-section {
     position: relative;
     width: 100%;
@@ -49,7 +49,7 @@ body {
     width: 100%;
     height: 28rem;
     object-fit: cover;
-    filter: brightness(0.8);
+    filter: brightness(0.75); /* Improves text readability */
 }
 
 .hero-overlay {
@@ -60,11 +60,11 @@ body {
 
 .hero-content {
     position: absolute;
-    bottom: 20%;
+    bottom: 15%;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
-    width: 90%;
+    width: 80%;
     padding: 2rem;
 }
 
@@ -96,11 +96,11 @@ body {
     background: var(--blue-500);
 }
 
-/* === SECTIONS GRID === */
+/* === SECTIONS GRID FIX === */
 .sections-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ensures responsiveness */
+    gap: 1.5rem;
     padding: 2rem;
     margin-top: 2rem;
 }
@@ -136,10 +136,26 @@ body {
     color: var(--blue-400);
 }
 
-/* === PROJECT GRID === */
+/* Section Expand Animation */
+.section-content {
+    display: none;
+    padding-top: 0.5rem;
+}
+
+.section-button.active + .section-content {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === PROJECT GRID FIX === */
 .main-projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive Grid */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Auto-adjust */
     gap: 2rem;
     margin-top: 3rem;
     padding: 1rem;
@@ -188,15 +204,6 @@ body {
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
-.contact-floating-button i {
-    font-size: 1.25rem;
-    transition: transform 0.3s ease;
-}
-
-.contact-floating-button:hover i {
-    transform: scale(1.1);
-}
-
 /* === RESPONSIVE FIXES === */
 @media (max-width: 768px) {
     .hero-content h2 {
@@ -216,7 +223,7 @@ body {
     }
 
     .hero-content {
-        bottom: 15%;
+        bottom: 12%;
     }
 }
 
@@ -227,5 +234,10 @@ body {
 
     .hero-image {
         height: 18rem;
+    }
+
+    .cta-button {
+        width: 100%;
+        padding: 0.5rem;
     }
 }
