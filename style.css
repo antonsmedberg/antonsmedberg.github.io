@@ -1,4 +1,19 @@
-/* General Layout Fixes */
+/* Base Styles */
+:root {
+    --blue-400: #60A5FA;
+    --blue-500: #3B82F6;
+    --indigo-500: #6366F1;
+    --slate-700: #334155;
+    --slate-800: #1E293B;
+    --slate-900: #0F172A;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(to bottom, var(--slate-900), var(--slate-800), var(--slate-900));
@@ -6,42 +21,35 @@ body {
     min-height: 100vh;
 }
 
-/* Improve Section Layout */
-.sections-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;  /* Ensure 3 columns for better alignment */
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-/* Improve Section Spacing */
-.section {
-    padding: 1rem;
-    background: rgba(30, 41, 59, 0.8);
-    border-radius: 10px;
-    text-align: center;
+/* === HEADER === */
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(8px);
     transition: transform 0.3s ease;
 }
 
-.section:hover {
-    transform: translateY(-5px);
-    background: rgba(30, 41, 59, 0.9);
-}
-
-/* Hero Section Improvements */
+/* === HERO SECTION === */
 .hero-section {
     position: relative;
-    border-radius: 1.5rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 1rem;
     overflow: hidden;
-    margin-bottom: 3rem;
     text-align: center;
+    margin-bottom: 3rem;
 }
 
 .hero-image {
     width: 100%;
     height: 28rem;
     object-fit: cover;
-    filter: brightness(0.7); /* Improve contrast */
+    filter: brightness(0.8);
 }
 
 .hero-overlay {
@@ -56,7 +64,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
-    width: 100%;
+    width: 90%;
     padding: 2rem;
 }
 
@@ -88,12 +96,53 @@ body {
     background: var(--blue-500);
 }
 
-/* Project Grid Fix */
+/* === SECTIONS GRID === */
+.sections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.section {
+    background: rgba(30, 41, 59, 0.8);
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.section:hover {
+    transform: translateY(-5px);
+    background: rgba(30, 41, 59, 0.9);
+}
+
+.section-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.section-button i {
+    transition: transform 0.3s ease;
+    color: var(--blue-400);
+}
+
+/* === PROJECT GRID === */
 .main-projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive */
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive Grid */
+    gap: 2rem;
     margin-top: 3rem;
+    padding: 1rem;
 }
 
 .project-item {
@@ -114,7 +163,41 @@ body {
     border-radius: 8px;
 }
 
-/* Responsive Fixes */
+/* === CONTACT FLOATING BUTTON === */
+.contact-floating-button {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: linear-gradient(to right, var(--blue-500), var(--indigo-500));
+    color: white;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: none;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 50;
+}
+
+.contact-floating-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.contact-floating-button i {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.contact-floating-button:hover i {
+    transform: scale(1.1);
+}
+
+/* === RESPONSIVE FIXES === */
 @media (max-width: 768px) {
     .hero-content h2 {
         font-size: 2rem;
@@ -138,10 +221,6 @@ body {
 }
 
 @media (max-width: 640px) {
-    .nav-container {
-        padding: 0.5rem;
-    }
-
     .hero-content {
         padding: 1.5rem;
     }
