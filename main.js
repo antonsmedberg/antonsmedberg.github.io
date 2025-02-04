@@ -1,238 +1,228 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements with error checking
-    const elements = {
-        header: document.getElementById('main-header'),
-        announcement: document.getElementById('announcement-bar'),
-        menuToggle: document.getElementById('menu-toggle'),
-        menuContent: document.getElementById('menu-content'),
-        menuIcon: document.querySelector('.menu-icon'),
-        closeIcon: document.querySelector('.close-icon'),
-        sections: document.querySelectorAll('.section-button'),
-        projects: document.querySelectorAll('.project-item'),
-        contactBtn: document.querySelector('.contact-floating-button')
-    };
+    // DOM Elements
+    const header = document.getElementById('main-header');
+    const announcementBar = document.getElementById('announcement-bar');
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuContent = document.getElementById('menu-content');
+    const menuIcon = menuToggle.querySelector('.menu-icon');
+    const closeIcon = menuToggle.querySelector('.close-icon');
+    const sectionButtons = document.querySelectorAll('.section-button');
+    
+    // State
+    let lastScroll = 0;
+    let isMenuOpen = false;
 
-    // State Management
-    const state = {
-        lastScroll: 0,
-        isMenuOpen: false,
-        isScrolling: false,
-        scrollTimeout: null,
-        activeSection: null
-    };
-
-    // Enhanced Scroll Handler with Throttling
+    // Scroll Handler
     function handleScroll() {
-        if (state.isScrolling) return;
-        state.isScrolling = true;
-
-        requestAnimationFrame(() => {
-            const currentScroll = window.pageYOffset;
-            const scrollingDown = currentScroll > state.lastScroll;
-            
-            // Header Visibility with Smooth Transition
-            if (currentScroll > 100) {
-                if (scrollingDown) {
-                    elements.header.style.transform = 'translateY(-100%)';
-                } else {
-                    elements.header.style.transform = 'translateY(0)';
-                }
-            } else {
-                elements.header.style.transform = 'translateY(0)';
-            }
-
-            // Announcement Bar with Fade Effect
-            elements.announcement.style.opacity = Math.max(0, 1 - (currentScroll / 100));
-            if (currentScroll > 100) {
-                elements.announcement.style.height = '0px';
-            } else {
-                elements.announcement.style.height = '40px';
-            }
-
-            // Dynamic Navigation Styling
-            const navContainer = elements.header.querySelector('.nav-container');
-            const scrollProgress = Math.min(currentScroll / 100, 1);
-            navContainer.style.padding = `${0.75 - (scrollProgress * 0.25)}rem ${1.5 - (scrollProgress * 0.5)}rem`;
-            
-            state.lastScroll = currentScroll;
-            state.isScrolling = false;
-        });
+        const currentScroll = window.pageYOffset;
+        
+        // Handle header visibility
+        if (currentScroll > lastScroll && currentScroll > 50) {
+            header.classList.add('header-hidden');
+        } else {
+            header.classList.remove('header-hidden');
+        }
+        
+        // Handle announcement bar
+        if (currentScroll > 100) {
+            announcementBar.classList.add('hidden');
+        } else {
+            announcementBar.classList.remove('hidden');
+        }
+        
+        // Update nav padding
+        if (currentScroll > 50) {
+            header.querySelector('.nav-container').style.paddingTop = '0.5rem';
+        } else {
+            header.querySelector('.nav-container').style.paddingTop = '1rem';
+        }
+        
+        lastScroll = currentScroll;
     }
 
-    // Enhanced Menu Toggle with Animations
-    function toggleMenu(forceClose = false) {
-        state.isMenuOpen = forceClose ? false : !state.isMenuOpen;
+    // Toggle Menu
+    function toggleMenu() {
+        isMenuOpen = !isMenuOpen;
         
-        // Toggle Menu Classes
-        elements.menuContent.classList.toggle('active', state.isMenuOpen);
-        document.body.style.overflow = state.isMenuOpen ? 'hidden' : '';
-        
-        // Animate Icons
-        elements.menuIcon.style.transform = state.isMenuOpen ? 'rotate(-180deg)' : 'rotate(0)';
-        elements.closeIcon.style.transform = state.isMenuOpen ? 'rotate(0)' : 'rotate(180deg)';
-        elements.menuIcon.style.opacity = state.isMenuOpen ? '0' : '1';
-        elements.closeIcon.style.opacity = state.isMenuOpen ? '1' : '0';
-        
-        // Add backdrop blur to main content
-        document.querySelector('main').style.filter = state.isMenuOpen ? 'blur(5px)' : 'none';
-        
-        // Animate menu items
-        const menuItems = elements.menuContent.querySelectorAll('.section-button, .project-card, .contact-btn, .download-btn');
-        menuItems.forEach((item, index) => {
-            item.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-            item.style.transitionDelay = state.isMenuOpen ? `${index * 0.05}s` : '0s';
-            item.style.transform = state.isMenuOpen ? 'translateX(0)' : 'translateX(20px)';
-            item.style.opacity = state.isMenuOpen ? '1' : '0';
-        });
+        if (isMenuOpen) {
+            menuContent.classList.add('active');
+            menuIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+        } else {
+            menuContent.classList.remove('active');
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+        }
     }
 
-    // Enhanced Section Toggle with Smooth Animations
+    // Section Toggle
     function toggleSection(event) {
         const button = event.currentTarget;
         const sectionId = button.getAttribute('data-section');
         const content = document.getElementById(`${sectionId}-content`);
         const icon = button.querySelector('i');
         
-        if (state.activeSection === sectionId) {
-            // Close section
-            content.style.maxHeight = '0px';
-            button.classList.remove('active');
+        // Check if this section is already active
+        const isActive = content.classList.contains('active');
+        
+        // Close all sections first
+        document.querySelectorAll('.section-content').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.querySelectorAll('.section-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelectorAll('.section-button i').forEach(icon => {
             icon.style.transform = 'rotate(0deg)';
-            state.activeSection = null;
-        } else {
-            // Close previous section
-            if (state.activeSection) {
-                const prevContent = document.getElementById(`${state.activeSection}-content`);
-                const prevButton = document.querySelector(`[data-section="${state.activeSection}"]`);
-                prevContent.style.maxHeight = '0px';
-                prevButton.classList.remove('active');
-                prevButton.querySelector('i').style.transform = 'rotate(0deg)';
-            }
-            
-            // Open new section
-            content.style.maxHeight = `${content.scrollHeight}px`;
+        });
+        
+        // Toggle the clicked section
+        if (!isActive) {
+            content.classList.add('active');
             button.classList.add('active');
             icon.style.transform = 'rotate(90deg)';
-            state.activeSection = sectionId;
         }
     }
 
-    // Enhanced Project Interactions
-    function setupProjectInteractions() {
-        elements.projects.forEach(project => {
-            const link = project.querySelector('.project-external-link');
-            const img = project.querySelector('img');
-            
+    // Project Hover Effects
+    function setupProjectHoverEffects() {
+        const projects = document.querySelectorAll('.project-item');
+        
+        projects.forEach(project => {
             project.addEventListener('mouseenter', () => {
-                link.style.transform = 'translate(-5px, -5px)';
-                img.style.transform = 'scale(1.05)';
+                const link = project.querySelector('.project-external-link');
+                if (link) link.style.opacity = '1';
             });
             
             project.addEventListener('mouseleave', () => {
-                link.style.transform = 'translate(0, 0)';
-                img.style.transform = 'scale(1)';
-            });
-
-            // Add click ripple effect
-            project.addEventListener('click', (e) => {
-                const ripple = document.createElement('div');
-                ripple.classList.add('ripple');
-                const rect = project.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                ripple.style.width = ripple.style.height = `${size}px`;
-                ripple.style.left = `${e.clientX - rect.left - size/2}px`;
-                ripple.style.top = `${e.clientY - rect.top - size/2}px`;
-                project.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 1000);
+                const link = project.querySelector('.project-external-link');
+                if (link) link.style.opacity = '0.9';
             });
         });
     }
 
-    // Enhanced Contact Button
+    // Contact Button Animation
     function setupContactButton() {
-        if (!elements.contactBtn) return;
+        const contactBtn = document.querySelector('.contact-floating-button');
         
-        let pulseTimeout;
-        elements.contactBtn.addEventListener('mouseenter', () => {
-            clearTimeout(pulseTimeout);
-            elements.contactBtn.classList.add('pulse');
+        contactBtn.addEventListener('mouseenter', () => {
+            const icon = contactBtn.querySelector('i');
+            icon.style.transform = 'scale(1.1)';
         });
         
-        elements.contactBtn.addEventListener('mouseleave', () => {
-            pulseTimeout = setTimeout(() => {
-                elements.contactBtn.classList.remove('pulse');
-            }, 200);
+        contactBtn.addEventListener('mouseleave', () => {
+            const icon = contactBtn.querySelector('i');
+            icon.style.transform = 'scale(1)';
         });
         
-        elements.contactBtn.addEventListener('click', () => {
-            // Create and animate contact form modal
-            showContactModal();
-        });
-    }
-
-    // Contact Modal
-    function showContactModal() {
-        const modal = document.createElement('div');
-        modal.className = 'contact-modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <button class="close-modal">&times;</button>
-                <h2>Get in Touch</h2>
-                <form id="contact-form">
-                    <input type="text" placeholder="Name" required>
-                    <input type="email" placeholder="Email" required>
-                    <textarea placeholder="Message" required></textarea>
-                    <button type="submit">Send Message</button>
-                </form>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        setTimeout(() => modal.classList.add('active'), 10);
-        
-        modal.querySelector('.close-modal').addEventListener('click', () => {
-            modal.classList.remove('active');
-            setTimeout(() => modal.remove(), 300);
+        // Handle contact button click
+        contactBtn.addEventListener('click', () => {
+            // You can customize this to open a contact form or mailto link
+            window.location.href = 'mailto:contact@example.com';
         });
     }
 
-    // Initialize all event listeners and features
+    // Smooth Scroll for Navigation
+    function setupSmoothScroll() {
+        const links = document.querySelectorAll('a[href^="#"]');
+        
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Close menu if open
+                    if (isMenuOpen) {
+                        toggleMenu();
+                    }
+                }
+            });
+        });
+    }
+
+    // Download CV Handler
+    function setupDownloadCV() {
+        const downloadBtn = document.querySelector('.download-btn');
+        
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                // Replace with actual CV download link
+                const cvUrl = 'path/to/your/cv.pdf';
+                const link = document.createElement('a');
+                link.href = cvUrl;
+                link.download = 'JohnDoe_CV.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+    }
+
+    // Section Intersection Observer
+    function setupSectionObserver() {
+        const sections = document.querySelectorAll('section');
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '-20% 0px -20% 0px'
+        };
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('section-visible');
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            sectionObserver.observe(section);
+            section.classList.add('section-animate');
+        });
+    }
+
+    // Initialize all event listeners
     function init() {
-        // Scroll handling with debounce
-        let scrollTimeout;
-        window.addEventListener('scroll', () => {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(handleScroll, 10);
-        }, { passive: true });
+        // Scroll handling
+        window.addEventListener('scroll', handleScroll, { passive: true });
         
         // Menu toggle
-        elements.menuToggle.addEventListener('click', () => toggleMenu());
-        
-        // Close menu on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && state.isMenuOpen) toggleMenu(true);
-        });
-        
-        // Close menu on outside click
-        document.addEventListener('click', (e) => {
-            if (state.isMenuOpen && 
-                !elements.menuContent.contains(e.target) && 
-                !elements.menuToggle.contains(e.target)) {
-                toggleMenu(true);
-            }
-        });
+        menuToggle.addEventListener('click', toggleMenu);
         
         // Section toggles
-        elements.sections.forEach(button => {
+        sectionButtons.forEach(button => {
             button.addEventListener('click', toggleSection);
         });
         
-        // Setup other interactions
-        setupProjectInteractions();
+        // Setup all other interactions
+        setupProjectHoverEffects();
         setupContactButton();
+        setupSmoothScroll();
+        setupDownloadCV();
+        setupSectionObserver();
         
-        // Initial scroll position check
-        handleScroll();
+        // Handle click outside menu to close
+        document.addEventListener('click', (event) => {
+            const isClickInsideMenu = menuContent.contains(event.target) || 
+                                    menuToggle.contains(event.target);
+            
+            if (isMenuOpen && !isClickInsideMenu) {
+                toggleMenu();
+            }
+        });
+        
+        // Handle escape key to close menu
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && isMenuOpen) {
+                toggleMenu();
+            }
+        });
     }
 
     // Initialize everything
