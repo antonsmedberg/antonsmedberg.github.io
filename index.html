@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANTSM | Developer Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS -->
+    <script defer src="script.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script> <!-- Lucide Icons -->
+    
+    <style>
+        /* 🔥 Navbar Hide/Show Effect - Optimized */
+        .navbar-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+            will-change: transform, opacity; /* Boosts animation performance */
+            transition: transform 0.6s ease-out, opacity 0.5s ease-out;
+        }
+    
+        .navbar-visible {
+            transform: translateY(0);
+            opacity: 1;
+            will-change: transform, opacity;
+            transition: transform 0.6s ease-out, opacity 0.5s ease-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white scroll-smooth">
+
+    <!-- 📢 Announcement Bar -->
+    <div class="fixed top-0 left-0 right-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white text-xs md:text-sm font-medium text-center py-1 z-50 shadow-md animate-slide">
+        <span class="inline-flex items-center justify-center space-x-2">
+            <span class="animate-pulse">●</span>
+            <span class="tracking-wide">Elevating technology with seamless, high-performance solutions.</span>
+            <i data-lucide="code" class="w-4 h-4"></i>
+        </span>
+    </div>
+
+
+    <!-- 🌐 Navbar -->
+    <header id="navbar" class="fixed top-[50px] left-0 right-0 z-50 navbar-visible transition-all duration-500 ease-in-out">
+        <nav id="navbar-container" class="max-w-4xl mx-auto px-6 py-3 bg-gray-900/90 rounded-full shadow-lg border border-gray-800/50 flex items-center justify-between transition-all duration-300">
+            
+            <!-- 🔗 Logo -->
+            <a href="#" class="flex items-center text-white font-bold text-lg tracking-widest hover:text-blue-400 transition">
+                <i data-lucide="terminal" class="w-6 h-6"></i>
+                <span class="ml-2">ANTS</span>
+            </a>
+    
+            <!-- 🔹 Navigation Links -->
+            <div class="hidden md:flex flex-1 justify-center space-x-8 text-sm font-medium">
+                <a href="#about" class="text-gray-300 hover:text-blue-400 transition px-4 py-2 rounded-md hover:bg-white/10">About</a>
+                <a href="#projects" class="text-gray-300 hover:text-blue-400 transition px-4 py-2 rounded-md hover:bg-white/10">Projects</a>
+                <a href="#contact" class="text-gray-300 hover:text-blue-400 transition px-4 py-2 rounded-md hover:bg-white/10">Contact</a>
+            </div>
+    
+            <!-- Social Icons -->
+            <div class="flex items-center space-x-4">
+                <a href="https://github.com/antonsmedberg" target="_blank" rel="noopener noreferrer" title="GitHub Profile" class="text-gray-400 hover:text-white transition">
+                    <i data-lucide="github" class="w-5 h-5 hover:scale-110 transition-transform"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" rel="noopener noreferrer" title="LinkedIn Profile" class="text-gray-400 hover:text-white transition">
+                    <i data-lucide="linkedin" class="w-5 h-5 hover:scale-110 transition-transform"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+    
+
+
+    <!-- 🎯 Hero Section -->
+    <section class="relative h-[480px] flex flex-col items-center justify-center text-center mt-4">
+        <h1 class="text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 animate-text-glow">
+            Full-Stack Developer
+        </h1>
+        <p class="mt-3 text-gray-300 text-lg max-w-2xl">
+            Building cutting-edge mobile, AI, and web applications with precision and creativity.
+        </p>
+        <div class="mt-6 flex space-x-4">
+            <a href="#projects" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg transition transform hover:scale-105">View Projects</a>
+            <a href="#contact" class="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow-lg transition transform hover:scale-105">Hire Me</a>
+        </div>
+    </section>
+
+    <!-- 🔻 Decorative Divider -->
+    <div class="relative flex items-center justify-center my-8">
+        <span class="absolute inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-gray-600 to-transparent"></span>
+    </div>
+
+    <!-- 💡 About Me -->
+    <section id="about" class="w-full px-6 pt-10 pb-12 bg-gray-900 relative">
+        <div class="max-w-4xl mx-auto px-6 py-8">
+            <div class="text-center mb-5">
+                <h3 class="text-lg font-semibold text-gray-300 uppercase tracking-wide">About Me</h3>
+                <div class="w-20 h-[2px] bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 mx-auto mt-2"></div>
+            </div>
+            <div id="about-me-container"></div>
+        </div>
+    </section>
+
+    <!-- Load About Me Section Dynamically -->
+    <script src="aboutMe.js"></script>
+
+    <!-- Decorative Divider -->
+    <div class="relative flex items-center justify-center my-8">
+        <span class="absolute inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-gray-600 to-transparent"></span>
+    </div>
+
+    <!-- Projects Section (GitHub API) -->
+    <section id="projects" class="max-w-6xl mx-auto px-6 py-16">
+        <h2 class="text-5xl font-extrabold tracking-tight text-gray-100 text-center mt-2">Projects</h2>
+        <p class="text-gray-400 text-lg mt-3 text-center">Highlighted repositories from my GitHub.</p>
+
+
+        <!-- Loading Skeleton -->
+        <div id="loading" class="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="animate-pulse bg-gray-800 p-6 rounded-xl shadow-lg h-[240px]"></div>
+            <div class="animate-pulse bg-gray-800 p-6 rounded-xl shadow-lg h-[240px]"></div>
+            <div class="animate-pulse bg-gray-800 p-6 rounded-xl shadow-lg h-[240px]"></div>
+        </div>
+
+        <!-- Error Message -->
+        <p id="error-message" class="mt-4 text-red-500 text-lg hidden text-center">Failed to load projects. Please try again later.</p>
+
+        <!-- GitHub Projects -->
+        <div id="github-projects" class="mt-10 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Repositories will be dynamically injected here -->
+        </div>
+    </section>
+
+    
+    <!-- Decorative Divider -->
+    <div class="relative flex items-center justify-center my-8">
+        <span class="absolute inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-gray-600 to-transparent"></span>
+    </div>
+
+
+<!-- 📩 Contact Section -->
+<section id="contact" class="max-w-3xl mx-auto px-6 py-20 text-center">
+    <h2 class="text-5xl font-extrabold tracking-tight text-gray-100">Let's Connect</h2>
+    <p class="text-gray-300 mt-4 text-lg">I'd love to hear from you. Whether it's a project, collaboration, or just a chat.</p>
+
+    <form class="mt-10 bg-gray-800/60 backdrop-blur-xl p-10 rounded-2xl shadow-2xl border border-gray-700 max-w-3xl mx-auto relative">
+        
+        <!-- Floating Label Name Input -->
+        <div class="relative mb-6">
+            <input type="text" id="name" placeholder=" " 
+                class="peer w-full px-5 py-4 rounded-lg bg-gray-800 text-white placeholder-transparent border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none">
+            <label for="name" 
+                class="absolute left-5 top-4 text-gray-400 text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-focus:top-[-12px] peer-focus:text-blue-400 transition-all bg-gray-800 px-2">
+                Your Name
+            </label>
+        </div>
+
+        <!-- Floating Label Email Input -->
+        <div class="relative mb-6">
+            <input type="email" id="email" placeholder=" " 
+                class="peer w-full px-5 py-4 rounded-lg bg-gray-800 text-white placeholder-transparent border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none">
+            <label for="email" 
+                class="absolute left-5 top-4 text-gray-400 text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-focus:top-[-12px] peer-focus:text-blue-400 transition-all bg-gray-800 px-2">
+                Your Email
+            </label>
+        </div>
+
+        <!-- Floating Label Message Input -->
+        <div class="relative mb-6">
+            <textarea id="message" placeholder=" " rows="5"
+                class="peer w-full px-5 py-4 rounded-lg bg-gray-800 text-white placeholder-transparent border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none"></textarea>
+            <label for="message" 
+                class="absolute left-5 top-4 text-gray-400 text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-500 peer-focus:top-[-12px] peer-focus:text-blue-400 transition-all bg-gray-800 px-2">
+                Your Message
+            </label>
+        </div>
+
+        <!-- Submit Button with Glow Effect -->
+        <button type="submit" 
+            class="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium rounded-lg shadow-lg transform transition-transform hover:scale-105 focus:ring-2 focus:ring-blue-400">
+            🚀 Send Message
+        </button>
+    </form>
+</section>
+
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-8 text-center border-t border-gray-800">
+        <p class="text-gray-400 text-sm">&copy; 2025 ANTSM | Built with ❤️ by Anton Smedberg</p>
+    </footer>
+
+
+        <!-- JavaScript -->
+    <script>
+        lucide.createIcons();
+
+        async function fetchGitHubRepos() {
+            const username = "antonsmedberg"; // Replace with your GitHub username
+            const selectedRepos = [
+              "projekt-del-2-Ai", "Scrollable_Top_Bottom_Bar.kt", "Mocka_Axios", "Avancerad-java-Anton-Smedberg-slutprojekt", "3d_Particle_Cloud_Anton", "mazeAlgoritm" // Manually specify which repos to display
+            ]; 
+
+            const apiUrl = `https://api.github.com/users/${username}/repos?sort=updated&per_page=20`;
+
+          // Select elements
+            const projectsContainer = document.getElementById("github-projects");
+            const loadingIndicator = document.getElementById("loading");
+            const errorMessage = document.getElementById("error-message");
+
+            try {
+              // Show loading skeleton
+                loadingIndicator.style.display = "grid";
+                errorMessage.style.display = "none";
+
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error("GitHub API request failed.");
+                }
+
+                let repos = await response.json();
+
+              // Filter only the selected repositories
+                repos = repos.filter(repo => selectedRepos.includes(repo.name));
+
+              // Hide loading
+                loadingIndicator.style.display = "none";
+
+              // Display repositories with better layout and text alignment
+                projectsContainer.innerHTML = repos
+                    .map(repo => `
+                        <div class="relative bg-gray-900/90 backdrop-blur-lg rounded-xl p-6 shadow-lg border border-gray-800 hover:border-blue-500 transition hover:shadow-xl flex flex-col justify-between h-[240px]">
+                            <div>
+                                <div class="flex items-center space-x-3">
+                                    <i data-lucide="folder" class="w-6 h-6 text-blue-400"></i>
+                                    <h4 class="text-xl font-semibold text-gray-100 truncate">${repo.name}</h4>
+                                </div>
+                                <p class="text-gray-400 mt-2 text-sm line-clamp-3 h-[60px] overflow-hidden">
+                                    ${repo.description ? repo.description : "<span class='italic text-gray-500'>No description available.</span>"}
+                                </p>
+                            </div>
+
+                            <div class="mt-4 flex items-center justify-between">
+                                ${repo.language ? `<span class="px-3 py-1 text-xs font-medium rounded-md bg-gray-700 text-white">${repo.language}</span>` : ''}
+                                <a href="${repo.html_url}" target="_blank" class="flex items-center space-x-2 text-blue-500 hover:text-blue-400 transition">
+                                    <i data-lucide="external-link" class="w-6 h-6"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `)
+                    .join("");
+
+              // Reinitialize icons
+                lucide.createIcons();
+            } catch (error) {
+                console.error("Error fetching GitHub repositories:", error);
+                loadingIndicator.style.display = "none";
+                errorMessage.style.display = "block";
+            }
+        }
+
+        fetchGitHubRepos();
+    </script>
+
+</body>
+</html>
