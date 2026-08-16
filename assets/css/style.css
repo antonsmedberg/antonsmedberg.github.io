@@ -129,7 +129,9 @@ strong { font-weight: 700; }
 .brand__mark::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 4px rgba(112,223,205,.08); }
 .brand__role { margin-left: .05rem; font: 600 .64rem/1 var(--mono); color: var(--ink-3); letter-spacing: .12em; text-transform: uppercase; }
 .nav { display: flex; align-items: center; gap: .12rem; padding: .2rem; border: 1px solid rgba(126,143,165,.10); border-radius: 12px; background: rgba(255,255,255,.018); }
-.nav a { padding: .49rem .68rem; border-radius: 9px; color: var(--ink-2); font-size: .85rem; font-weight: 620; transition: color .18s, background .18s, transform .18s; }
+.nav a { padding: .49rem .68rem; border-radius: 9px; color: var(--ink-2); font-size: .85rem; font-weight: 620; transition: color .18s, background .18s, transform .18s; position: relative; }
+.nav a::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 0; height: 2px; background: var(--signal); transition: width .2s, left .2s; border-radius: 1px; }
+.nav a:hover::after, .nav a[aria-current="true"]::after { width: 60%; left: 20%; }
 .nav a:hover, .nav a[aria-current="true"] { color: var(--ink); background: var(--surface); }
 .header-actions { display: flex; align-items: center; gap: .45rem; }
 .icon-link { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: rgba(15,20,28,.72); color: var(--ink-2); transition: color .18s, border-color .18s, transform .18s; }
@@ -254,7 +256,7 @@ strong { font-weight: 700; }
   transform-origin: 50% 72%;
 }
 .identity-portrait {
-  width: min(100%, 386px);
+  width: min(100%, 320px);
   height: 100%;
   object-fit: cover;
   object-position: center 22%;
