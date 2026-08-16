@@ -12,6 +12,51 @@ if (masthead) {
   new IntersectionObserver(([entry]) => {
     masthead.dataset.stuck = String(!entry.isIntersecting);
   }).observe(sentinel);
+
+  // Smooth hide-on-scroll-down, show-on-scroll-up with compact state
+  let lastScroll = 0;
+  let ticking = false;
+  const compactThreshold = 80;
+  const hideThreshold = 200;
+  
+  const updateMasthead = () => {
+    ticking = false;
+    const scrollY = window.scrollY || window.pageYOffset;
+    const delta = scrollY - lastScroll;
+    lastScroll = scrollY;
+    
+    // Compact state after scrolling past threshold
+    if (scrollY > compactThreshold) {
+      masthead.dataset.compact = 'true';
+      const shrink = Math.min(1, (scrollY - compactThreshold) / 200);
+      masthead.style.setProperty('--nav-shrink', shrink.toFixed(3));
+    } else {
+      masthead.dataset.compact = 'false';
+      masthead.style.setProperty('--nav-shrink', '0');
+    }
+    
+    // Hide/show based on scroll direction
+    if (scrollY > hideThreshold) {
+      if (delta > 0) {
+        // Scrolling down — hide nav
+        masthead.dataset.hidden = 'true';
+      } else if (delta < 0) {
+        // Scrolling up — show nav
+        masthead.dataset.hidden = 'false';
+      }
+    } else {
+      masthead.dataset.hidden = 'false';
+    }
+  };
+  
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(updateMasthead);
+      ticking = true;
+    }
+  }, { passive: true });
+  
+  updateMasthead();
 }
 
 const field = document.getElementById('depth-field');

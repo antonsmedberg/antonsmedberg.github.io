@@ -106,7 +106,7 @@ strong { font-weight: 700; }
 .skip-link:focus { top: 1rem; }
 
 /* Floating navigation */
-.masthead { position: sticky; top: .65rem; z-index: 80; padding-top: .65rem; pointer-events: none; }
+.masthead { position: sticky; top: .65rem; z-index: 80; padding-top: .65rem; pointer-events: none; transition: padding-top .3s ease, top .3s ease, transform .4s cubic-bezier(.22,.61,.36,1), opacity .3s ease; }
 .masthead__inner {
   min-height: 58px;
   display: flex;
@@ -121,16 +121,34 @@ strong { font-weight: 700; }
   backdrop-filter: blur(22px) saturate(135%);
   -webkit-backdrop-filter: blur(22px) saturate(135%);
   pointer-events: auto;
-  transition: border-color .2s, background .2s, box-shadow .2s;
+  transition: all .35s cubic-bezier(.22,.61,.36,1);
+  transform-origin: top center;
+}
+.masthead[data-hidden="true"] { transform: translateY(-110%); opacity: 0; }
+.masthead[data-compact="true"] { padding-top: .25rem; top: .25rem; }
+.masthead[data-compact="true"] .masthead__inner {
+  min-height: 44px;
+  padding-block: .28rem;
+  border-radius: 14px;
+  background: rgba(8,10,14,.94);
+  box-shadow: 0 8px 28px rgba(0,0,0,.32), 0 0 0 1px rgba(112,223,205,.08);
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
 }
 .masthead[data-stuck="true"] .masthead__inner { border-color: rgba(126,143,165,.27); background: rgba(8,10,14,.91); box-shadow: 0 18px 55px rgba(0,0,0,.30); }
-.brand { display: flex; align-items: center; gap: .65rem; min-width: max-content; font-size: .92rem; font-weight: 760; letter-spacing: -.018em; }
-.brand__mark { position: relative; width: 17px; height: 17px; flex: none; border: 1px solid var(--line-strong); border-radius: 50%; }
+.masthead[data-compact="true"][data-stuck="true"] .masthead__inner { border-color: rgba(112,223,205,.18); }
+.brand { display: flex; align-items: center; gap: .65rem; min-width: max-content; font-size: .92rem; font-weight: 760; letter-spacing: -.018em; transition: gap .3s ease, font-size .3s ease; }
+.masthead[data-compact="true"] .brand { gap: .5rem; font-size: .85rem; }
+.brand__mark { position: relative; width: 17px; height: 17px; flex: none; border: 1px solid var(--line-strong); border-radius: 50%; transition: width .3s ease, height .3s ease; }
+.masthead[data-compact="true"] .brand__mark { width: 14px; height: 14px; }
 .brand__mark::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 4px rgba(112,223,205,.08); }
-.brand__role { margin-left: .05rem; font: 600 .64rem/1 var(--mono); color: var(--ink-3); letter-spacing: .12em; text-transform: uppercase; }
-.nav { display: flex; align-items: center; gap: .12rem; padding: .2rem; border: 1px solid rgba(126,143,165,.10); border-radius: 12px; background: rgba(255,255,255,.018); position: relative; }
+.brand__role { margin-left: .05rem; font: 600 .64rem/1 var(--mono); color: var(--ink-3); letter-spacing: .12em; text-transform: uppercase; transition: opacity .3s ease, font-size .3s ease; }
+.masthead[data-compact="true"] .brand__role { font-size: .58rem; }
+.nav { display: flex; align-items: center; gap: .12rem; padding: .2rem; border: 1px solid rgba(126,143,165,.10); border-radius: 12px; background: rgba(255,255,255,.018); position: relative; transition: all .35s cubic-bezier(.22,.61,.36,1); }
 .nav::before { content: ""; position: absolute; inset: -1px; border-radius: 12px; background: linear-gradient(135deg, rgba(112,223,205,.08), transparent 50%, rgba(138,141,244,.06)); z-index: -1; }
-.nav a { padding: .49rem .68rem; border-radius: 9px; color: var(--ink-2); font-size: .85rem; font-weight: 620; transition: color .18s, background .18s, transform .18s; position: relative; }
+.masthead[data-compact="true"] .nav { padding: .15rem; border-radius: 10px; }
+.nav a { padding: .49rem .68rem; border-radius: 9px; color: var(--ink-2); font-size: .85rem; font-weight: 620; transition: color .18s, background .18s, transform .18s, padding .3s ease, font-size .3s ease; position: relative; }
+.masthead[data-compact="true"] .nav a { padding: .38rem .55rem; font-size: .8rem; }
 .nav a::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 0; height: 2px; background: linear-gradient(90deg, var(--signal), #8a8df4); transition: width .25s, left .25s; border-radius: 1px; }
 .nav a:hover::after, .nav a[aria-current="true"]::after { width: 60%; left: 20%; }
 .nav a:hover, .nav a[aria-current="true"] { color: var(--ink); background: var(--surface); }
