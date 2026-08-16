@@ -1,69 +1,23 @@
-/**
- * main.js — progressive enhancement only.
- * Every word of content is already in the HTML; nothing here is required to
- * read the page. Keeps the site crawlable and resilient if JS fails.
- */
-
 import { mountDepthField } from './depth-field.js';
-
-/* Mark the document as scripted. Reveal animations are gated on this class,
-   so a failed or blocked script leaves the page fully readable. */
+document.documentElement.classList.remove('no-js');
 document.documentElement.classList.add('js');
 
-/* Hero depth field ---------------------------------------------------------- */
-const field = document.getElementById('depth-field');
-if (field) mountDepthField(field);
+const masthead=document.querySelector('.masthead');
+if(masthead){const s=document.createElement('span');s.setAttribute('aria-hidden','true');s.style.cssText='position:absolute;top:0;width:1px;height:1px';document.body.prepend(s);new IntersectionObserver(([e])=>masthead.dataset.stuck=String(!e.isIntersecting)).observe(s)}
 
-/* Sticky header hairline ---------------------------------------------------- */
-const masthead = document.querySelector('.masthead');
-if (masthead) {
-  const sentinel = document.createElement('div');
-  sentinel.setAttribute('aria-hidden', 'true');
-  sentinel.style.cssText = 'position:absolute;top:0;height:1px;width:1px;';
-  document.body.prepend(sentinel);
+const field=document.getElementById('depth-field');if(field)mountDepthField(field);
 
-  new IntersectionObserver(([entry]) => {
-    masthead.dataset.stuck = String(!entry.isIntersecting);
-  }).observe(sentinel);
-}
+const reveals=[...document.querySelectorAll('.reveal')];
+if(reveals.length){const io=new IntersectionObserver((entries,obs)=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-visible');obs.unobserve(e.target)}}),{rootMargin:'0px 0px -7% 0px',threshold:.06});reveals.forEach(el=>io.observe(el))}
 
-/* Scroll reveal ------------------------------------------------------------- */
-const revealables = document.querySelectorAll('[data-reveal]');
-if (revealables.length) {
-  const io = new IntersectionObserver((entries, obs) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('is-visible');
-      obs.unobserve(entry.target);
-    });
-  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+document.querySelectorAll('[data-year]').forEach(el=>el.textContent=new Date().getFullYear());
 
-  revealables.forEach((el) => io.observe(el));
-}
-
-/* Scroll spy — marks the nav link for the section in view -------------------- */
-const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')];
-if (navLinks.length) {
-  const sections = navLinks
-    .map((link) => document.querySelector(link.getAttribute('href')))
-    .filter(Boolean);
-
-  const spy = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      navLinks.forEach((link) => {
-        link.setAttribute(
-          'aria-current',
-          link.getAttribute('href') === `#${entry.target.id}` ? 'true' : 'false'
-        );
-      });
-    });
-  }, { rootMargin: '-45% 0px -50% 0px' });
-
-  sections.forEach((section) => spy.observe(section));
-}
-
-/* Footer year --------------------------------------------------------------- */
-document.querySelectorAll('[data-year]').forEach((el) => {
-  el.textContent = String(new Date().getFullYear());
+// Keep optional CV downloads invisible when the binary is not present in a fresh clone.
+document.querySelectorAll('[data-optional-file]').forEach(async link=>{
+  try{const r=await fetch(link.getAttribute('href'),{method:'HEAD',cache:'no-store'});if(!r.ok)link.hidden=true}catch{link.hidden=true}
 });
+
+// Scroll spy for anchors that exist on the current page.
+const navLinks=[...document.querySelectorAll('.nav a[href^="#"]')];
+const sections=navLinks.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+if(sections.length){const spy=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting)return;navLinks.forEach(a=>{if(a.getAttribute('href')===`#${e.target.id}`)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')})}),{rootMargin:'-45% 0px -50%'});sections.forEach(s=>spy.observe(s))}
