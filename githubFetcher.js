@@ -2,12 +2,9 @@ class GitHubRepositoryFetcher {
   constructor() {
       this.username = "antonsmedberg";
       this.selectedRepos = [
-          "projekt-del-2-Ai",
-          "Scrollable_Top_Bottom_Bar.kt",
-          "Mocka_Axios",
-          "Avancerad-java-Anton-Smedberg-slutprojekt",
-          "3d_Particle_Cloud_Anton",
-          "mazeAlgoritm"
+          "MetalVisualKit",
+          "DeviceMonitor-Examensarbete",
+          "antonsmedberg.github.io"
       ];
       this.elements = {
           container: document.getElementById("github-projects"),
