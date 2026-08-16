@@ -84,3 +84,62 @@ if (!reducedMotion && finePointer && parallaxItems.length) {
   addEventListener('resize', requestUpdate, { passive: true });
   requestUpdate();
 }
+
+// Prefer a transparent portrait cutout when the optimized asset exists.
+// The normal portrait remains a safe fallback, so fresh clones never break.
+const cutoutPortrait = document.querySelector('[data-cutout]');
+if (cutoutPortrait) {
+  const stage = cutoutPortrait.closest('[data-depth-stage]');
+  const candidates = [cutoutPortrait.dataset.cutoutAvif, cutoutPortrait.dataset.cutoutWebp].filter(Boolean);
+  const tryCandidate = (index = 0) => {
+    if (index >= candidates.length) return;
+    const probe = new Image();
+    probe.decoding = 'async';
+    probe.onload = () => {
+      cutoutPortrait.src = candidates[index];
+      stage?.classList.add('has-alpha-cutout');
+    };
+    probe.onerror = () => tryCandidate(index + 1);
+    probe.src = candidates[index];
+  };
+  tryCandidate();
+}
+
+// Layered hero depth: the portrait moves least, the mesh/particles move more.
+// Transform-only and disabled for reduced motion / coarse pointers.
+const depthStages = [...document.querySelectorAll('[data-depth-stage]')];
+if (!reducedMotion && finePointer && depthStages.length) {
+  let depthFrame = 0;
+  let pointerX = 0;
+  let pointerY = 0;
+
+  const renderDepth = () => {
+    depthFrame = 0;
+    const viewportCenter = innerHeight * 0.5;
+    for (const stage of depthStages) {
+      const rect = stage.getBoundingClientRect();
+      if (rect.bottom < -120 || rect.top > innerHeight + 120) continue;
+      const stageCenter = rect.top + rect.height * 0.5;
+      const scrollRatio = Math.max(-1, Math.min(1, (stageCenter - viewportCenter) / innerHeight));
+      stage.querySelectorAll('[data-depth-layer]').forEach(layer => {
+        const speed = Math.max(0, Math.min(.5, Number(layer.dataset.depthLayer) || .1));
+        layer.style.setProperty('--depth-scroll', `${(-scrollRatio * speed * 28).toFixed(2)}px`);
+        layer.style.setProperty('--depth-x', `${(pointerX * speed * 5).toFixed(2)}px`);
+        layer.style.setProperty('--depth-y', `${(pointerY * speed * 4).toFixed(2)}px`);
+        layer.style.setProperty('--depth-r', `${(pointerX * speed * .55).toFixed(3)}deg`);
+      });
+    }
+  };
+  const requestDepth = () => {
+    if (!depthFrame) depthFrame = requestAnimationFrame(renderDepth);
+  };
+  addEventListener('pointermove', event => {
+    pointerX = (event.clientX / innerWidth - .5) * 2;
+    pointerY = (event.clientY / innerHeight - .5) * 2;
+    requestDepth();
+  }, { passive: true });
+  addEventListener('scroll', requestDepth, { passive: true });
+  addEventListener('resize', requestDepth, { passive: true });
+  requestDepth();
+}
+
