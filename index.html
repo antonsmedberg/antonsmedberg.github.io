@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Anton Smedberg — iOS Developer in Malmö | Swift, SwiftUI, Metal</title>
+<meta name="description" content="Anton Smedberg is an iOS developer in Malmö, Sweden. Swift 6, SwiftUI, Swift Concurrency, AVFoundation and Metal. Five months in Axis Communications' Mobile Apps team. Open to iOS roles in Malmö, Lund and Copenhagen.">
+<meta name="author" content="Anton Smedberg">
+<link rel="canonical" href="https://antonsmedberg.github.io/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#080b11">
+
+<!-- Open Graph / LinkedIn -->
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Anton Smedberg">
+<meta property="og:title" content="Anton Smedberg — iOS Developer in Malmö">
+<meta property="og:description" content="Swift 6, SwiftUI, AVFoundation and Metal. On-device apps built for real devices. Open to iOS roles in Malmö, Lund and Copenhagen.">
+<meta property="og:url" content="https://antonsmedberg.github.io/">
+<meta property="og:image" content="https://antonsmedberg.github.io/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Anton Smedberg — iOS Developer, Swift · SwiftUI · Metal">
+<meta property="og:locale" content="en_GB">
+<meta property="profile:first_name" content="Anton">
+<meta property="profile:last_name" content="Smedberg">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Anton Smedberg — iOS Developer in Malmö">
+<meta name="twitter:description" content="Swift 6, SwiftUI, AVFoundation and Metal. On-device apps built for real devices.">
+<meta name="twitter:image" content="https://antonsmedberg.github.io/assets/img/og-image.png">
+
+<!-- Icons & manifest -->
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Type -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@700&display=swap">
+
+<link rel="stylesheet" href="/assets/css/style.css">
+
+<!-- Structured data: this is what Google reads to build a knowledge panel
+     and what makes the profile answerable in search. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "url": "https://antonsmedberg.github.io/",
+  "dateModified": "2026-08-16",
+  "mainEntity": {
+    "@type": "Person",
+    "@id": "https://antonsmedberg.github.io/#anton",
+    "name": "Anton Smedberg",
+    "givenName": "Anton",
+    "familyName": "Smedberg",
+    "jobTitle": "iOS Developer",
+    "description": "iOS developer working in Swift, SwiftUI and Swift Concurrency, with a focus on on-device media processing, AVFoundation and Metal rendering.",
+    "url": "https://antonsmedberg.github.io/",
+    "image": "https://antonsmedberg.github.io/assets/img/anton-smedberg.png",
+    "email": "mailto:anton@smedberg.eu",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Malmö",
+      "addressRegion": "Skåne",
+      "addressCountry": "SE"
+    },
+    "sameAs": [
+      "https://github.com/antonsmedberg",
+      "https://www.linkedin.com/in/anton-smedberg-a9aa6121b/"
+    ],
+    "knowsLanguage": [
+      { "@type": "Language", "name": "Swedish", "alternateName": "sv" },
+      { "@type": "Language", "name": "English", "alternateName": "en" }
+    ],
+    "knowsAbout": [
+      "iOS development", "Swift", "SwiftUI", "Swift Concurrency", "UIKit",
+      "AVFoundation", "Metal", "ARKit", "SwiftData", "Core ML",
+      "Kotlin", "Jetpack Compose", "Java", "Spring Boot", "REST APIs", "GraphQL"
+    ],
+    "alumniOf": [
+      { "@type": "EducationalOrganization", "name": "Grit Academy" },
+      { "@type": "EducationalOrganization", "name": "Malmö Yrkeshögskola" }
+    ],
+    "seeks": {
+      "@type": "Demand",
+      "name": "Early-career iOS developer roles in Malmö, Lund and Copenhagen"
+    }
+  }
+}
+</script>
+
+<script type="module" src="/assets/js/main.js"></script>
+</head>
+
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- Icon sprite: local, so there is no icon CDN to fail. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-github" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.2 3.44 9.6 8.2 11.16.6.1.82-.25.82-.56v-2.17c-3.34.7-4.04-1.4-4.04-1.4-.55-1.36-1.34-1.72-1.34-1.72-1.09-.72.08-.71.08-.71 1.2.08 1.84 1.2 1.84 1.2 1.07 1.79 2.8 1.27 3.48.97.11-.76.42-1.28.76-1.57-2.67-.29-5.47-1.3-5.47-5.81 0-1.28.47-2.33 1.24-3.15-.13-.29-.54-1.48.11-3.09 0 0 1.01-.31 3.3 1.2a11.6 11.6 0 0 1 6.01 0c2.29-1.51 3.3-1.2 3.3-1.2.65 1.61.24 2.8.12 3.09.77.82 1.23 1.87 1.23 3.15 0 4.52-2.8 5.51-5.48 5.8.43.36.81 1.08.81 2.18v3.23c0 .31.22.67.83.56A11.8 11.8 0 0 0 24 12.29C24 5.78 18.63.5 12 .5z"/>
+  </symbol>
+  <symbol id="i-linkedin" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.06 3.77-2.06C20.6 8.64 22 11.1 22 14.6V21h-4v-5.7c0-1.36-.02-3.1-1.9-3.1-1.9 0-2.2 1.48-2.2 3v5.8H9z"/>
+  </symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>
+  </symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h3"/>
+  </symbol>
+  <symbol id="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+  </symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>
+  </symbol>
+</svg>
+
+<header class="masthead">
+  <div class="shell masthead__inner">
+    <a class="wordmark" href="/" aria-label="Anton Smedberg — home">
+      <span class="wordmark__dot" aria-hidden="true"></span>
+      <span>Anton Smedberg</span>
+      <span class="wordmark__role">iOS</span>
+    </a>
+
+    <nav class="nav" aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
+      <a href="#toolkit">Toolkit</a>
+      <a href="/cv.html">CV</a>
+    </nav>
+
+    <div class="masthead__actions">
+      <a class="icon-btn" href="https://github.com/antonsmedberg" rel="me noopener" target="_blank" aria-label="GitHub profile">
+        <svg aria-hidden="true"><use href="#i-github"></use></svg>
+      </a>
+      <a class="icon-btn" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" rel="me noopener" target="_blank" aria-label="LinkedIn profile">
+        <svg aria-hidden="true"><use href="#i-linkedin"></use></svg>
+      </a>
+      <!-- TODO: replace anton@smedberg.eu everywhere in this file and in cv.html -->
+      <a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS%20role%20—%20Anton%20Smedberg">Get in touch</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ======================================================= HERO -->
+  <section class="hero">
+    <canvas class="hero__field" id="depth-field" aria-hidden="true"></canvas>
+
+    <div class="shell hero__inner">
+      <div>
+        <p class="hero__status">
+          <span class="hero__pulse" aria-hidden="true"></span>
+          Open to iOS roles · Malmö · Lund · Copenhagen
+        </p>
+
+        <h1>
+          Anton Smedberg
+          <span class="hero__rule">iOS developer — Swift, SwiftUI, Metal</span>
+        </h1>
+
+        <p class="hero__lede">
+          I build iOS apps that do their work on the device: speech, video and GPU
+          rendering, written in Swift 6 under strict concurrency. Five months inside
+          Axis Communications' Mobile Apps team in Lund; now building and shipping my own.
+        </p>
+
+        <div class="hero__cta">
+          <a class="btn btn--primary" href="/cv.html">
+            <svg aria-hidden="true"><use href="#i-doc"></use></svg>
+            Read my CV
+          </a>
+          <a class="btn btn--ghost" href="#work">See the work</a>
+        </div>
+
+        <p class="hero__meta">
+          <span><b>Based in</b> Malmö, Sweden</span>
+          <span><b>Working</b> on-site, hybrid or remote</span>
+          <span><b>Languages</b> Swedish, English</span>
+        </p>
+      </div>
+
+      <figure class="portrait">
+        <div class="portrait__frame">
+          <span class="portrait__fallback" aria-hidden="true">AS</span>
+          <!-- Replace with a real photo at assets/img/anton-smedberg.png (800×1000).
+               If the file is missing the element removes itself and the frame stays clean. -->
+          <img src="/assets/img/anton-smedberg.png"
+               alt="Portrait of Anton Smedberg"
+               width="800" height="1000"
+               onerror="this.remove()">
+        </div>
+        <figcaption class="portrait__caption">Malmö, Skåne · SE</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================================================= ABOUT -->
+  <section class="band band--tight band--hairline" id="about" data-reveal>
+    <div class="shell split">
+      <div>
+        <p class="eyebrow">About</p>
+        <h2 class="band-head" style="font-size:var(--step-2)">
+          Junior by title, production-trained by practice.
+        </h2>
+      </div>
+
+      <div class="prose stack-md">
+        <p>
+          My iOS work started at <strong>Malmö Yrkeshögskola</strong> and got serious at
+          <strong>Axis Communications</strong>, where I spent five months inside an established
+          production codebase — not a sandbox. I shipped SwiftUI improvements, migrated
+          asynchronous flows to <strong>async/await</strong> under strict Swift Concurrency,
+          worked on live-video controls, and added Datadog and OpenTelemetry instrumentation
+          so failures could actually be traced.
+        </p>
+        <p>
+          Since graduating in May 2026 I've been building independently: an on-device
+          captioning app, a Metal Gaussian-splat renderer, and an open-source Swift package
+          for GPU-backed SwiftUI components. The common thread is doing the heavy work
+          <strong>on the device</strong> — no servers, no accounts, no data leaving the phone.
+        </p>
+        <p>
+          I also carry a Java backend degree (Spring Boot, JPA, SQL) and a year of
+          Android/Kotlin, which means I can read the other side of an API instead of
+          guessing at it.
+        </p>
+
+        <ul class="facts" style="margin-top:1.75rem">
+          <li><span class="facts__key">Seeking</span><span class="facts__val">Early-career iOS / mobile developer</span></li>
+          <li><span class="facts__key">Where</span><span class="facts__val">Malmö · Lund · Copenhagen · hybrid or remote</span></li>
+          <li><span class="facts__key">Notice</span><span class="facts__val">Available now</span></li>
+          <li><span class="facts__key">På svenska</span><span class="facts__val">iOS-utvecklare i Malmö. Söker jobb som mobilutvecklare i Skåne eller Köpenhamn.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================= WORK -->
+  <section class="band" id="work">
+    <div class="shell">
+      <div class="band-head" data-reveal>
+        <p class="eyebrow">Selected work</p>
+        <h2>Four things I built, and what each one taught me.</h2>
+        <p class="lede">Status is stated plainly — shipped, in development, or open source. No mockups pretending to be products.</p>
+      </div>
+
+      <div class="work-grid">
+
+        <article class="card" style="--accent: var(--near)" data-reveal>
+          <div class="card__top">
+            <div>
+              <h3>Subtl</h3>
+              <p class="card__sub">iOS app · one-time purchase</p>
+            </div>
+            <span class="status">In development</span>
+          </div>
+          <div class="card__body">
+            <p>
+              Privacy-first captioning for short-form video. Transcription runs entirely
+              on-device through Apple's SpeechAnalyzer — no upload, no account. Five caption
+              styles render identically in preview and export, enforced by a single
+              <code>CaptionStyle</code> source of truth and a Core Animation compositor.
+            </p>
+            <p style="margin-top:.75rem">
+              The interesting problem was <em>preview/export parity</em>: what you see while
+              scrubbing has to be pixel-identical to what AVFoundation writes to the file.
+            </p>
+          </div>
+          <div class="chips">
+            <span class="chip">Swift 6</span><span class="chip">SpeechAnalyzer</span>
+            <span class="chip">AVFoundation</span><span class="chip">Actors</span>
+            <span class="chip">StoreKit 2</span>
+          </div>
+        </article>
+
+        <article class="card" style="--accent: var(--mid)" data-reveal>
+          <div class="card__top">
+            <div>
+              <h3>Prism Spatial</h3>
+              <p class="card__sub">iOS app · 3D viewer</p>
+            </div>
+            <span class="status">In development</span>
+          </div>
+          <div class="card__body">
+            <p>
+              A 3D Gaussian-splat viewer. Imports PLY captures from tools like Scaniverse and
+              renders them with a hand-written Metal splat renderer using EWA covariance
+              projection, then applies tilt-shift and colour grading to make the scene read
+              as a miniature.
+            </p>
+            <p style="margin-top:.75rem">
+              I rescoped it after finding Apple's RealityKit splat component was render-only
+              in beta — knowing when a framework can't carry you is part of the job.
+            </p>
+          </div>
+          <div class="chips">
+            <span class="chip">Metal</span><span class="chip">ARKit / LiDAR</span>
+            <span class="chip">RealityKit</span><span class="chip">SwiftData</span>
+          </div>
+        </article>
+
+        <article class="card" style="--accent: var(--far)" data-reveal>
+          <div class="card__top">
+            <div>
+              <h3>MetalVisualKit</h3>
+              <p class="card__sub">Swift package · MIT</p>
+            </div>
+            <span class="status">Open source</span>
+          </div>
+          <div class="card__body">
+            <p>
+              Metal-backed SwiftUI components: a GPU particle progress loader driven by a
+              compute shader, and an ARKit LiDAR point-cloud renderer that unprojects roughly
+              49,000 depth samples per frame on the GPU.
+            </p>
+            <p style="margin-top:.75rem">
+              Published as a proper SPM package — DocC documentation, unit tests, an example
+              app and CI — because a library nobody can integrate isn't a library.
+            </p>
+          </div>
+          <div class="chips">
+            <span class="chip">Metal</span><span class="chip">SwiftUI</span>
+            <span class="chip">ARKit</span><span class="chip">SPM</span><span class="chip">DocC</span>
+          </div>
+          <div class="card__links">
+            <a href="https://github.com/antonsmedberg/MetalVisualKit" rel="noopener" target="_blank">
+              <svg aria-hidden="true"><use href="#i-github"></use></svg>
+              Source on GitHub
+            </a>
+          </div>
+        </article>
+
+        <article class="card" style="--accent: var(--far)" data-reveal>
+          <div class="card__top">
+            <div>
+              <h3>DeviceMonitor</h3>
+              <p class="card__sub">Degree project · 2026</p>
+            </div>
+            <span class="status">Public repo</span>
+          </div>
+          <div class="card__body">
+            <p>
+              A network-device monitoring app in SwiftUI and SwiftData, written under strict
+              Swift 6 concurrency. My degree project, and the piece where I worked out how to
+              keep a data layer safe across actor boundaries without fighting the compiler.
+            </p>
+          </div>
+          <div class="chips">
+            <span class="chip">SwiftUI</span><span class="chip">SwiftData</span>
+            <span class="chip">Swift 6</span><span class="chip">Concurrency</span>
+          </div>
+          <div class="card__links">
+            <a href="https://github.com/antonsmedberg/DeviceMonitor" rel="noopener" target="_blank">
+              <svg aria-hidden="true"><use href="#i-github"></use></svg>
+              Source on GitHub
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================= EXPERIENCE -->
+  <section class="band band--hairline" id="experience">
+    <div class="shell split">
+      <div data-reveal>
+        <p class="eyebrow">Experience</p>
+        <h2 style="font-size:var(--step-2)">Where the code went into production.</h2>
+        <p style="color:var(--ink-2);margin-top:1rem;font-size:var(--step--1)">
+          Full detail, including education and references, is on the
+          <a href="/cv.html" style="color:var(--far);text-decoration:underline;text-underline-offset:3px">CV page</a>.
+        </p>
+      </div>
+
+      <ol class="timeline" data-reveal>
+
+        <li class="entry" data-current="true">
+          <p class="entry__when">Jun 2026 — present</p>
+          <h3 class="entry__role">Independent iOS Developer</h3>
+          <p class="entry__org">Self-employed · <em>Malmö, remote</em></p>
+          <ul class="entry__points">
+            <li>Designing and building iOS apps end to end in Swift 6 and SwiftUI, from architecture to App Store preparation.</li>
+            <li>On-device speech and video processing with AVFoundation; GPU rendering with Metal and ARKit.</li>
+            <li>Published MetalVisualKit as an open-source Swift package with tests, DocC and CI.</li>
+          </ul>
+        </li>
+
+        <li class="entry">
+          <p class="entry__when">Jan — May 2026</p>
+          <h3 class="entry__role">iOS Developer Intern (LIA) — Mobile Apps</h3>
+          <p class="entry__org">Axis Communications · <em>Lund, on-site</em></p>
+          <ul class="entry__points">
+            <li>Delivered Swift and SwiftUI improvements, bug fixes and connected-device functionality in an established production app.</li>
+            <li>Migrated selected asynchronous flows to async/await under strict Swift Concurrency requirements.</li>
+            <li>Worked on live-video controls including microphone, speaker and PTZ interactions.</li>
+            <li>Added Datadog and OpenTelemetry instrumentation for traceability and troubleshooting.</li>
+            <li>Worked in a Jira-based agile workflow — refinement, pull requests, code review, testing and QA — alongside iOS and Android colleagues.</li>
+          </ul>
+        </li>
+
+        <li class="entry">
+          <p class="entry__when">Apr — Nov 2023</p>
+          <h3 class="entry__role">Android Developer</h3>
+          <p class="entry__org">Weavy · <em>Malmö</em></p>
+          <ul class="entry__points">
+            <li>Built chat features in Kotlin and Jetpack Compose against a REST backend.</li>
+            <li>First professional exposure to code review, release cadence and working from real specs.</li>
+          </ul>
+        </li>
+
+      </ol>
+    </div>
+  </section>
+
+  <!-- ======================================================= TOOLKIT -->
+  <section class="band" id="toolkit">
+    <div class="shell">
+      <div class="band-head" data-reveal>
+        <p class="eyebrow">Toolkit</p>
+        <h2>What I reach for.</h2>
+        <p class="lede">Grouped by what it's for, not by how confident it makes me sound.</p>
+      </div>
+
+      <div class="toolkit">
+        <div class="toolkit__group" data-reveal>
+          <h3>Platform</h3>
+          <div class="chips">
+            <span class="chip">Swift 6</span><span class="chip">SwiftUI</span>
+            <span class="chip">UIKit</span><span class="chip">Swift Concurrency</span>
+            <span class="chip">Actors</span><span class="chip">SwiftData</span>
+            <span class="chip">Combine</span>
+          </div>
+        </div>
+
+        <div class="toolkit__group" data-reveal>
+          <h3>Media &amp; graphics</h3>
+          <div class="chips">
+            <span class="chip">AVFoundation</span><span class="chip">Metal</span>
+            <span class="chip">ARKit</span><span class="chip">RealityKit</span>
+            <span class="chip">Core Image</span><span class="chip">SpeechAnalyzer</span>
+            <span class="chip">Core ML</span>
+          </div>
+        </div>
+
+        <div class="toolkit__group" data-reveal>
+          <h3>Build &amp; ship</h3>
+          <div class="chips">
+            <span class="chip">Xcode</span><span class="chip">Swift Package Manager</span>
+            <span class="chip">XCTest</span><span class="chip">Instruments</span>
+            <span class="chip">StoreKit 2</span><span class="chip">TestFlight</span>
+            <span class="chip">os.Logger</span>
+          </div>
+        </div>
+
+        <div class="toolkit__group" data-reveal>
+          <h3>Other platforms</h3>
+          <div class="chips">
+            <span class="chip">Kotlin</span><span class="chip">Jetpack Compose</span>
+            <span class="chip">Java</span><span class="chip">Spring Boot</span>
+            <span class="chip">JPA</span><span class="chip">SQL</span>
+            <span class="chip">REST</span><span class="chip">GraphQL</span>
+          </div>
+        </div>
+
+        <div class="toolkit__group" data-reveal>
+          <h3>Ways of working</h3>
+          <div class="chips">
+            <span class="chip">Git</span><span class="chip">GitHub Actions</span>
+            <span class="chip">Jira</span><span class="chip">Code review</span>
+            <span class="chip">Agile / Scrum</span><span class="chip">Datadog</span>
+            <span class="chip">OpenTelemetry</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================= CONTACT -->
+  <section class="band band--tight" id="contact">
+    <div class="shell">
+      <div class="contact" data-reveal>
+        <p class="eyebrow">Contact</p>
+        <h2>Hiring for an iOS team in Skåne or Copenhagen?</h2>
+        <p>
+          I'm looking for an early-career iOS role where I can keep learning from people who've
+          shipped more than I have. Happy to walk through any of the code above, or take a
+          take-home test. Fastest way to reach me is email.
+        </p>
+
+        <div class="channels">
+          <a class="channel" href="mailto:anton@smedberg.eu?subject=iOS%20role%20—%20Anton%20Smedberg">
+            <svg aria-hidden="true"><use href="#i-mail"></use></svg>
+            <span class="channel__text"><span class="channel__label">Email</span><span class="channel__value">anton@smedberg.eu</span></span>
+          </a>
+          <a class="channel" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" rel="me noopener" target="_blank">
+            <svg aria-hidden="true"><use href="#i-linkedin"></use></svg>
+            <span class="channel__text"><span class="channel__label">LinkedIn</span><span class="channel__value">anton-smedberg</span></span>
+          </a>
+          <a class="channel" href="https://github.com/antonsmedberg" rel="me noopener" target="_blank">
+            <svg aria-hidden="true"><use href="#i-github"></use></svg>
+            <span class="channel__text"><span class="channel__label">GitHub</span><span class="channel__value">antonsmedberg</span></span>
+          </a>
+          <div class="channel">
+            <svg aria-hidden="true"><use href="#i-pin"></use></svg>
+            <span class="channel__text"><span class="channel__label">Location</span><span class="channel__value">Malmö, Sweden</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="shell footer__inner">
+    <p>© <span data-year>2026</span> Anton Smedberg · Malmö</p>
+    <p>
+      <a href="/cv.html">CV</a> ·
+      <a href="https://github.com/antonsmedberg/antonsmedberg.github.io" rel="noopener" target="_blank">Source of this site</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
