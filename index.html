@@ -59,7 +59,7 @@
 <header class="masthead">
   <div class="masthead__inner">
     <a class="brand" href="/" aria-label="Anton Smedberg — home"><span class="brand__mark"></span><span>Anton Smedberg</span><span class="brand__role">iOS</span></a>
-    <nav class="nav" aria-label="Primary navigation"><a href="#work">Work</a><a href="#experience">Experience</a><a href="#toolkit">Skills</a><a href="/cv.html">CV</a></nav>
+    <nav class="nav" aria-label="Primary navigation"><span class="nav__pill" aria-hidden="true"></span><a href="#work">Work</a><a href="#experience">Experience</a><a href="#toolkit">Skills</a><a href="/cv.html">CV</a></nav>
     <div class="header-actions"><a class="icon-link" href="https://github.com/antonsmedberg" target="_blank" rel="me noopener" aria-label="GitHub"><svg><use href="#i-github"/></svg></a><a class="icon-link" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" rel="me noopener" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a><a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS%20role%20%E2%80%94%20Anton%20Smedberg">Contact</a></div>
   </div>
 </header>
@@ -69,32 +69,30 @@
     <div>
       <p class="hero__eyebrow"><span class="availability-dot"></span>Available for iOS roles · Malmö / Lund / Copenhagen</p>
       <h1>Anton Smedberg<span>iOS developer working close to the device.</span></h1>
-      <p class="hero__lede">I build native iOS software in Swift and SwiftUI, with production experience from Axis Communications' Mobile Apps team in Lund. My strongest work sits where product UI meets concurrency, media processing, observability and GPU rendering.</p>
+      <p class="hero__lede">I build native iOS software in Swift and SwiftUI. At Axis Communications' Mobile Apps team in Lund, I worked in a production codebase across live-video UI, Swift Concurrency and observability. My own work extends into AVFoundation, Metal and ARKit.</p>
       <div class="hero__stack" aria-label="Core skills"><span class="skill-pill">Swift 6</span><span class="skill-pill">SwiftUI</span><span class="skill-pill">Swift Concurrency</span><span class="skill-pill">UIKit</span><span class="skill-pill">AVFoundation</span><span class="skill-pill">Metal</span></div>
       <div class="hero__actions"><a class="btn btn--primary" href="#work">View selected work</a><a class="btn btn--quiet" href="/cv.html">Open CV<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
-      <div class="identity-facts">
-        <div class="identity-fact"><span>Production</span><strong>Axis Communications</strong><small>Mobile Apps · iOS · Lund</small></div>
-        <div class="identity-fact"><span>Open source</span><strong>MetalVisualKit</strong><small>Metal · SwiftUI · ARKit · SPM</small></div>
-        <div class="identity-fact"><span>Focus</span><strong>Native iOS</strong><small>Product code · performance · quality</small></div>
-        <div class="identity-fact"><span>Languages</span><strong>Swedish · English</strong><small>Malmö · Lund · Copenhagen</small></div>
-      </div>
     </div>
     <aside class="identity-stage" aria-label="Professional overview" data-depth-stage>
       <div class="identity-scene" data-depth-stage>
         <div class="identity-layer identity-bg"></div>
         <div class="identity-layer identity-scan"></div>
         <div class="identity-layer identity-portrait-wrap">
-          <picture><source srcset="/assets/img/portrait.webp" type="image/webp"><img class="identity-portrait" src="/assets/img/portrait.png" alt="Anton Smedberg, iOS developer based in Malm&#246;" width="560" height="700" loading="eager" fetchpriority="high" decoding="async"></picture>
+          <picture>
+            <source media="(max-width: 640px)" srcset="/assets/img/portrait@2x-small.webp" type="image/webp">
+            <source srcset="/assets/img/portrait.webp" type="image/webp">
+            <img class="identity-portrait" src="/assets/img/portrait.png" alt="Anton Smedberg, iOS developer based in Malm&#246;" width="560" height="700" loading="eager" fetchpriority="high" decoding="async">
+          </picture>
         </div>
         <span class="identity-chip">iOS &#183; Malm&#246;</span>
       </div>
       </aside>
   </div>
 </section>
-<section class="proof-strip" aria-label="Core experience"><div class="shell proof-strip__inner"><div class="proof"><strong>Production iOS</strong><span>Swift · SwiftUI · established codebase</span></div><div class="proof"><strong>Concurrency</strong><span>async/await · actors · Swift 6</span></div><div class="proof"><strong>Quality & delivery</strong><span>XCTest · CI/CD · code review</span></div><div class="proof"><strong>On-device</strong><span>AVFoundation · Metal · ARKit</span></div></div></section>
+<section class="proof-strip" aria-label="Professional overview"><div class="shell proof-strip__inner"><div class="proof"><strong>Axis Communications</strong><span>Production iOS · Mobile Apps · Lund</span></div><div class="proof"><strong>MetalVisualKit</strong><span>Metal · SwiftUI · ARKit · Swift Package</span></div><div class="proof"><strong>Native iOS</strong><span>Swift 6 · SwiftUI · Concurrency</span></div><div class="proof"><strong>Malmö · Lund · Copenhagen</strong><span>Swedish · English</span></div></div></section>
 
 <section class="section" id="work"><div class="shell">
-  <header class="section-head reveal"><div><p class="section-kicker">Selected work</p><h2>Four projects that show how I build.</h2></div><p>Real screenshots are used for the public repositories. In-development work is shown as engineering structure rather than invented product screens.</p></header>
+  <header class="section-head reveal"><div><p class="section-kicker">Selected work</p><h2>Four projects that show how I build.</h2></div><p>Public iOS work across GPU rendering, device monitoring, media pipelines and spatial experiments.</p></header>
   <div class="project-grid">
     <article class="project-card reveal">
       <div class="project-card__media" data-parallax="5"><picture><source srcset="/work/metalvisualkit-screenshot.webp" type="image/webp"><img src="/work/metalvisualkit-screenshot.png" alt="MetalVisualKit particle loader running in the iOS simulator" width="506" height="1100" loading="lazy" decoding="async"></picture><span class="media-caption">Real screenshot</span></div>
@@ -125,14 +123,14 @@
 </div></section>
 
 <section class="section section--border" id="toolkit"><div class="shell">
-  <header class="section-head reveal"><div><p class="section-kicker">Technical profile</p><h2>The tools I use and where they fit.</h2></div><p>Skills are grouped by engineering context rather than logo walls or confidence bars. The wording also keeps the portfolio searchable for the technologies used in iOS roles.</p></header>
+  <header class="section-head reveal"><div><p class="section-kicker">Technical profile</p><h2>The tools I use and where they fit.</h2></div><p>Native iOS is the core. The surrounding tools support shipping, profiling and operating real applications.</p></header>
   <div class="toolkit-grid reveal">
-    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-device"/></svg></span><h3>Core iOS</h3></div><p>Swift 6 · iOS SDK · SwiftUI · UIKit · Swift Concurrency · async/await · actors · SwiftData · Combine</p></div>
-    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-arch"/></svg></span><h3>Architecture & quality</h3></div><p>MVVM · dependency injection · XCTest · unit testing · maintainable data flow · Apple Human Interface Guidelines</p></div>
-    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-gpu"/></svg></span><h3>Media & graphics</h3></div><p>AVFoundation · Core Animation · Metal · ARKit · RealityKit · Core Image · SpeechAnalyzer · Core ML</p></div>
-    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-perf"/></svg></span><h3>Build & performance</h3></div><p>Xcode · Swift Package Manager · Instruments · performance profiling · StoreKit 2 · TestFlight · os.Logger</p></div>
-    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-ops"/></svg></span><h3>Delivery & observability</h3></div><p>Git · GitHub Actions · CI/CD · code review · Jira · Agile / Scrum · Datadog · OpenTelemetry</p></div>
-    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-api"/></svg></span><h3>Beyond iOS</h3></div><p>Kotlin · Jetpack Compose · Java · Spring Boot · JPA · SQL · REST APIs · GraphQL</p></div>
+    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-device"/></svg></span><h3>Core iOS</h3></div><div class="skill-rows"><div class="skill-row"><dt>Language</dt><dd>Swift 6</dd></div><div class="skill-row"><dt>UI</dt><dd>SwiftUI · UIKit</dd></div><div class="skill-row"><dt>Concurrency</dt><dd>async/await · actors</dd></div><div class="skill-row"><dt>Data</dt><dd>SwiftData · Combine</dd></div></div></div>
+    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-arch"/></svg></span><h3>Architecture</h3></div><div class="skill-rows"><div class="skill-row"><dt>Pattern</dt><dd>MVVM · dependency injection</dd></div><div class="skill-row"><dt>Quality</dt><dd>XCTest · unit testing</dd></div><div class="skill-row"><dt>Style</dt><dd>Apple HIG</dd></div></div></div>
+    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-gpu"/></svg></span><h3>Media & graphics</h3></div><div class="skill-rows"><div class="skill-row"><dt>Media</dt><dd>AVFoundation · Core Image</dd></div><div class="skill-row"><dt>Graphics</dt><dd>Metal · Core Animation</dd></div><div class="skill-row"><dt>Spatial</dt><dd>ARKit · RealityKit</dd></div><div class="skill-row"><dt>Intelligence</dt><dd>SpeechAnalyzer · Core ML</dd></div></div></div>
+    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-perf"/></svg></span><h3>Build & perf</h3></div><div class="skill-rows"><div class="skill-row"><dt>Build</dt><dd>Xcode · SPM</dd></div><div class="skill-row"><dt>Profiling</dt><dd>Instruments</dd></div><div class="skill-row"><dt>Store</dt><dd>StoreKit 2 · TestFlight</dd></div></div></div>
+    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-ops"/></svg></span><h3>Delivery</h3></div><div class="skill-rows"><div class="skill-row"><dt>Version</dt><dd>Git · GitHub Actions</dd></div><div class="skill-row"><dt>Process</dt><dd>code review · Jira · Agile</dd></div><div class="skill-row"><dt>Observability</dt><dd>Datadog · OpenTelemetry</dd></div></div></div>
+    <div class="toolkit-group"><div class="toolkit-head"><span class="toolkit-mark"><svg aria-hidden="true"><use href="#g-api"/></svg></span><h3>Beyond iOS</h3></div><div class="skill-rows"><div class="skill-row"><dt>Android</dt><dd>Kotlin · Jetpack Compose</dd></div><div class="skill-row"><dt>Backend</dt><dd>Java · Spring Boot · SQL</dd></div><div class="skill-row"><dt>APIs</dt><dd>REST · GraphQL</dd></div></div></div>
   </div>
 </div></section>
 

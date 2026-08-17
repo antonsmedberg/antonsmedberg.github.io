@@ -33,10 +33,13 @@ const nav = document.querySelector('.nav');
    own underline. One element, two custom properties, no layout thrash. */
 let navIndicator = null;
 if (nav && nav.children.length) {
-  navIndicator = document.createElement('span');
-  navIndicator.className = 'nav__indicator';
-  navIndicator.setAttribute('aria-hidden', 'true');
-  nav.append(navIndicator);
+  navIndicator = nav.querySelector('.nav__pill');
+  if (!navIndicator) {
+    navIndicator = document.createElement('span');
+    navIndicator.className = 'nav__pill';
+    navIndicator.setAttribute('aria-hidden', 'true');
+    nav.prepend(navIndicator);
+  }
 }
 
 function moveIndicator(target) {
