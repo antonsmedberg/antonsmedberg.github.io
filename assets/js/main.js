@@ -132,41 +132,47 @@ if (cutoutPortrait) {
   tryCandidate();
 }
 
-// Layered hero depth: the portrait moves least, the mesh/particles move more.
-// Transform-only and disabled for reduced motion / coarse pointers.
+// 2.5D Parallax scene — mouse + scroll driven
 const depthStages = [...document.querySelectorAll('[data-depth-stage]')];
-if (!reducedMotion && finePointer && depthStages.length) {
-  let depthFrame = 0;
+if (depthStages.length) {
   let pointerX = 0;
   let pointerY = 0;
+  let scrollY = 0;
+  let frame = 0;
 
   const renderDepth = () => {
-    depthFrame = 0;
-    const viewportCenter = innerHeight * 0.5;
+    frame = 0;
     for (const stage of depthStages) {
-      const rect = stage.getBoundingClientRect();
-      if (rect.bottom < -120 || rect.top > innerHeight + 120) continue;
-      const stageCenter = rect.top + rect.height * 0.5;
-      const scrollRatio = Math.max(-1, Math.min(1, (stageCenter - viewportCenter) / innerHeight));
-      stage.querySelectorAll('[data-depth-layer]').forEach(layer => {
-        const speed = Math.max(0, Math.min(.5, Number(layer.dataset.depthLayer) || .1));
-        layer.style.setProperty('--depth-scroll', `${(-scrollRatio * speed * 28).toFixed(2)}px`);
-        layer.style.setProperty('--depth-x', `${(pointerX * speed * 5).toFixed(2)}px`);
-        layer.style.setProperty('--depth-y', `${(pointerY * speed * 4).toFixed(2)}px`);
-        layer.style.setProperty('--depth-r', `${(pointerX * speed * .55).toFixed(3)}deg`);
+      const scene = stage.querySelector('.identity-scene');
+      if (!scene) continue;
+      const layers = scene.querySelectorAll('.identity-layer');
+      layers.forEach(layer => {
+        const depth = layer.classList.contains('identity-bg') ? -40 :
+                      layer.classList.contains('identity-mesh') ? -20 :
+                      layer.classList.contains('identity-particles') ? 10 :
+                      layer.classList.contains('identity-portrait-wrap') ? 30 :
+                      layer.classList.contains('identity-floaters') ? 50 : 0;
+        const tx = pointerX * depth * 0.15;
+        const ty = pointerY * depth * 0.15 + scrollY * depth * 0.02;
+        const scale = 1 + depth * 0.002;
+        layer.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, ${depth}px) scale(${scale})`;
       });
     }
   };
-  const requestDepth = () => {
-    if (!depthFrame) depthFrame = requestAnimationFrame(renderDepth);
-  };
-  addEventListener('pointermove', event => {
-    pointerX = (event.clientX / innerWidth - .5) * 2;
-    pointerY = (event.clientY / innerHeight - .5) * 2;
+
+  const requestDepth = () => { if (!frame) frame = requestAnimationFrame(renderDepth); };
+
+  document.addEventListener('pointermove', e => {
+    pointerX = (e.clientX / window.innerWidth - 0.5) * 2;
+    pointerY = (e.clientY / window.innerHeight - 0.5) * 2;
     requestDepth();
   }, { passive: true });
-  addEventListener('scroll', requestDepth, { passive: true });
-  addEventListener('resize', requestDepth, { passive: true });
-  requestDepth();
+
+  window.addEventListener('scroll', () => {
+    scrollY = window.scrollY || window.pageYOffset;
+    requestDepth();
+  }, { passive: true });
+
+  renderDepth();
 }
 

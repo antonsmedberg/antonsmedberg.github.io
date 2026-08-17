@@ -46,7 +46,7 @@
   <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
 </svg>
 <header class="masthead">
-  <div class="shell masthead__inner">
+  <div class="masthead__inner">
     <a class="brand" href="/" aria-label="Anton Smedberg — home"><span class="brand__mark"></span><span>Anton Smedberg</span><span class="brand__role">iOS</span></a>
     <nav class="nav" aria-label="Primary navigation"><a href="#work">Work</a><a href="#experience">Experience</a><a href="#toolkit">Skills</a><a href="/cv.html">CV</a></nav>
     <div class="header-actions"><a class="icon-link" href="https://github.com/antonsmedberg" target="_blank" rel="me noopener" aria-label="GitHub"><svg><use href="#i-github"/></svg></a><a class="icon-link" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" rel="me noopener" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a><a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS%20role%20%E2%80%94%20Anton%20Smedberg">Contact</a></div>
@@ -64,15 +64,14 @@
       <div class="hero__actions"><a class="btn btn--primary" href="#work">View selected work</a><a class="btn btn--quiet" href="/cv.html">Open CV →</a></div>
     </div>
     <aside class="identity-stage" aria-label="Professional overview" data-depth-stage>
-      <div class="identity-art" aria-hidden="true">
-        <span class="identity-glow" data-depth-layer="0.10"></span>
-        <span class="identity-arc identity-arc--outer" data-depth-layer="0.22"></span>
-        <span class="identity-arc identity-arc--inner" data-depth-layer="0.14"></span>
-        <span class="identity-mesh" data-depth-layer="0.34"></span>
-        <span class="identity-particles" data-depth-layer="0.42"></span>
-        <div class="identity-portrait-wrap" data-depth-layer="0.08">
-          <img class="identity-portrait" src="/assets/img/anton-smedberg.png" data-cutout data-cutout-avif="/assets/img/anton-smedberg-cutout.avif" data-cutout-webp="/assets/img/anton-smedberg-cutout.webp" onerror="this.onerror=null;this.src='/assets/img/anton-smedberg-fallback.svg'" alt="Portrait of Anton Smedberg" width="640" height="800" decoding="async" fetchpriority="high">
+      <div class="identity-scene">
+        <div class="identity-layer identity-bg"></div>
+        <div class="identity-layer identity-mesh"></div>
+        <div class="identity-layer identity-particles"></div>
+        <div class="identity-layer identity-portrait-wrap">
+          <img class="identity-portrait" src="/assets/img/anton-smedberg.png" alt="Portrait of Anton Smedberg" width="320" height="400" loading="eager" fetchpriority="high">
         </div>
+        <div class="identity-layer identity-floaters"></div>
         <span class="identity-chip">iOS · Malmö</span>
       </div>
       <div class="identity-facts">
