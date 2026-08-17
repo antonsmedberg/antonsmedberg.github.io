@@ -1,50 +1,161 @@
-import { mountDepthField } from './depth-field.js';
+/**
+ * main.js — progressive enhancement only.
+ *
+ * Every word of content is already in the HTML. Nothing here is required to
+ * read the page; if this file fails to load, the site still works.
+ *
+ * All scroll and pointer work is batched into a single rAF loop that only runs
+ * when something has actually changed, so the page does no work while idle.
+ */
 
-document.documentElement.classList.remove('no-js');
-document.documentElement.classList.add('js');
+
+const root = document.documentElement;
+root.classList.remove('no-js');
+root.classList.add('js');
+
+const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const finePointer = matchMedia('(pointer: fine)');
+
+/* -------------------------------------------------------------------------
+   Hero depth field
+   ------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------
+   Masthead
+   One boolean, one surface. The bar densifies; nothing nested resizes, which
+   is what made the old header read as a box inside a box inside a border.
+   ------------------------------------------------------------------------- */
 
 const masthead = document.querySelector('.masthead');
-if (masthead) {
-  const sentinel = document.createElement('span');
-  sentinel.setAttribute('aria-hidden', 'true');
-  sentinel.style.cssText = 'position:absolute;top:0;width:1px;height:1px;';
-  document.body.prepend(sentinel);
-  new IntersectionObserver(([entry]) => {
-    masthead.dataset.stuck = String(!entry.isIntersecting);
-  }).observe(sentinel);
+const nav = document.querySelector('.nav');
 
-  // Compact-on-scroll behavior
-  let ticking = false;
-  const compactThreshold = 80;
-  
-  const updateMasthead = () => {
-    ticking = false;
-    const scrollY = window.scrollY || window.pageYOffset;
-    
-    if (scrollY > compactThreshold) {
-      masthead.dataset.compact = 'true';
-      const shrink = Math.min(1, (scrollY - compactThreshold) / 200);
-      masthead.style.setProperty('--nav-shrink', shrink.toFixed(3));
-    } else {
-      masthead.dataset.compact = 'false';
-      masthead.style.setProperty('--nav-shrink', '0');
-    }
-  };
-  
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(updateMasthead);
-      ticking = true;
-    }
-  }, { passive: true });
-  
-  updateMasthead();
+/* A single indicator slides between nav items instead of each item owning its
+   own underline. One element, two custom properties, no layout thrash. */
+let navIndicator = null;
+if (nav && nav.children.length) {
+  navIndicator = document.createElement('span');
+  navIndicator.className = 'nav__indicator';
+  navIndicator.setAttribute('aria-hidden', 'true');
+  nav.append(navIndicator);
 }
 
-const field = document.getElementById('depth-field');
-if (field) mountDepthField(field);
+function moveIndicator(target) {
+  if (!navIndicator || !target) return;
+  const navBox = nav.getBoundingClientRect();
+  const box = target.getBoundingClientRect();
+  navIndicator.style.setProperty('--x', `${(box.left - navBox.left).toFixed(1)}px`);
+  navIndicator.style.setProperty('--w', `${box.width.toFixed(1)}px`);
+  nav.dataset.indicating = 'true';
+}
 
-const revealables = [...document.querySelectorAll('.reveal')];
+function restIndicator() {
+  const current = nav?.querySelector('a[aria-current="true"]');
+  if (current) moveIndicator(current);
+  else if (nav) nav.dataset.indicating = 'false';
+}
+
+if (nav) {
+  nav.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('pointerenter', () => moveIndicator(link));
+    link.addEventListener('focus', () => moveIndicator(link));
+  });
+  nav.addEventListener('pointerleave', restIndicator);
+  addEventListener('resize', restIndicator, { passive: true });
+}
+
+/* -------------------------------------------------------------------------
+   2.5D parallax
+   The stage owns three custom properties. Every layer inside it reads the same
+   three and multiplies them by its own --depth, so the depth ordering lives in
+   CSS and this file only reports where the pointer and the scroll are.
+   ------------------------------------------------------------------------- */
+
+const stages = [...document.querySelectorAll('[data-depth-stage]')];
+const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
+
+const pointerTarget = { x: 0, y: 0 };
+const pointerCurrent = { x: 0, y: 0 };
+
+let scrollY = window.scrollY;
+let needsFrame = false;
+
+function schedule() {
+  if (needsFrame) return;
+  needsFrame = true;
+  requestAnimationFrame(update);
+}
+
+function update() {
+  needsFrame = false;
+
+  if (masthead) {
+    masthead.dataset.scrolled = String(scrollY > 8);
+    // The hairline under the bar doubles as a reading-progress meter, so the
+    // one decorative line in the header carries real information.
+    const max = document.documentElement.scrollHeight - innerHeight;
+    masthead.style.setProperty('--progress', max > 0 ? (scrollY / max).toFixed(4) : '0');
+  }
+
+  if (prefersReducedMotion.matches) return;
+
+  // Ease toward the pointer so the scene never snaps.
+  pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.08;
+  pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.08;
+
+  for (const stage of stages) {
+    const rect = stage.getBoundingClientRect();
+    // -1 when the stage sits below the fold, +1 once it has passed above it.
+    const progress = 1 - (rect.top + rect.height / 2) / (innerHeight / 2);
+    stage.style.setProperty('--px', pointerCurrent.x.toFixed(3));
+    stage.style.setProperty('--py', pointerCurrent.y.toFixed(3));
+    stage.style.setProperty('--sy', Math.max(-1.5, Math.min(1.5, progress)).toFixed(3));
+  }
+
+  for (const item of parallaxItems) {
+    const strength = Number(item.dataset.parallax) || 0;
+    const rect = item.getBoundingClientRect();
+    if (rect.bottom < -200 || rect.top > innerHeight + 200) continue;
+    const progress = 1 - (rect.top + rect.height / 2) / (innerHeight / 2);
+    item.style.setProperty('--shift', (progress * strength).toFixed(2));
+  }
+
+  // Keep easing until the pointer has settled.
+  if (
+    Math.abs(pointerTarget.x - pointerCurrent.x) > 0.001 ||
+    Math.abs(pointerTarget.y - pointerCurrent.y) > 0.001
+  ) {
+    schedule();
+  }
+}
+
+addEventListener('scroll', () => { scrollY = window.scrollY; schedule(); }, { passive: true });
+addEventListener('resize', schedule, { passive: true });
+
+if (finePointer.matches) {
+  addEventListener('pointermove', (event) => {
+    pointerTarget.x = (event.clientX / innerWidth - 0.5) * 2;
+    pointerTarget.y = (event.clientY / innerHeight - 0.5) * 2;
+    schedule();
+  }, { passive: true });
+}
+
+// Reset the scene when the visitor turns motion off mid-session.
+prefersReducedMotion.addEventListener('change', () => {
+  if (!prefersReducedMotion.matches) return;
+  for (const stage of stages) {
+    stage.style.removeProperty('--px');
+    stage.style.removeProperty('--py');
+    stage.style.removeProperty('--sy');
+  }
+});
+
+schedule();
+
+/* -------------------------------------------------------------------------
+   Reveal on scroll — gated behind the .js class set above
+   ------------------------------------------------------------------------- */
+
+const revealables = document.querySelectorAll('.reveal');
 if (revealables.length) {
   const observer = new IntersectionObserver((entries, obs) => {
     for (const entry of entries) {
@@ -53,15 +164,48 @@ if (revealables.length) {
       obs.unobserve(entry.target);
     }
   }, { rootMargin: '0px 0px -7% 0px', threshold: 0.06 });
-  revealables.forEach(element => observer.observe(element));
+
+  revealables.forEach((el) => observer.observe(el));
 }
 
-document.querySelectorAll('[data-year]').forEach(element => {
-  element.textContent = String(new Date().getFullYear());
+/* -------------------------------------------------------------------------
+   Scroll spy for same-page anchors
+   ------------------------------------------------------------------------- */
+
+const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')];
+const sections = navLinks
+  .map((link) => document.querySelector(link.getAttribute('href')))
+  .filter(Boolean);
+
+if (sections.length) {
+  const spy = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      for (const link of navLinks) {
+        if (link.getAttribute('href') === `#${entry.target.id}`) {
+          link.setAttribute('aria-current', 'true');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      }
+      restIndicator();
+    }
+  }, { rootMargin: '-45% 0px -50% 0px' });
+
+  sections.forEach((section) => spy.observe(section));
+}
+
+/* -------------------------------------------------------------------------
+   Housekeeping
+   ------------------------------------------------------------------------- */
+
+document.querySelectorAll('[data-year]').forEach((el) => {
+  el.textContent = String(new Date().getFullYear());
 });
 
-// Optional binary CV downloads are hidden in fresh clones until the file exists.
-document.querySelectorAll('[data-optional-file]').forEach(async link => {
+// Links to files that may not exist yet in a fresh clone (CV PDFs) hide
+// themselves rather than serving a 404 to a recruiter.
+document.querySelectorAll('[data-optional-file]').forEach(async (link) => {
   try {
     const response = await fetch(link.getAttribute('href'), { method: 'HEAD', cache: 'no-store' });
     if (!response.ok) link.hidden = true;
@@ -70,109 +214,16 @@ document.querySelectorAll('[data-optional-file]').forEach(async link => {
   }
 });
 
-// Scroll spy for same-page anchors only.
-const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')];
-const sections = navLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
-if (sections.length) {
-  const spy = new IntersectionObserver(entries => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      navLinks.forEach(link => {
-        if (link.getAttribute('href') === `#${entry.target.id}`) link.setAttribute('aria-current', 'true');
-        else link.removeAttribute('aria-current');
-      });
-    }
-  }, { rootMargin: '-45% 0px -50%' });
-  sections.forEach(section => spy.observe(section));
+/* Cards track the pointer so the sheen sits under the cursor. Two custom
+   properties per card, written only while the pointer is inside it. */
+if (finePointer.matches && !prefersReducedMotion.matches) {
+  document.querySelectorAll('.project-card, .toolkit-group, .contact-card').forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      const box = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${((event.clientX - box.left) / box.width * 100).toFixed(1)}%`);
+      card.style.setProperty('--my', `${((event.clientY - box.top) / box.height * 100).toFixed(1)}%`);
+    }, { passive: true });
+  });
 }
 
-// Small depth response for proof surfaces. Transform-only, desktop/fine pointers only.
-const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const finePointer = matchMedia('(pointer: fine)').matches;
-const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
-if (!reducedMotion && finePointer && parallaxItems.length) {
-  let frame = 0;
-  const update = () => {
-    frame = 0;
-    const center = innerHeight * 0.5;
-    for (const item of parallaxItems) {
-      const rect = item.getBoundingClientRect();
-      if (rect.bottom < -80 || rect.top > innerHeight + 80) continue;
-      const strength = Math.min(10, Number(item.dataset.parallax) || 5);
-      const itemCenter = rect.top + rect.height * 0.5;
-      const normalized = Math.max(-1, Math.min(1, (itemCenter - center) / innerHeight));
-      item.style.setProperty('--parallax-y', `${(-normalized * strength).toFixed(2)}px`);
-    }
-  };
-  const requestUpdate = () => {
-    if (!frame) frame = requestAnimationFrame(update);
-  };
-  addEventListener('scroll', requestUpdate, { passive: true });
-  addEventListener('resize', requestUpdate, { passive: true });
-  requestUpdate();
-}
-
-// Prefer a transparent portrait cutout when the optimized asset exists.
-// The normal portrait remains a safe fallback, so fresh clones never break.
-const cutoutPortrait = document.querySelector('[data-cutout]');
-if (cutoutPortrait) {
-  const stage = cutoutPortrait.closest('[data-depth-stage]');
-  const candidates = [cutoutPortrait.dataset.cutoutAvif, cutoutPortrait.dataset.cutoutWebp].filter(Boolean);
-  const tryCandidate = (index = 0) => {
-    if (index >= candidates.length) return;
-    const probe = new Image();
-    probe.decoding = 'async';
-    probe.onload = () => {
-      cutoutPortrait.src = candidates[index];
-      stage?.classList.add('has-alpha-cutout');
-    };
-    probe.onerror = () => tryCandidate(index + 1);
-    probe.src = candidates[index];
-  };
-  tryCandidate();
-}
-
-// 2.5D Parallax scene — mouse + scroll driven
-const depthStages = [...document.querySelectorAll('[data-depth-stage]')];
-if (depthStages.length) {
-  let pointerX = 0;
-  let pointerY = 0;
-  let scrollY = 0;
-  let frame = 0;
-
-  const renderDepth = () => {
-    frame = 0;
-    for (const stage of depthStages) {
-      const scene = stage.querySelector('.identity-scene');
-      if (!scene) continue;
-      const layers = scene.querySelectorAll('.identity-layer');
-      layers.forEach(layer => {
-        const depth = layer.classList.contains('identity-bg') ? -40 :
-                      layer.classList.contains('identity-mesh') ? -20 :
-                      layer.classList.contains('identity-particles') ? 10 :
-                      layer.classList.contains('identity-portrait-wrap') ? 30 :
-                      layer.classList.contains('identity-floaters') ? 50 : 0;
-        const tx = pointerX * depth * 0.15;
-        const ty = pointerY * depth * 0.15 + scrollY * depth * 0.02;
-        const scale = 1 + depth * 0.002;
-        layer.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, ${depth}px) scale(${scale})`;
-      });
-    }
-  };
-
-  const requestDepth = () => { if (!frame) frame = requestAnimationFrame(renderDepth); };
-
-  document.addEventListener('pointermove', e => {
-    pointerX = (e.clientX / window.innerWidth - 0.5) * 2;
-    pointerY = (e.clientY / window.innerHeight - 0.5) * 2;
-    requestDepth();
-  }, { passive: true });
-
-  window.addEventListener('scroll', () => {
-    scrollY = window.scrollY || window.pageYOffset;
-    requestDepth();
-  }, { passive: true });
-
-  renderDepth();
-}
-
+restIndicator();
