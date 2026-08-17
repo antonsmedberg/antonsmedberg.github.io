@@ -521,9 +521,9 @@ code { font-family: var(--font-mono); font-size: 0.92em; }
 .hero__inner {
   position: relative;
   z-index: 1;
-  padding-block: clamp(2.75rem, 7vw, 5.5rem) clamp(3rem, 7vw, 5.5rem);
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2.5rem, 6vw, 4.5rem);
   display: grid;
-  gap: clamp(2.5rem, 5vw, 4rem);
+  gap: clamp(2rem, 4vw, 3.5rem);
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
 }
@@ -606,7 +606,7 @@ code { font-family: var(--font-mono); font-size: 0.92em; }
   --sy: 0;
   position: relative;
   align-self: stretch;
-  min-height: min(72vh, 600px);
+  min-height: min(55vh, 460px);
   perspective: 1500px;
   perspective-origin: 55% 40%;
 }
@@ -707,7 +707,7 @@ code { font-family: var(--font-mono); font-size: 0.92em; }
   bottom: 0;
   width: auto;
   max-width: none;
-  height: 88%;
+  height: 78%;
   transform: translateX(-50%);
   object-fit: contain;
   mask-image:
