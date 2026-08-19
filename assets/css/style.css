@@ -1181,6 +1181,52 @@ body.no-js .reveal { opacity: 1; transform: none; }
 .contact-card p { color: var(--ink-2); margin: 0; line-height: 1.65; }
 .contact-actions { display: flex; gap: .55rem; justify-content: flex-end; flex-wrap: wrap; }
 
+
+
+/* Locale switch */
+.locale-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 2.25rem;
+  padding: .45rem .62rem;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  color: var(--ink-2);
+  text-decoration: none;
+  transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease);
+}
+
+.locale-switch svg {
+  width: .95rem;
+  height: .95rem;
+  transition: transform .35s var(--ease-out);
+}
+
+.locale-switch span {
+  font: 500 var(--t--2)/1 var(--font-mono);
+  letter-spacing: .06em;
+}
+
+.locale-switch:hover {
+  color: var(--ink);
+  border-color: var(--line-2);
+  background: var(--surface);
+  transform: translateY(-1px);
+}
+
+.locale-switch:hover svg {
+  transform: rotate(14deg);
+}
+
+@media (max-width: 620px) {
+  .locale-switch span {
+    display: none;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    16. Footer
    --------------------------------------------------------------------------- */

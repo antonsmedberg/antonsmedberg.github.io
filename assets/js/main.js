@@ -86,7 +86,7 @@ if (nav) {
    ------------------------------------------------------------------------- */
 
 const stages = [...document.querySelectorAll('[data-depth-stage]')];
-const parallaxItems = [...document.querySelectorAll('[data-parallax]')];
+// parallaxItems removed - no CSS consumer
 
 const pointerTarget = { x: 0, y: 0 };
 const pointerCurrent = { x: 0, y: 0 };
@@ -126,13 +126,7 @@ function update() {
     stage.style.setProperty('--sy', Math.max(-1.5, Math.min(1.5, progress)).toFixed(3));
   }
 
-  for (const item of parallaxItems) {
-    const strength = Number(item.dataset.parallax) || 0;
-    const rect = item.getBoundingClientRect();
-    if (rect.bottom < -200 || rect.top > innerHeight + 200) continue;
-    const progress = 1 - (rect.top + rect.height / 2) / (innerHeight / 2);
-    item.style.setProperty('--shift', (progress * strength).toFixed(2));
-  }
+  // parallax items removed - no CSS consumer
 
   // Keep easing until the pointer has settled.
   if (
@@ -236,17 +230,7 @@ document.querySelectorAll('[data-optional-file]').forEach(async (link) => {
   }
 });
 
-/* Cards track the pointer so the sheen sits under the cursor. Two custom
-   properties per card, written only while the pointer is inside it. */
-if (finePointer.matches && !prefersReducedMotion.matches) {
-  document.querySelectorAll('.project-card, .toolkit-group, .contact-card').forEach((card) => {
-    card.addEventListener('pointermove', (event) => {
-      const box = card.getBoundingClientRect();
-      card.style.setProperty('--mx', `${((event.clientX - box.left) / box.width * 100).toFixed(1)}%`);
-      card.style.setProperty('--my', `${((event.clientY - box.top) / box.height * 100).toFixed(1)}%`);
-    }, { passive: true });
-  });
-}
+// card pointer tracking removed - no CSS consumer
 
 /* -------------------------------------------------------------------------
    PDF Modal
