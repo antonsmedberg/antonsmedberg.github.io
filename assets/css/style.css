@@ -422,15 +422,20 @@ body.no-js .reveal { opacity: 1; transform: none; }
    06. Hero
    --------------------------------------------------------------------------- */
 
-.hero { position: relative; overflow: visible; }
+.hero {
+  position: relative;
+  overflow: visible;
+  margin-top: -1rem;
+}
+
 .hero__inner {
   position: relative;
   z-index: 1;
-  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2rem, 5vw, 3.5rem);
+  padding-block: clamp(1.5rem, 4vw, 3rem) clamp(2rem, 5vw, 3.5rem);
   display: grid;
   gap: clamp(2rem, 4vw, 3.5rem);
   grid-template-columns: minmax(0, 1fr);
-  align-items: center;
+  align-items: start;
 }
 
 /* ---------------------------------------------------------------------------
@@ -450,12 +455,13 @@ body.no-js .reveal { opacity: 1; transform: none; }
   --py: 0;
   --sy: 0;
   position: relative;
-  align-self: center;
+  align-self: start;
   width: 100%;
-  height: clamp(450px, 43vw, 540px);
+  height: clamp(420px, 42vw, 520px);
   min-height: 0;
   perspective: 1600px;
   perspective-origin: 62% 43%;
+  margin-top: -2rem;
 }
 
 .identity-scene {
@@ -684,7 +690,7 @@ body.no-js .reveal { opacity: 1; transform: none; }
   font: 400 var(--t--2)/1 var(--font-mono);
   box-shadow: var(--shadow-1);
 }
-.hero__actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2rem; }
+.hero__actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2.5rem; }
 
 /* ---------------------------------------------------------------------------
    09. Proof strip
