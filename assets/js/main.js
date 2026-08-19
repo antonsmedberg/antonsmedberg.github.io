@@ -8,6 +8,18 @@
  * when something has actually changed, so the page does no work while idle.
  */
 
+document.addEventListener('DOMContentLoaded', function() {
+
+/**
+ * main.js — progressive enhancement only.
+ *
+ * Every word of content is already in the HTML. Nothing here is required to
+ * read the page; if this file fails to load, the site still works.
+ *
+ * All scroll and pointer work is batched into a single rAF loop that only runs
+ * when something has actually changed, so the page does no work while idle.
+ */
+
 
 const root = document.documentElement;
 root.classList.remove('no-js');
@@ -313,3 +325,5 @@ if (pdfModal) {
 }
 
 restIndicator();
+
+});
