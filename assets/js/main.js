@@ -229,4 +229,75 @@ if (finePointer.matches && !prefersReducedMotion.matches) {
   });
 }
 
+/* -------------------------------------------------------------------------
+   PDF Modal
+   ------------------------------------------------------------------------- */
+
+const pdfModal = document.getElementById('pdfModal');
+const pdfIframe = document.getElementById('pdfIframe');
+const pdfCloseBtn = document.getElementById('pdfCloseBtn');
+const pdfDownloadBtn = document.getElementById('pdfDownloadBtn');
+const pdfFallbackDownload = document.getElementById('pdfFallbackDownload');
+const pdfFallback = document.getElementById('pdfFallback');
+const pdfTitle = document.getElementById('pdfModalTitle');
+const openPdfBtns = document.querySelectorAll('.btn-open-pdf');
+
+let lastFocusedElement = null;
+
+function openPdfModal(pdfUrl, title) {
+  if (!pdfModal) return;
+  lastFocusedElement = document.activeElement;
+  
+  if (pdfIframe) {
+    pdfIframe.src = pdfUrl;
+    pdfIframe.style.display = 'block';
+    if (pdfFallback) pdfFallback.style.display = 'none';
+  }
+  if (pdfDownloadBtn) pdfDownloadBtn.href = pdfUrl;
+  if (pdfFallbackDownload) pdfFallbackDownload.href = pdfUrl;
+  if (pdfTitle && title) pdfTitle.textContent = title;
+  
+  pdfModal.classList.add('is-open');
+  pdfModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  
+  if (pdfCloseBtn) pdfCloseBtn.focus();
+}
+
+function closePdfModal() {
+  if (!pdfModal) return;
+  pdfModal.classList.remove('is-open');
+  pdfModal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  
+  if (pdfIframe) pdfIframe.src = '';
+  
+  if (lastFocusedElement) lastFocusedElement.focus();
+}
+
+if (pdfModal) {
+  openPdfBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const pdfUrl = btn.dataset.pdf || btn.getAttribute('href');
+      const title = btn.dataset.title || 'CV — Anton Smedberg';
+      openPdfModal(pdfUrl, title);
+    });
+  });
+  
+  if (pdfCloseBtn) {
+    pdfCloseBtn.addEventListener('click', closePdfModal);
+  }
+  
+  pdfModal.addEventListener('click', (e) => {
+    if (e.target === pdfModal) closePdfModal();
+  });
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pdfModal.classList.contains('is-open')) {
+      closePdfModal();
+    }
+  });
+}
+
 restIndicator();

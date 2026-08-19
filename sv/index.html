@@ -16,6 +16,7 @@
 <link rel="preload" href="/assets/fonts/schibsted-grotesk-wght.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/pdf-modal.css">
 <script type="module" src="/assets/js/main.js"></script>
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Anton Smedberg — iOS-utvecklare i Malmö">
@@ -42,10 +43,35 @@
 <header class="masthead">
   <div class="masthead__inner">
     <a class="brand" href="/sv/"><span class="brand__mark"></span><span>Anton Smedberg</span><span class="brand__role">iOS</span></a>
-    <nav class="nav" aria-label="Huvudnavigering"><span class="nav__pill" aria-hidden="true"></span><a href="#work">Projekt</a><a href="#experience">Erfarenhet</a><a href="#toolkit">Kompetens</a><a href="/sv/cv.html">CV</a></nav>
+    <nav class="nav" aria-label="Huvudnavigering"><span class="nav__pill" aria-hidden="true"></span><a href="#work">Projekt</a><a href="#experience">Erfarenhet</a><a href="#toolkit">Kompetens</a><a href="#" class="btn-open-pdf" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">CV</a></nav>
     <div class="header-actions"><a class="btn" href="/">English</a><a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS-roll%20%E2%80%94%20Anton%20Smedberg">Kontakt</a></div>
   </div>
 </header>
+<div class="pdf-modal" id="pdfModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
+  <div class="pdf-modal__inner">
+    <div class="pdf-modal__header">
+      <div class="pdf-modal__title">
+        <h2 id="pdfModalTitle">CV — Anton Smedberg</h2>
+      </div>
+      <div class="pdf-modal__actions">
+        <a class="btn" id="pdfDownloadBtn" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" download>
+          <svg aria-hidden="true"><use href="#i-download"/></svg>
+          Ladda ner
+        </a>
+        <button class="pdf-modal__close" id="pdfCloseBtn" aria-label="Stäng">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="pdf-modal__body">
+      <iframe class="pdf-modal__iframe" id="pdfIframe" src="" title="CV PDF"></iframe>
+      <div class="pdf-modal__fallback" id="pdfFallback">
+        <p>Kunde inte ladda PDF-visaren.</p>
+        <a class="btn btn--primary" id="pdfFallbackDownload" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" download>Ladda ner PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
 <main id="main">
 <section class="hero">
   <div class="shell hero__inner">
@@ -54,7 +80,7 @@
       <h1>Anton Smedberg<span>iOS-utvecklare nära plattformen och enheten.</span></h1>
       <p class="hero__lede">Jag bygger native iOS i Swift och SwiftUI. Jag har produktionserfarenhet från Axis Communications Mobile Apps-team i Lund, där jag arbetade i live-video UI, Swift Concurrency och observability. Mitt eget arbete sträcker sig även in i AVFoundation, Metal och ARKit.</p>
       <div class="hero__stack" aria-label="Kunskaper"><span class="skill-pill">Swift 6</span><span class="skill-pill">SwiftUI</span><span class="skill-pill">Swift Concurrency</span><span class="skill-pill">UIKit</span><span class="skill-pill">AVFoundation</span><span class="skill-pill">Metal</span></div>
-      <div class="hero__actions"><a class="btn btn--primary" href="#work">Se utvalda projekt</a><a class="btn btn--quiet" href="/sv/cv.html">Öppna CV<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <div class="hero__actions"><a class="btn btn--primary" href="#work">Se utvalda projekt</a><a class="btn btn--quiet btn-open-pdf" href="#" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">Öppna CV<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
     </div>
     <aside class="identity-stage" aria-label="Professionell översikt" data-depth-stage>
       <div class="identity-scene" data-depth-stage>
@@ -119,7 +145,7 @@
 
 <section class="section section--border" id="about"><div class="shell about-grid"><div class="reveal"><p class="section-kicker">Om mig</p><h2 class="about-title">Native mobile med systembakgrund.</h2></div><div class="about-copy reveal"><p>Jag fokuserar på native iOS eftersom det är där min starkaste produktionserfarenhet och bästa arbete finns. Java backend och Android/Kotlin hjälper mig att förstå API:er, dataflöden och angränsande plattformar.</p><p>Jag söker en <strong>roll som iOS- eller mobilutvecklare</strong> där jag kan bidra i produktionskod, lära av erfarna utvecklare och ta ansvar för successivt svårare problem.</p><div class="fact-grid"><div class="fact"><span>Bas</span><strong>Malmö</strong></div><div class="fact"><span>Öppen för</span><strong>Malmö · Lund · Köpenhamn</strong></div><div class="fact"><span>Arbetssätt</span><strong>På plats · hybrid · distans</strong></div><div class="fact"><span>Språk</span><strong>Svenska · Engelska</strong></div></div></div></div></section>
 
-<section class="section section--compact" id="contact"><div class="shell"><div class="contact-card reveal"><div><p class="section-kicker">Kontakt</p><h2>Pratar gärna iOS.</h2><p>Jag går gärna igenom publika repositories, arkitekturval och den produktionskod jag får diskutera.</p></div><div class="contact-actions"><a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS-roll%20%E2%80%94%20Anton%20Smedberg"><svg><use href="#i-mail"/></svg>Mejla</a><a class="btn" href="/sv/cv.html">CV</a><a class="btn" href="/">English</a></div></div></div></section>
+<section class="section section--compact" id="contact"><div class="shell"><div class="contact-card reveal"><div><p class="section-kicker">Kontakt</p><h2>Pratar gärna iOS.</h2><p>Jag går gärna igenom publika repositories, arkitekturval och den produktionskod jag får diskutera.</p></div><div class="contact-actions"><a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS-roll%20%E2%80%94%20Anton%20Smedberg"><svg><use href="#i-mail"/></svg>Mejla</a><a class="btn btn--quiet btn-open-pdf" href="#" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">CV</a><a class="btn" href="/">English</a></div></div></div></section>
 </main>
-<footer class="footer"><div class="shell footer__inner"><span>© <span data-year>2026</span> Anton Smedberg · Malmö</span><span><a href="/sv/cv.html">CV</a> · <a href="https://github.com/antonsmedberg/antonsmedberg.github.io" target="_blank" rel="noopener">Källkod</a> · <a href="/">English</a></span></div></footer>
+<footer class="footer"><div class="shell footer__inner"><span>© <span data-year>2026</span> Anton Smedberg · Malmö</span><a href="#" class="btn-open-pdf" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">CV</a> · <a href="https://github.com/antonsmedberg/antonsmedberg.github.io" target="_blank" rel="noopener">Källkod</a> · <a href="/">English</a></div></footer>
 </body></html>
