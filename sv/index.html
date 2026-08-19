@@ -36,6 +36,7 @@
   <symbol id="g-perf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"><path d="M3 19h18"/><path d="M6 19v-5M10 19V8M14 19v-8M18 19V4"/></symbol>
   <symbol id="g-ops" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"><path d="M2.5 13.5h4l2.5-6 3 12 2.5-6h7"/></symbol>
   <symbol id="g-api" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7.5 8 11 15.6M16.5 8 13 15.6M8.5 6h7"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 19h14"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></symbol>
   <symbol id="i-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></symbol>
 </svg>
@@ -43,7 +44,7 @@
 <header class="masthead">
   <div class="masthead__inner">
     <a class="brand" href="/sv/"><span class="brand__mark"></span><span>Anton Smedberg</span><span class="brand__role">iOS</span></a>
-    <nav class="nav" aria-label="Huvudnavigering"><span class="nav__pill" aria-hidden="true"></span><a href="#work">Projekt</a><a href="#experience">Erfarenhet</a><a href="#toolkit">Kompetens</a><a href="#" class="btn-open-pdf" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">CV</a></nav>
+    <nav class="nav" aria-label="Huvudnavigering"><span class="nav__pill" aria-hidden="true"></span><a href="#work">Projekt</a><a href="#experience">Erfarenhet</a><a href="#toolkit">Kompetens</a><a class="btn-open-pdf" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" data-title="CV — Anton Smedberg">CV</a></nav>
     <div class="header-actions"><a class="btn" href="/">English</a><a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS-roll%20%E2%80%94%20Anton%20Smedberg">Kontakt</a></div>
   </div>
 </header>
@@ -80,7 +81,7 @@
       <h1>Anton Smedberg<span>iOS-utvecklare nära plattformen och enheten.</span></h1>
       <p class="hero__lede">Jag bygger native iOS i Swift och SwiftUI. Jag har produktionserfarenhet från Axis Communications Mobile Apps-team i Lund, där jag arbetade i live-video UI, Swift Concurrency och observability. Mitt eget arbete sträcker sig även in i AVFoundation, Metal och ARKit.</p>
       <div class="hero__stack" aria-label="Kunskaper"><span class="skill-pill">Swift 6</span><span class="skill-pill">SwiftUI</span><span class="skill-pill">Swift Concurrency</span><span class="skill-pill">UIKit</span><span class="skill-pill">AVFoundation</span><span class="skill-pill">Metal</span></div>
-      <div class="hero__actions"><a class="btn btn--primary" href="#work">Se utvalda projekt</a><a class="btn btn--quiet btn-open-pdf" href="#" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">Öppna CV<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <div class="hero__actions"><a class="btn btn--primary" href="#work">Se utvalda projekt</a><a class="btn btn--quiet btn-open-pdf" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" data-title="CV — Anton Smedberg">Öppna CV<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
     </div>
     <aside class="identity-stage" aria-label="Professionell översikt" data-depth-stage>
       <div class="identity-scene" data-depth-stage>
@@ -101,7 +102,7 @@
 <section class="proof-strip" aria-label="Professionell översikt"><div class="shell proof-strip__inner"><div class="proof"><strong>Axis Communications</strong><span>Produktion iOS · Mobile Apps · Lund</span></div><div class="proof"><strong>MetalVisualKit</strong><span>Metal · SwiftUI · ARKit · Swift Package</span></div><div class="proof"><strong>Native iOS</strong><span>Swift 6 · SwiftUI · Concurrency</span></div><div class="proof"><strong>Malmö · Lund · Köpenhamn</strong><span>Svenska · Engelska</span></div></div></section>
 
 <section class="section" id="work"><div class="shell">
-  <header class="section-head reveal"><div><p class="section-kicker">Utvalda projekt</p><h2>Fyra projekt som visar hur jag bygger.</h2></p></div><p>Publikt iOS-arbete inom GPU-rendering, enhetsövervakning, mediepipelines och spatiala experiment.</p></header>
+  <header class="section-head reveal"><div><p class="section-kicker">Utvalda projekt</p><h2>Fyra projekt som visar hur jag bygger.</h2></div><p>Publikt iOS-arbete inom GPU-rendering, enhetsövervakning, mediepipelines och spatiala experiment.</p></header>
   <div class="project-grid">
     <article class="project-card reveal">
       <div class="project-card__media" data-parallax="5"><picture><source srcset="/work/metalvisualkit-screenshot.webp" type="image/webp"><img src="/work/metalvisualkit-screenshot.png" alt="MetalVisualKit partikelindikator i iOS Simulator" width="506" height="1100" loading="lazy" decoding="async"></picture><span class="media-caption">Riktig skärmdump</span></div>
@@ -145,7 +146,7 @@
 
 <section class="section section--border" id="about"><div class="shell about-grid"><div class="reveal"><p class="section-kicker">Om mig</p><h2 class="about-title">Native mobile med systembakgrund.</h2></div><div class="about-copy reveal"><p>Jag fokuserar på native iOS eftersom det är där min starkaste produktionserfarenhet och bästa arbete finns. Java backend och Android/Kotlin hjälper mig att förstå API:er, dataflöden och angränsande plattformar.</p><p>Jag söker en <strong>roll som iOS- eller mobilutvecklare</strong> där jag kan bidra i produktionskod, lära av erfarna utvecklare och ta ansvar för successivt svårare problem.</p><div class="fact-grid"><div class="fact"><span>Bas</span><strong>Malmö</strong></div><div class="fact"><span>Öppen för</span><strong>Malmö · Lund · Köpenhamn</strong></div><div class="fact"><span>Arbetssätt</span><strong>På plats · hybrid · distans</strong></div><div class="fact"><span>Språk</span><strong>Svenska · Engelska</strong></div></div></div></div></section>
 
-<section class="section section--compact" id="contact"><div class="shell"><div class="contact-card reveal"><div><p class="section-kicker">Kontakt</p><h2>Pratar gärna iOS.</h2><p>Jag går gärna igenom publika repositories, arkitekturval och den produktionskod jag får diskutera.</p></div><div class="contact-actions"><a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS-roll%20%E2%80%94%20Anton%20Smedberg"><svg><use href="#i-mail"/></svg>Mejla</a><a class="btn btn--quiet btn-open-pdf" href="#" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">CV</a><a class="btn" href="/">English</a></div></div></div></section>
+<section class="section section--compact" id="contact"><div class="shell"><div class="contact-card reveal"><div><p class="section-kicker">Kontakt</p><h2>Pratar gärna iOS.</h2><p>Jag går gärna igenom publika repositories, arkitekturval och den produktionskod jag får diskutera.</p></div><div class="contact-actions"><a class="btn btn--primary" href="mailto:anton@smedberg.eu?subject=iOS-roll%20%E2%80%94%20Anton%20Smedberg"><svg><use href="#i-mail"/></svg>Mejla</a><a class="btn btn--quiet btn-open-pdf" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" data-title="CV — Anton Smedberg">CV</a><a class="btn" href="/">English</a></div></div></div></section>
 </main>
 <footer class="footer">
   <div class="shell footer__inner">
@@ -153,7 +154,7 @@
       <span>© <span data-year>2026</span> Anton Smedberg · Malmö</span>
     </div>
     <div class="footer__links">
-      <a href="#" class="btn-open-pdf" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">CV</a>
+      <a class="btn-open-pdf" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" data-title="CV — Anton Smedberg">CV</a>
       <span class="footer__sep">·</span>
       <a href="https://github.com/antonsmedberg/antonsmedberg.github.io" target="_blank" rel="noopener">Källkod</a>
       <span class="footer__sep">·</span>

@@ -187,9 +187,16 @@ if (revealables.length) {
    Scroll spy for same-page anchors
    ------------------------------------------------------------------------- */
 
-const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')];
+const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')]
+  .filter((link) => {
+    const hash = link.getAttribute('href');
+    return hash && hash.length > 1;
+  });
 const sections = navLinks
-  .map((link) => document.querySelector(link.getAttribute('href')))
+  .map((link) => {
+    const id = link.getAttribute('href').slice(1);
+    return document.getElementById(id);
+  })
   .filter(Boolean);
 
 if (sections.length) {
@@ -256,36 +263,17 @@ const openPdfBtns = document.querySelectorAll('.btn-open-pdf');
 
 let lastFocusedElement = null;
 
-async function openPdfModal(pdfUrl, title) {
-  if (!pdfModal) return;
+function openPdfModal(pdfUrl, title) {
+  if (!pdfModal || !pdfIframe) return;
   lastFocusedElement = document.activeElement;
-  
-  if (pdfDownloadBtn) pdfDownloadBtn.href = pdfUrl;
-  if (pdfFallbackDownload) pdfFallbackDownload.href = pdfUrl;
+  pdfIframe.src = pdfUrl;
+  if (pdfDownloadBtn) pdfDownloadBtn.setAttribute('href', pdfUrl);
+  if (pdfFallbackDownload) pdfFallbackDownload.setAttribute('href', pdfUrl);
   if (pdfTitle && title) pdfTitle.textContent = title;
-  
   pdfModal.classList.add('is-open');
   pdfModal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-  
   if (pdfCloseBtn) pdfCloseBtn.focus();
-  
-  // Fetch PDF as blob to bypass Content-Disposition: attachment
-  if (pdfIframe) {
-    try {
-      const response = await fetch(pdfUrl);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      pdfIframe.src = blobUrl;
-      pdfIframe.style.display = 'block';
-      if (pdfFallback) pdfFallback.style.display = 'none';
-    } catch (e) {
-      // Fallback to direct URL if blob fails
-      pdfIframe.src = pdfUrl;
-      pdfIframe.style.display = 'block';
-      if (pdfFallback) pdfFallback.style.display = 'none';
-    }
-  }
 }
 
 function closePdfModal() {
@@ -293,9 +281,7 @@ function closePdfModal() {
   pdfModal.classList.remove('is-open');
   pdfModal.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
-  
-  if (pdfIframe) pdfIframe.src = '';
-  
+  if (pdfIframe) pdfIframe.src = 'about:blank';
   if (lastFocusedElement) lastFocusedElement.focus();
 }
 
@@ -303,7 +289,7 @@ if (pdfModal) {
   openPdfBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const pdfUrl = btn.dataset.pdf || btn.getAttribute('href');
+      const pdfUrl = btn.getAttribute('href');
       const title = btn.dataset.title || 'CV — Anton Smedberg';
       openPdfModal(pdfUrl, title);
     });
