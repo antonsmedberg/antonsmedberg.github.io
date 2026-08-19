@@ -244,15 +244,10 @@ const openPdfBtns = document.querySelectorAll('.btn-open-pdf');
 
 let lastFocusedElement = null;
 
-function openPdfModal(pdfUrl, title) {
+async function openPdfModal(pdfUrl, title) {
   if (!pdfModal) return;
   lastFocusedElement = document.activeElement;
   
-  if (pdfIframe) {
-    pdfIframe.src = pdfUrl;
-    pdfIframe.style.display = 'block';
-    if (pdfFallback) pdfFallback.style.display = 'none';
-  }
   if (pdfDownloadBtn) pdfDownloadBtn.href = pdfUrl;
   if (pdfFallbackDownload) pdfFallbackDownload.href = pdfUrl;
   if (pdfTitle && title) pdfTitle.textContent = title;
@@ -262,6 +257,23 @@ function openPdfModal(pdfUrl, title) {
   document.body.style.overflow = 'hidden';
   
   if (pdfCloseBtn) pdfCloseBtn.focus();
+  
+  // Fetch PDF as blob to bypass Content-Disposition: attachment
+  if (pdfIframe) {
+    try {
+      const response = await fetch(pdfUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      pdfIframe.src = blobUrl;
+      pdfIframe.style.display = 'block';
+      if (pdfFallback) pdfFallback.style.display = 'none';
+    } catch (e) {
+      // Fallback to direct URL if blob fails
+      pdfIframe.src = pdfUrl;
+      pdfIframe.style.display = 'block';
+      if (pdfFallback) pdfFallback.style.display = 'none';
+    }
+  }
 }
 
 function closePdfModal() {
