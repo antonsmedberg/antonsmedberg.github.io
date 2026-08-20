@@ -52,17 +52,17 @@
   </div>
 </header>
 <div class="pdf-modal" id="pdfModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
-  <div class="pdf-modal__inner">
+  <div class="pdf-modal__panel">
     <div class="pdf-modal__header">
-      <div class="pdf-modal__title"><h2 id="pdfModalTitle">CV — Anton Smedberg</h2></div>
+      <h2 id="pdfModalTitle">CV</h2>
       <div class="pdf-modal__actions">
-        <a class="btn btn--ghost" id="pdfDownloadBtn" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" download><svg aria-hidden="true"><use href="#i-download"/></svg>Ladda ner</a>
-        <button class="pdf-modal__close" id="pdfCloseBtn" aria-label="Stäng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        <a id="pdfDownloadBtn" class="btn btn--secondary" href="#" download>Ladda ner</a>
+        <button id="pdfCloseBtn" class="btn btn--primary" type="button">Stäng</button>
       </div>
     </div>
     <div class="pdf-modal__body">
-      <iframe class="pdf-modal__iframe" id="pdfIframe" src="" title="CV PDF"></iframe>
-      <div class="pdf-modal__fallback" id="pdfFallback"><p>Kunde inte ladda PDF-visaren.</p><a class="btn" id="pdfFallbackDownload" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" download>Ladda ner PDF</a></div>
+      <iframe id="pdfIframe" title="CV preview" src="about:blank" loading="lazy"></iframe>
+      <a id="pdfFallbackDownload" class="pdf-modal__fallback" href="#" target="_blank" rel="noopener">Öppna PDF i en ny flik</a>
     </div>
   </div>
 </div>

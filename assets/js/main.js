@@ -1,11 +1,11 @@
-// main.js — progressive enhancement only.
+// main.js - progressive enhancement only.
 // Content and primary navigation still work if JavaScript fails.
 
 const root = document.documentElement;
 root.classList.remove('no-js');
 root.classList.add('js');
 
-/* Reveal --------------------------------------------------------------- */
+/* Reveal */
 
 const revealables = document.querySelectorAll('.reveal');
 
@@ -26,7 +26,7 @@ if (revealables.length && 'IntersectionObserver' in window) {
   revealables.forEach((element) => element.classList.add('is-visible'));
 }
 
-/* Scroll spy ----------------------------------------------------------- */
+/* Scroll spy */
 
 const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')]
   .filter((link) => {
@@ -62,7 +62,7 @@ if (sections.length && 'IntersectionObserver' in window) {
   sections.forEach((section) => spy.observe(section));
 }
 
-/* Header --------------------------------------------------------------- */
+/* Header */
 
 const masthead = document.querySelector('.masthead');
 
@@ -74,7 +74,7 @@ function updateHeader() {
 updateHeader();
 addEventListener('scroll', updateHeader, { passive: true });
 
-/* PDF modal ------------------------------------------------------------ */
+/* PDF modal */
 
 const pdfModal = document.getElementById('pdfModal');
 const pdfIframe = document.getElementById('pdfIframe');
@@ -83,7 +83,6 @@ const pdfDownloadBtn = document.getElementById('pdfDownloadBtn');
 const pdfFallbackDownload = document.getElementById('pdfFallbackDownload');
 const pdfTitle = document.getElementById('pdfModalTitle');
 const openPdfBtns = document.querySelectorAll('.pdf-modal-trigger');
-
 let lastFocusedElement = null;
 
 function openPdfModal(pdfUrl, title = 'CV — Anton Smedberg') {
@@ -100,7 +99,9 @@ function openPdfModal(pdfUrl, title = 'CV — Anton Smedberg') {
   pdfModal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 
-  requestAnimationFrame(() => pdfCloseBtn?.focus());
+  requestAnimationFrame(() => {
+    pdfCloseBtn?.focus();
+  });
 }
 
 function closePdfModal() {
@@ -126,18 +127,15 @@ if (pdfModal) {
 
       const url = button.dataset.pdf || button.getAttribute('href');
 
-      // If the progressive modal cannot be used, the real href remains a
-      // valid PDF fallback in the HTML.
       if (!url) return;
 
-      openPdfModal(
-        url,
-        button.dataset.title || 'CV — Anton Smedberg'
-      );
+      openPdfModal(url, button.dataset.title || 'CV — Anton Smedberg');
     });
   });
 
-  pdfCloseBtn?.addEventListener('click', closePdfModal);
+  if (pdfCloseBtn) {
+    pdfCloseBtn.addEventListener('click', closePdfModal);
+  }
 
   pdfModal.addEventListener('click', (event) => {
     if (event.target === pdfModal) closePdfModal();
@@ -150,7 +148,7 @@ if (pdfModal) {
   });
 }
 
-/* Housekeeping --------------------------------------------------------- */
+/* Housekeeping */
 
 document.querySelectorAll('[data-year]').forEach((element) => {
   element.textContent = String(new Date().getFullYear());

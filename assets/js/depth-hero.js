@@ -27,8 +27,6 @@ function initDepthHero(canvas, THREE) {
 
   const scene = new THREE.Scene();
 
-  // The CSS model is 4:5, so an orthographic camera gives one stable
-  // coordinate system for depth texture, particles and portrait.
   const aspect = 4 / 5;
   const camera = new THREE.OrthographicCamera(
     -aspect / 2,
@@ -77,15 +75,8 @@ function initDepthHero(canvas, THREE) {
 
       const geometry = new THREE.BufferGeometry();
 
-      geometry.setAttribute(
-        'position',
-        new THREE.BufferAttribute(positions, 3)
-      );
-
-      geometry.setAttribute(
-        'uv',
-        new THREE.BufferAttribute(uvs, 2)
-      );
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 
       const material = new THREE.ShaderMaterial({
         transparent: true,
@@ -120,13 +111,10 @@ function initDepthHero(canvas, THREE) {
             float depth = sampleValue.r;
             float alpha = sampleValue.a;
 
-            /* Narrow reconstruction seam:
-               flat scan -> sparse depth samples -> clean photograph. */
             float enter = smoothstep(0.12, 0.23, uv.x);
             float exit = 1.0 - smoothstep(0.43, 0.53, uv.x);
             float seam = enter * exit;
 
-            /* Stable thinning. No per-load Math.random() noise. */
             float keep = step(0.43, hash21(uv * 251.0));
 
             vec3 position3d = position;
@@ -134,38 +122,20 @@ function initDepthHero(canvas, THREE) {
 
             position3d.z = (depth - 0.5) * 0.17;
 
-            position3d.x +=
-              uPointer.x *
-              mix(0.0015, 0.017, nearFactor);
+            position3d.x += uPointer.x * mix(0.0015, 0.017, nearFactor);
+            position3d.y += uPointer.y * mix(0.001, 0.008, nearFactor);
 
-            position3d.y +=
-              uPointer.y *
-              mix(0.001, 0.008, nearFactor);
+            position3d.x -= (1.0 - uReveal) * mix(0.045, 0.012, uv.x);
 
-            /* One-time reconstruction settle, not perpetual motion. */
-            position3d.x -=
-              (1.0 - uReveal) *
-              mix(0.045, 0.012, uv.x);
+            vec4 mv = modelViewMatrix * vec4(position3d, 1.0);
 
-            vec4 mv =
-              modelViewMatrix *
-              vec4(position3d, 1.0);
+            gl_Position = projectionMatrix * mv;
 
-            gl_Position =
-              projectionMatrix *
-              mv;
-
-            gl_PointSize =
-              mix(1.0, 2.25, nearFactor) *
-              uPixelRatio;
+            gl_PointSize = mix(1.0, 2.25, nearFactor) * uPixelRatio;
 
             vDepth = depth;
 
-            vAlpha =
-              alpha *
-              seam *
-              keep *
-              smoothstep(0.05, 0.45, uReveal);
+            vAlpha = alpha * seam * keep * smoothstep(0.05, 0.45, uReveal);
           }
         `,
 
@@ -179,43 +149,17 @@ function initDepthHero(canvas, THREE) {
 
             if (radius > 0.5) discard;
 
-            float softEdge =
-              1.0 -
-              smoothstep(
-                0.22,
-                0.5,
-                radius
-              );
+            float softEdge = 1.0 - smoothstep(0.22, 0.5, radius);
 
-            vec3 farColour =
-              vec3(0.62, 0.69, 0.79);
+            vec3 farColour = vec3(0.62, 0.69, 0.79);
+            vec3 midColour = vec3(0.39, 0.48, 0.71);
+            vec3 nearColour = vec3(0.20, 0.32, 0.70);
 
-            vec3 midColour =
-              vec3(0.39, 0.48, 0.71);
+            vec3 colour = vDepth < 0.5
+              ? mix(farColour, midColour, vDepth * 2.0)
+              : mix(midColour, nearColour, (vDepth - 0.5) * 2.0);
 
-            vec3 nearColour =
-              vec3(0.20, 0.32, 0.70);
-
-            vec3 colour =
-              vDepth < 0.5
-              ? mix(
-                  farColour,
-                  midColour,
-                  vDepth * 2.0
-                )
-              : mix(
-                  midColour,
-                  nearColour,
-                  (vDepth - 0.5) * 2.0
-                );
-
-            gl_FragColor =
-              vec4(
-                colour,
-                vAlpha *
-                softEdge *
-                0.78
-              );
+            gl_FragColor = vec4(colour, vAlpha * softEdge * 0.78);
           }
         `
       });
@@ -245,24 +189,14 @@ function initDepthHero(canvas, THREE) {
         currentX += (targetX - currentX) * 0.085;
         currentY += (targetY - currentY) * 0.085;
 
-        const reveal = Math.min(
-          1,
-          (now - revealStartedAt) / 780
-        );
+        const reveal = Math.min(1, (now - revealStartedAt) / 780);
 
-        material.uniforms.uReveal.value =
-          1 - Math.pow(1 - reveal, 3);
-
-        material.uniforms.uPointer.value.set(
-          currentX,
-          -currentY
-        );
+        material.uniforms.uReveal.value = 1 - Math.pow(1 - reveal, 3);
+        material.uniforms.uPointer.value.set(currentX, -currentY);
 
         renderer.render(scene, camera);
 
-        const pointerMoving =
-          Math.abs(targetX - currentX) > 0.001 ||
-          Math.abs(targetY - currentY) > 0.001;
+        const pointerMoving = Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001;
 
         if (reveal < 1 || pointerMoving) {
           requestFrame();
@@ -272,33 +206,11 @@ function initDepthHero(canvas, THREE) {
       function setPointer(event) {
         const rect = stage.getBoundingClientRect();
 
-        targetX =
-          Math.max(
-            -1,
-            Math.min(
-              1,
-              ((event.clientX - rect.left) / rect.width - 0.5) * 2
-            )
-          );
+        targetX = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - 0.5) * 2));
+        targetY = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - 0.5) * 2));
 
-        targetY =
-          Math.max(
-            -1,
-            Math.min(
-              1,
-              ((event.clientY - rect.top) / rect.height - 0.5) * 2
-            )
-          );
-
-        stage.style.setProperty(
-          '--px',
-          targetX.toFixed(3)
-        );
-
-        stage.style.setProperty(
-          '--py',
-          targetY.toFixed(3)
-        );
+        stage.style.setProperty('--px', targetX.toFixed(3));
+        stage.style.setProperty('--py', targetY.toFixed(3));
 
         requestFrame();
       }
@@ -313,65 +225,40 @@ function initDepthHero(canvas, THREE) {
         requestFrame();
       }
 
-      stage.addEventListener(
-        'pointermove',
-        setPointer,
-        { passive: true }
-      );
+      stage.addEventListener('pointermove', setPointer, { passive: true });
+      stage.addEventListener('pointerleave', resetPointer, { passive: true });
 
-      stage.addEventListener(
-        'pointerleave',
-        resetPointer,
-        { passive: true }
-      );
-
-      const resizeObserver =
-        new ResizeObserver(() => {
-          const rect =
-            model.getBoundingClientRect();
-
-          renderer.setSize(
-            Math.max(1, rect.width),
-            Math.max(1, rect.height),
-            false
-          );
-
-          requestFrame();
-        });
+      const resizeObserver = new ResizeObserver(() => {
+        const rect = model.getBoundingClientRect();
+        renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
+        requestFrame();
+      });
 
       resizeObserver.observe(model);
 
-      const visibilityObserver =
-        new IntersectionObserver(
-          ([entry]) => {
-            visible = entry.isIntersecting;
+      const visibilityObserver = new IntersectionObserver(
+        ([entry]) => {
+          visible = entry.isIntersecting;
 
-            if (visible) {
-              requestFrame();
-            } else if (frame) {
-              cancelAnimationFrame(frame);
-              frame = 0;
-            }
-          },
-          { rootMargin: '160px' }
-        );
+          if (visible) {
+            requestFrame();
+          } else if (frame) {
+            cancelAnimationFrame(frame);
+            frame = 0;
+          }
+        },
+        { rootMargin: '160px' }
+      );
 
       visibilityObserver.observe(stage);
 
-      const rect =
-        model.getBoundingClientRect();
-
-      renderer.setSize(
-        Math.max(1, rect.width),
-        Math.max(1, rect.height),
-        false
-      );
+      const rect = model.getBoundingClientRect();
+      renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
 
       requestFrame();
     },
     undefined,
     () => {
-      /* Static SVG/photo fallback already remains visible. */
       canvas.hidden = true;
     }
   );
