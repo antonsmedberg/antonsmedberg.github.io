@@ -12,7 +12,9 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
 initDepthHero(canvas);
 
 async function initDepthHero(canvas) {
-  const container = canvas.parentElement;
+  const model = canvas.closest('.identity-model');
+  const stage = canvas.closest('.identity-stage');
+  if (!model || !stage) return;
   
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -90,12 +92,12 @@ async function initDepthHero(canvas) {
         float alpha = depthSample.a;
         
         // Seam: only show points in transition zone
-        float enter = smoothstep(0.18, 0.32, uv.x);
-        float exit = 1.0 - smoothstep(0.52, 0.68, uv.x);
+        float enter = smoothstep(0.14, 0.27, uv.x);
+        float exit = 1.0 - smoothstep(0.48, 0.61, uv.x);
         float seam = enter * exit;
         
-        // Sparse density
-        float density = step(0.25, fract(aSeed * 19.71));
+        // Sparse density - measured samples not confetti
+        float density = step(0.42, fract(aSeed * 19.71));
         
         vec3 p = position;
         // Depth displacement
@@ -140,19 +142,17 @@ async function initDepthHero(canvas) {
   let pointerY = 0;
 
   function pointerMove(event) {
-    const rect = container.getBoundingClientRect();
+    const rect = stage.getBoundingClientRect();
     targetX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
     targetY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
   }
-  container.addEventListener('pointermove', pointerMove, { passive: true });
+  stage.addEventListener('pointermove', pointerMove, { passive: true });
 
   function resize() {
-    const rect = container.getBoundingClientRect();
+    const rect = model.getBoundingClientRect();
     renderer.setSize(rect.width, rect.height, false);
-    camera.aspect = rect.width / rect.height;
-    camera.updateProjectionMatrix();
   }
-  new ResizeObserver(resize).observe(container);
+  new ResizeObserver(resize).observe(model);
 
   const clock = new THREE.Clock();
   let active = true;
@@ -162,7 +162,7 @@ async function initDepthHero(canvas) {
     if (entry.isIntersecting) start();
     else stop();
   }, { rootMargin: '150px' });
-  observer.observe(container);
+  observer.observe(stage);
 
   function render() {
     raf = requestAnimationFrame(render);
