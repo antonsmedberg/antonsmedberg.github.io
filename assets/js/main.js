@@ -82,6 +82,7 @@ const pdfCloseBtn = document.getElementById('pdfCloseBtn');
 const pdfDownloadBtn = document.getElementById('pdfDownloadBtn');
 const pdfFallbackDownload = document.getElementById('pdfFallbackDownload');
 const pdfTitle = document.getElementById('pdfModalTitle');
+const pdfTitle = document.getElementById('pdfModalTitle');
 const openPdfBtns = document.querySelectorAll('.pdf-modal-trigger');
 let lastFocusedElement = null;
 
