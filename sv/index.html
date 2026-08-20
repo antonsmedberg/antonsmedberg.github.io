@@ -6,7 +6,7 @@
 <title>Anton Smedberg — iOS-utvecklare | Swift, SwiftUI & Metal</title>
 <meta name="description" content="iOS-utvecklare i Malmö med produktionserfarenhet från Axis Communications. Swift 6, SwiftUI, Swift Concurrency, AVFoundation, Metal, testning och CI/CD.">
 <meta name="robots" content="index,follow">
-<meta name="theme-color" content="#f4f6f9">
+<meta name="theme-color" content="#edeff2">
 <link rel="canonical" href="https://antonsmedberg.github.io/sv/">
 <link rel="alternate" hreflang="sv" href="https://antonsmedberg.github.io/sv/">
 <link rel="alternate" hreflang="en" href="https://antonsmedberg.github.io/">
@@ -37,6 +37,8 @@
   <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 19h14"/></symbol>
   <symbol id="i-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6 18 18"/><path d="M18 6 6 18"/></symbol>
 </svg>
 <header class="masthead">
   <div class="masthead__inner">
@@ -47,16 +49,30 @@
       <a class="icon-link" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" rel="me noopener" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a>
       <nav class="language-switch" aria-label="Språk"><a href="/" hreflang="en">EN</a><span aria-hidden="true">/</span><span aria-current="page">SV</span></nav>
       <a class="btn" href="mailto:anton@smedberg.eu?subject=iOS-roll%20%E2%80%94%20Anton%20Smedberg">Kontakt</a>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="navSheet" aria-label="Meny"><svg class="nav-toggle__open" aria-hidden="true"><use href="#i-menu"/></svg><svg class="nav-toggle__close" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
   </div>
 </header>
+<div class="nav-sheet" id="navSheet" data-open="false">
+  <a href="#work">Arbete</a>
+  <a href="#experience">Erfarenhet</a>
+  <a href="#toolkit">Kompetens</a>
+  <a href="#about">Om mig</a>
+  <a class="pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">CV</a>
+  <a href="/" hreflang="en">English</a>
+  <div class="nav-sheet__meta">
+    <a class="btn" href="mailto:anton@smedberg.eu?subject=iOS-roll%20%E2%80%94%20Anton%20Smedberg">Kontakt</a>
+    <a class="icon-link" href="https://github.com/antonsmedberg" target="_blank" rel="me noopener" aria-label="GitHub"><svg><use href="#i-github"/></svg></a>
+    <a class="icon-link" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" rel="me noopener" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a>
+  </div>
+</div>
 <div class="pdf-modal" id="pdfModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
   <div class="pdf-modal__inner">
     <div class="pdf-modal__header">
-      <h2 id="pdfModalTitle">CV</h2>
+      <h2 id="pdfModalTitle" data-default="CV">CV</h2>
       <div class="pdf-modal__actions">
-        <a id="pdfDownloadBtn" class="btn btn btn--ghost" href="#" download>Ladda ner</a>
-        <button id="pdfCloseBtn" class="btn btn" type="button">Stäng</button>
+        <a id="pdfDownloadBtn" class="btn btn--ghost" href="#" download>Ladda ner</a>
+        <button id="pdfCloseBtn" class="btn" type="button">Stäng</button>
       </div>
     </div>
     <div class="pdf-modal__body">
@@ -75,24 +91,30 @@
       <div class="hero-tech"><span>Swift 6</span><span>SwiftUI</span><span>Concurrency</span><span>AVFoundation</span><span>Metal</span></div>
       <div class="hero__actions"><a class="btn" href="#work">Se utvalda projekt</a><a class="btn btn--text pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV-SV.pdf">Öppna CV →</a></div>
     </div>
-    <aside class="identity-stage" data-depth-stage aria-label="Professionell översikt">
+    <aside class="identity-stage" data-depth-stage aria-label="Djupskannat porträtt">
       <div class="identity-field" aria-hidden="true">
         <div class="identity-bg"></div>
-        <svg class="identity-aperture" viewBox="0 0 500 500" aria-hidden="true">
+        <div class="identity-glow"></div>
+        <svg class="identity-aperture" viewBox="0 0 500 500" fill="none" aria-hidden="true">
+          <circle class="aperture aperture--hairline" cx="250" cy="250" r="238"/>
           <path class="aperture aperture--far" d="M 315 35 A 215 215 0 0 1 476 208"/>
           <path class="aperture aperture--near" d="M 476 283 A 215 215 0 0 1 350 461"/>
           <path class="aperture aperture--fine" d="M 291 61 A 188 188 0 0 1 447 220"/>
+          <path class="aperture aperture--fine" d="M 60 300 A 200 200 0 0 0 150 430"/>
         </svg>
       </div>
       <div class="identity-model">
         <div class="identity-scan" aria-hidden="true"></div>
         <canvas class="identity-model__depth" data-depth-canvas aria-hidden="true"></canvas>
         <picture class="identity-model__portrait">
+          <source media="(max-width: 640px)" srcset="/assets/img/portrait@2x-small.webp" type="image/webp">
           <source srcset="/assets/img/portrait.webp" type="image/webp">
           <img src="/assets/img/portrait.png" alt="Anton Smedberg" width="560" height="700" fetchpriority="high" decoding="async">
         </picture>
+        <div class="identity-seam" aria-hidden="true"></div>
       </div>
-      <span class="identity-chip">DEPTH / iOS · Malmö</span>
+      <span class="identity-chip">DJUP · iOS</span>
+      <span class="identity-readout">MALMÖ / LUND / KHM</span>
     </aside>
   </div>
 </section>
