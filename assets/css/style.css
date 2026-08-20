@@ -1218,7 +1218,6 @@ body.no-js .reveal { opacity: 1; transform: none; }
 .contact-actions { display: flex; gap: .55rem; justify-content: flex-end; flex-wrap: wrap; }
 
 
-
 /* Locale switch */
 .locale-switch {
   display: inline-flex;
@@ -1262,7 +1261,6 @@ body.no-js .reveal { opacity: 1; transform: none; }
     display: none;
   }
 }
-
 
 
 /* Container queries for toolkit groups */
@@ -1335,6 +1333,182 @@ body.no-js .reveal { opacity: 1; transform: none; }
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+
+
+/* Hero tech metadata row */
+.hero-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem 1rem;
+  margin-top: 1.4rem;
+  color: var(--ink-3);
+  font: 500 .68rem/1 var(--font-mono);
+  letter-spacing: .035em;
+}
+
+.hero-tech span:not(:last-child)::after {
+  content: "/";
+  margin-left: 1rem;
+  color: var(--line-2);
+}
+
+/* Identity model - shared coordinate system */
+.identity-model {
+  position: absolute;
+  right: -1%;
+  bottom: 0;
+  width: min(78%, 430px);
+  aspect-ratio: 4 / 5;
+  transform-style: preserve-3d;
+  transform: translate3d(calc(var(--px) * 2px), calc(var(--py) * 1px), 0) rotateY(calc(var(--px) * 1.2deg)) rotateX(calc(var(--py) * -.6deg));
+}
+
+.identity-model__depth,
+.identity-model__portrait {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.identity-model__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Depth canvas */
+.identity-depth {
+  --depth: 1.5;
+  z-index: 2;
+  left: auto;
+  width: min(66%, 460px);
+  right: -1%;
+  top: 3%;
+  bottom: 0;
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 61%, rgb(0 0 0 / .55) 72%, transparent 90%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 61%, rgb(0 0 0 / .55) 72%, transparent 90%);
+}
+
+.identity-depth__canvas {
+  width: 100%;
+  height: 100%;
+  opacity: .72;
+}
+
+/* Aperture arc */
+.identity-aperture {
+  position: absolute;
+  width: 640px;
+  height: 640px;
+  right: -280px;
+  top: -70px;
+  opacity: .28;
+  pointer-events: none;
+  transform: rotate(-8deg);
+}
+
+/* Reduce scan opacity */
+.identity-scan {
+  opacity: .32;
+  filter: saturate(.72) contrast(1.02);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 15%, #000 40%, rgb(0 0 0 / .62) 48%, rgb(0 0 0 / .12) 58%, transparent 65%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 15%, #000 40%, rgb(0 0 0 / .62) 48%, rgb(0 0 0 / .12) 58%, transparent 65%);
+}
+
+/* Identity chip */
+.identity-chip {
+  padding: .32rem .52rem;
+  border-radius: 6px;
+  box-shadow: none;
+  background: rgb(255 255 255 / .7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Technical Profile - single surface */
+.toolkit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--line);
+}
+
+.toolkit-group {
+  min-width: 0;
+  padding: .9rem 1rem 1rem;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  box-shadow: none;
+  transition: background .2s var(--ease);
+}
+
+.toolkit-group:hover {
+  transform: none;
+  background: color-mix(in srgb, var(--surface) 96%, var(--accent-soft));
+  box-shadow: none;
+}
+
+.toolkit-head {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .45rem;
+}
+
+.toolkit-mark {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.toolkit-mark svg {
+  width: .78rem;
+  height: .78rem;
+}
+
+.toolkit-head h3 {
+  font-size: .9rem;
+}
+
+.skill-rows {
+  margin: 0;
+}
+
+.skill-row {
+  display: grid;
+  grid-template-columns: 4.35rem minmax(0, 1fr);
+  gap: .45rem;
+  padding-block: .31rem;
+  border-top: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+}
+
+.skill-row dt {
+  font-size: .64rem;
+}
+
+.skill-row dd {
+  font-size: .78rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 979px) {
+  .toolkit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .toolkit-grid {
+    grid-template-columns: 1fr;
+  }
+}
 /* ---------------------------------------------------------------------------
    16. Footer
    --------------------------------------------------------------------------- */
@@ -1355,175 +1529,84 @@ body.no-js .reveal { opacity: 1; transform: none; }
 .footer__inner a:hover { color: var(--ink); }
 
 /* ---------------------------------------------------------------------------
-   17. Desktop (1024px+)
-   --------------------------------------------------------------------------- */
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
 
-/* Tablet landscape / compact desktop */
+/* 760+: compact split */
 @media (min-width: 760px) {
   .hero__inner {
     grid-template-columns:
-      minmax(0, 1.15fr)
-      minmax(250px, .85fr);
-    gap: clamp(1.4rem, 3.5vw, 3rem);
-    align-items: start;
-  }
-  .identity-stage {
-    height: clamp(340px, 40vw, 455px);
-    margin-top: -.75rem;
-    margin-inline: 0;
-    align-self: start;
-  }
-  .identity-scene {
-    inset: 0;
-  }
-  .identity-portrait {
-    left: 65%;
-    height: 90%;
-  }
-  .identity-scan {
-    left: 50%;
-    height: 85%;
-    opacity: .43;
-  }
-}
-/* Full desktop */
-@media (min-width: 1100px) {
-  .hero__inner {
-    grid-template-columns:
-      minmax(0, 1.08fr)
-      minmax(350px, .92fr);
-    gap: clamp(2.5rem, 5vw, 4.75rem);
+      minmax(0, 1.12fr)
+      minmax(255px, .88fr);
+    gap: clamp(1.5rem, 3.5vw, 3rem);
     align-items: center;
   }
-  .identity-stage {
-    height: clamp(420px, 41vw, 520px);
-    margin-top: -1.5rem;
-  }
-  .identity-portrait {
-    left: 63%;
-    height: 89%;
-  }
-  .identity-scan {
-    left: 52%;
-    height: 88%;
-    opacity: .46;
-  }
-}
-/* Mobile */
-@media (max-width: 759px) {
-  .hero__inner {
-    grid-template-columns: 1fr;
-    gap: .8rem;
-  }
-  .identity-stage {
-    height: clamp(290px, 82vw, 365px);
-    margin: .4rem calc(var(--gutter) * -1) 0;
-  }
-  .identity-portrait {
-    left: 67%;
-    height: 94%;
-  }
-  .identity-scan {
-    left: 47%;
-    height: 87%;
-    opacity: .36;
-  }
-  .identity-chip {
-    left: var(--gutter);
-    bottom: .75rem;
-  }
-}
-
-  .proof-strip__inner { grid-template-columns: repeat(4, 1fr); }
-
   .project-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .experience-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: 3rem;
-  }
-
-  .toolkit-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .about-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: 3rem;
+  .proof-strip__inner {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-/* ---------------------------------------------------------------------------
-   18. Large desktop
-   --------------------------------------------------------------------------- */
-
-@media (min-width: 1080px) {
+/* 980+: technical matrix */
+@media (min-width: 980px) {
   .toolkit-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-/* ---------------------------------------------------------------------------
-   19. Tablet (760px - 1023px)
-   --------------------------------------------------------------------------- */
-
-@media (min-width: 760px) and (max-width: 1023px) {
-  .project-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+/* 1100+: full desktop */
+@media (min-width: 1100px) {
+  .hero__inner {
+    grid-template-columns:
+      minmax(0, 1.05fr)
+      minmax(370px, .95fr);
+    gap: clamp(3rem, 5vw, 5rem);
   }
-
-  .toolkit-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .experience-layout {
+    grid-template-columns:
+      minmax(240px, .7fr)
+      minmax(0, 1.3fr);
+  }
+  .about-grid {
+    grid-template-columns:
+      minmax(240px, .7fr)
+      minmax(0, 1.3fr);
   }
 }
 
-/* ---------------------------------------------------------------------------
-   20. Tablet portrait / small desktop
-   --------------------------------------------------------------------------- */
-
-
-  .identity-portrait { left: 61%; height: 80%; }
-  .identity-scan { left: 49%; height: 80%; opacity: 0.54; }
-}
-
-/* ---------------------------------------------------------------------------
-   21. Phone (640px-)
-   --------------------------------------------------------------------------- */
-
-@media (max-width: 640px) {
-  .hero__inner { gap: 1.25rem; }
-
-  .identity-stage {
-    height: clamp(320px, 88vw, 390px);
-    margin-top: 0.5rem;
+/* Phone */
+@media (max-width: 759px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    gap: .75rem;
   }
-  .identity-portrait { left: 66%; height: 94%; }
-  .identity-scan { left: 46%; height: 88%; opacity: 0.45; }
-  .identity-chip { left: var(--gutter); bottom: .9rem; }
-
-  .proof-strip__inner { grid-template-columns: 1fr; }
-
-  .fact-grid { grid-template-columns: 1fr; }
-
-  .contact-card { grid-template-columns: 1fr; text-align: center; }
-  .contact-actions { justify-content: center; }
-
   .project-grid,
   .toolkit-grid {
     grid-template-columns: 1fr;
   }
-
-  .masthead__inner { gap: .75rem; padding-inline: .75rem; }
-  .nav { display: none; }
-  .header-actions .icon-link { display: none; }
-  .btn { min-height: 44px; }
+  .proof-strip__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-/* ---------------------------------------------------------------------------
-   22. Reduced motion
-   --------------------------------------------------------------------------- */
+@media (max-width: 430px) {
+  .proof-strip__inner {
+    grid-template-columns: 1fr;
+  }
+  .fact-grid {
+    grid-template-columns: 1fr;
+  }
+  .contact-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .contact-actions {
+    justify-content: center;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1533,10 +1616,6 @@ body.no-js .reveal { opacity: 1; transform: none; }
   .reveal { opacity: 1; transform: none; }
   html { scroll-behavior: auto; }
 }
-
-/* ---------------------------------------------------------------------------
-   23. Print
-   --------------------------------------------------------------------------- */
 
 @media (print) {
   body { background: #fff; color: #000; }

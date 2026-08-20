@@ -1,9 +1,15 @@
 import * as THREE from '../vendor/three.module.js';
 
 const canvas = document.querySelector('[data-depth-canvas]');
-if (canvas) {
-  initDepthHero(canvas);
+if (!canvas) return;
+
+// Respect reduced motion
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  canvas.style.display = 'none';
+  return;
 }
+
+initDepthHero(canvas);
 
 async function initDepthHero(canvas) {
   const container = canvas.parentElement;
@@ -18,15 +24,24 @@ async function initDepthHero(canvas) {
   renderer.setClearColor(0x000000, 0);
   
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 20);
-  camera.position.z = 3.4;
+  
+  // Orthographic camera for proper 2D registration
+  const aspect = 4 / 5;
+  const camera = new THREE.OrthographicCamera(
+    -aspect / 2, aspect / 2,
+    0.5, -0.5,
+    -2, 2
+  );
+  camera.position.z = 1;
 
   const texture = await new THREE.TextureLoader().loadAsync('/assets/img/portrait-depth.png');
   texture.colorSpace = THREE.NoColorSpace;
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
 
-  const columns = matchMedia('(max-width: 700px)').matches ? 52 : 88;
+  // Responsive point count
+  const isMobile = matchMedia('(max-width: 700px)').matches;
+  const columns = isMobile ? 52 : 88;
   const rows = Math.round(columns * 1.25);
   const positions = [];
   const uvs = [];
@@ -36,7 +51,12 @@ async function initDepthHero(canvas) {
     for (let x = 0; x < columns; x++) {
       const u = x / (columns - 1);
       const v = y / (rows - 1);
-      positions.push(u - 0.5, 0.5 - v, 0);
+      // Position directly in portrait coordinates
+      positions.push(
+        (u - 0.5) * aspect,
+        0.5 - v,
+        0
+      );
       uvs.push(u, 1 - v);
       seeds.push(Math.random());
     }
@@ -68,13 +88,24 @@ async function initDepthHero(canvas) {
         vec4 depthSample = texture2D(uDepth, uv);
         float depth = depthSample.r;
         float alpha = depthSample.a;
-        float seam = 1.0 - smoothstep(0.34, 0.64, uv.x);
+        
+        // Seam: only show points in transition zone
+        float enter = smoothstep(0.18, 0.32, uv.x);
+        float exit = 1.0 - smoothstep(0.52, 0.68, uv.x);
+        float seam = enter * exit;
+        
+        // Sparse density
         float density = step(0.25, fract(aSeed * 19.71));
+        
         vec3 p = position;
-        p.z += (depth - 0.5) * 0.45;
-        p.x += uPointer.x * depth * 0.035;
-        p.y += uPointer.y * depth * 0.022;
-        p.z += sin(uTime * 0.35 + aSeed * 8.0) * 0.006;
+        // Depth displacement
+        p.z = (depth - 0.5) * 0.18;
+        // Pointer parallax - near points move more
+        p.x += uPointer.x * depth * 0.02;
+        p.y += uPointer.y * depth * 0.012;
+        // Subtle motion
+        p.z += sin(uTime * 0.35 + aSeed * 8.0) * 0.004;
+        
         vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mvPosition;
         gl_PointSize = mix(1.0, 2.4, depth) * uPixelRatio;
@@ -101,7 +132,6 @@ async function initDepthHero(canvas) {
   });
 
   const cloud = new THREE.Points(geometry, material);
-  cloud.scale.set(1.65, 2.05, 1);
   scene.add(cloud);
 
   let targetX = 0;
@@ -126,24 +156,39 @@ async function initDepthHero(canvas) {
 
   const clock = new THREE.Clock();
   let active = true;
+  let raf = 0;
 
   const observer = new IntersectionObserver(([entry]) => {
-    active = entry.isIntersecting;
+    if (entry.isIntersecting) start();
+    else stop();
   }, { rootMargin: '150px' });
   observer.observe(container);
 
-  function frame() {
-    requestAnimationFrame(frame);
+  function render() {
+    raf = requestAnimationFrame(render);
     if (!active) return;
+    
     pointerX += (targetX - pointerX) * 0.045;
     pointerY += (targetY - pointerY) * 0.045;
     material.uniforms.uPointer.value.set(pointerX, -pointerY);
     material.uniforms.uTime.value = clock.getElapsedTime();
-    cloud.rotation.y = pointerX * 0.055;
-    cloud.rotation.x = pointerY * -0.025;
+    cloud.rotation.y = pointerX * 0.03;
+    cloud.rotation.x = pointerY * -0.015;
     renderer.render(scene, camera);
   }
 
+  function start() {
+    if (raf) return;
+    active = true;
+    render();
+  }
+
+  function stop() {
+    cancelAnimationFrame(raf);
+    raf = 0;
+    active = false;
+  }
+
   resize();
-  frame();
+  start();
 }
