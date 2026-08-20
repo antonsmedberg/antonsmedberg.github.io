@@ -53,7 +53,6 @@ async function initDepthHero(canvas) {
     for (let x = 0; x < columns; x++) {
       const u = x / (columns - 1);
       const v = y / (rows - 1);
-      // Position directly in portrait coordinates
       positions.push(
         (u - 0.5) * aspect,
         0.5 - v,
@@ -96,16 +95,13 @@ async function initDepthHero(canvas) {
         float exit = 1.0 - smoothstep(0.48, 0.61, uv.x);
         float seam = enter * exit;
         
-        // Sparse density - measured samples not confetti
+        // Sparse density
         float density = step(0.42, fract(aSeed * 19.71));
         
         vec3 p = position;
-        // Depth displacement
         p.z = (depth - 0.5) * 0.18;
-        // Pointer parallax - near points move more
         p.x += uPointer.x * depth * 0.02;
         p.y += uPointer.y * depth * 0.012;
-        // Subtle motion
         p.z += sin(uTime * 0.35 + aSeed * 8.0) * 0.004;
         
         vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
