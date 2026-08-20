@@ -18,26 +18,28 @@ function initDepthHero(canvas, THREE) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: false,
+    antialias: true,
     powerPreference: 'high-performance'
   });
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene();
 
+  // Orthographic camera for proper 2D registration
   const aspect = 4 / 5;
+  const frustumSize = 1.0;
   const camera = new THREE.OrthographicCamera(
-    -aspect / 2,
-     aspect / 2,
-     0.5,
-    -0.5,
-    -2,
-     2
+    -frustumSize * aspect / 2,
+    frustumSize * aspect / 2,
+    frustumSize / 2,
+    -frustumSize / 2,
+    0.1,
+    10
   );
 
-  camera.position.z = 1;
+  camera.position.z = 5;
 
   const loader = new THREE.TextureLoader();
 
@@ -50,42 +52,55 @@ function initDepthHero(canvas, THREE) {
       texture.generateMipmaps = false;
 
       const mobile = matchMedia('(max-width: 700px)').matches;
-      const columns = mobile ? 52 : 84;
+      const columns = mobile ? 60 : 120;
       const rows = Math.round(columns * 1.25);
 
-      const positions = new Float32Array(columns * rows * 3);
-      const uvs = new Float32Array(columns * rows * 2);
+      const positions = [];
+      const uvs = [];
+      const sizes = [];
+      const alphas = [];
 
-      let p = 0;
-      let t = 0;
-
+      // Generate grid points
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < columns; x++) {
           const u = x / (columns - 1);
           const v = y / (rows - 1);
 
-          positions[p++] = (u - 0.5) * aspect;
-          positions[p++] = 0.5 - v;
-          positions[p++] = 0;
+          // Position in normalized space
+          const px = (u - 0.5) * aspect;
+          const py = 0.5 - v;
 
-          uvs[t++] = u;
-          uvs[t++] = 1 - v;
+          positions.push(px, py, 0);
+          uvs.push(u, 1 - v);
+
+          // Deterministic hash for stable point distribution
+          const hash = fractSinHash(u * 311.7, v * 191.3);
+          
+          // Size variation based on position
+          const sizeBase = 0.8 + hash * 0.8;
+          sizes.push(sizeBase);
+
+          // Alpha variation
+          alphas.push(0.4 + hash * 0.6);
         }
       }
 
       const geometry = new THREE.BufferGeometry();
-
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geometry.setAttribute('aSize', new THREE.Float32BufferAttribute(sizes, 1));
+      geometry.setAttribute('aAlpha', new THREE.Float32BufferAttribute(alphas, 1));
 
       const material = new THREE.ShaderMaterial({
         transparent: true,
         depthWrite: false,
         depthTest: false,
+        blending: THREE.AdditiveBlending,
 
         uniforms: {
           uDepth: { value: texture },
           uPointer: { value: new THREE.Vector2(0, 0) },
+          uTime: { value: 0 },
           uPixelRatio: { value: renderer.getPixelRatio() },
           uReveal: { value: 0 }
         },
@@ -93,89 +108,103 @@ function initDepthHero(canvas, THREE) {
         vertexShader: `
           uniform sampler2D uDepth;
           uniform vec2 uPointer;
+          uniform float uTime;
           uniform float uPixelRatio;
           uniform float uReveal;
 
+          attribute float aSize;
+          attribute float aAlpha;
+
           varying float vAlpha;
           varying float vDepth;
-
-          float hash21(vec2 p) {
-            p = fract(p * vec2(123.34, 456.21));
-            p += dot(p, p + 45.32);
-            return fract(p.x * p.y);
-          }
+          varying float vSize;
 
           void main() {
-            vec4 sampleValue = texture2D(uDepth, uv);
+            vec4 depthSample = texture2D(uDepth, uv);
+            float depth = depthSample.r;
+            float alpha = depthSample.a;
 
-            float depth = sampleValue.r;
-            float alpha = sampleValue.a;
-
-            float enter = smoothstep(0.12, 0.23, uv.x);
-            float exit = 1.0 - smoothstep(0.43, 0.53, uv.x);
+            // Seam: reconstruction zone
+            float enter = smoothstep(0.10, 0.22, uv.x);
+            float exit = 1.0 - smoothstep(0.42, 0.55, uv.x);
             float seam = enter * exit;
 
-            float keep = step(0.43, hash21(uv * 251.0));
-
-            vec3 position3d = position;
+            // Depth-based displacement
             float nearFactor = depth * depth;
+            vec3 pos = position;
+            pos.z = (depth - 0.45) * 0.2;
 
-            position3d.z = (depth - 0.5) * 0.17;
+            // Pointer parallax - depth-dependent
+            pos.x += uPointer.x * mix(0.002, 0.025, nearFactor);
+            pos.y += uPointer.y * mix(0.001, 0.012, nearFactor);
 
-            position3d.x += uPointer.x * mix(0.0015, 0.017, nearFactor);
-            position3d.y += uPointer.y * mix(0.001, 0.008, nearFactor);
+            // Reveal animation - points converge from left
+            float revealDelay = uv.x * 0.5;
+            float localReveal = smoothstep(revealDelay, revealDelay + 0.4, uReveal);
+            pos.x -= (1.0 - localReveal) * mix(0.08, 0.02, uv.x);
+            pos.z += (1.0 - localReveal) * 0.1;
 
-            position3d.x -= (1.0 - uReveal) * mix(0.045, 0.012, uv.x);
+            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+            gl_Position = projectionMatrix * mvPosition;
 
-            vec4 mv = modelViewMatrix * vec4(position3d, 1.0);
+            // Size based on depth and reveal
+            float sizeMult = mix(0.5, 1.5, nearFactor) * localReveal;
+            gl_PointSize = aSize * sizeMult * uPixelRatio * 3.0;
 
-            gl_Position = projectionMatrix * mv;
-
-            gl_PointSize = mix(1.0, 2.25, nearFactor) * uPixelRatio;
-
+            vAlpha = alpha * seam * aAlpha * localReveal;
             vDepth = depth;
-
-            vAlpha = alpha * seam * keep * smoothstep(0.05, 0.45, uReveal);
+            vSize = aSize;
           }
         `,
 
         fragmentShader: `
+          precision mediump float;
+
           varying float vAlpha;
           varying float vDepth;
+          varying float vSize;
 
           void main() {
-            vec2 d = gl_PointCoord - 0.5;
-            float radius = length(d);
+            vec2 center = gl_PointCoord - 0.5;
+            float dist = length(center);
 
-            if (radius > 0.5) discard;
+            if (dist > 0.5) discard;
 
-            float softEdge = 1.0 - smoothstep(0.22, 0.5, radius);
+            // Soft circular point
+            float softness = 1.0 - smoothstep(0.1, 0.5, dist);
 
-            vec3 farColour = vec3(0.62, 0.69, 0.79);
-            vec3 midColour = vec3(0.39, 0.48, 0.71);
-            vec3 nearColour = vec3(0.20, 0.32, 0.70);
+            // Depth-based color gradient
+            vec3 farColor = vec3(0.55, 0.65, 0.85);
+            vec3 midColor = vec3(0.35, 0.55, 0.95);
+            vec3 nearColor = vec3(0.15, 0.35, 0.85);
 
-            vec3 colour = vDepth < 0.5
-              ? mix(farColour, midColour, vDepth * 2.0)
-              : mix(midColour, nearColour, (vDepth - 0.5) * 2.0);
+            vec3 color;
+            if (vDepth < 0.5) {
+              color = mix(farColor, midColor, vDepth * 2.0);
+            } else {
+              color = mix(midColor, nearColor, (vDepth - 0.5) * 2.0);
+            }
 
-            gl_FragColor = vec4(colour, vAlpha * softEdge * 0.78);
+            // Add subtle glow
+            float glow = exp(-dist * 3.0) * 0.5;
+            color += glow * vec3(0.3, 0.5, 1.0);
+
+            gl_FragColor = vec4(color, vAlpha * softness * 0.85);
           }
         `
       });
 
-      const cloud = new THREE.Points(geometry, material);
-      scene.add(cloud);
+      const points = new THREE.Points(geometry, material);
+      scene.add(points);
 
+      // Animation state
       let visible = true;
       let frame = 0;
-
       let targetX = 0;
       let targetY = 0;
       let currentX = 0;
       let currentY = 0;
-
-      const revealStartedAt = performance.now();
+      const revealStartTime = performance.now();
 
       function requestFrame() {
         if (!visible || frame) return;
@@ -186,18 +215,20 @@ function initDepthHero(canvas, THREE) {
         frame = 0;
         if (!visible) return;
 
-        currentX += (targetX - currentX) * 0.085;
-        currentY += (targetY - currentY) * 0.085;
+        // Smooth pointer interpolation
+        currentX += (targetX - currentX) * 0.06;
+        currentY += (targetY - currentY) * 0.06;
 
-        const reveal = Math.min(1, (now - revealStartedAt) / 780);
+        // Reveal animation (0 to 1 over ~800ms)
+        const reveal = Math.min(1, (now - revealStartTime) / 800);
 
         material.uniforms.uReveal.value = 1 - Math.pow(1 - reveal, 3);
         material.uniforms.uPointer.value.set(currentX, -currentY);
 
         renderer.render(scene, camera);
 
-        const pointerMoving = Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001;
-
+        // Continue animating if still revealing or pointer moving
+        const pointerMoving = Math.abs(targetX - currentX) > 0.002 || Math.abs(targetY - currentY) > 0.002;
         if (reveal < 1 || pointerMoving) {
           requestFrame();
         }
@@ -205,7 +236,6 @@ function initDepthHero(canvas, THREE) {
 
       function setPointer(event) {
         const rect = stage.getBoundingClientRect();
-
         targetX = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - 0.5) * 2));
         targetY = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - 0.5) * 2));
 
@@ -218,10 +248,8 @@ function initDepthHero(canvas, THREE) {
       function resetPointer() {
         targetX = 0;
         targetY = 0;
-
         stage.style.setProperty('--px', '0');
         stage.style.setProperty('--py', '0');
-
         requestFrame();
       }
 
@@ -233,28 +261,23 @@ function initDepthHero(canvas, THREE) {
         renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
         requestFrame();
       });
-
       resizeObserver.observe(model);
 
       const visibilityObserver = new IntersectionObserver(
         ([entry]) => {
           visible = entry.isIntersecting;
-
-          if (visible) {
-            requestFrame();
-          } else if (frame) {
+          if (visible) requestFrame();
+          else if (frame) {
             cancelAnimationFrame(frame);
             frame = 0;
           }
         },
-        { rootMargin: '160px' }
+        { rootMargin: '100px' }
       );
-
       visibilityObserver.observe(stage);
 
       const rect = model.getBoundingClientRect();
       renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
-
       requestFrame();
     },
     undefined,
@@ -262,4 +285,9 @@ function initDepthHero(canvas, THREE) {
       canvas.hidden = true;
     }
   );
+}
+
+function fractSinHash(x, y) {
+  const s = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+  return s - Math.floor(s);
 }
