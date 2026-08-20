@@ -52,16 +52,16 @@
   </div>
 </header>
 <div class="pdf-modal" id="pdfModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
-  <div class="pdf-modal__panel">
+  <div class="pdf-modal__inner">
     <div class="pdf-modal__header">
       <h2 id="pdfModalTitle">CV</h2>
       <div class="pdf-modal__actions">
-        <a id="pdfDownloadBtn" class="btn btn--secondary" href="#" download>Ladda ner</a>
-        <button id="pdfCloseBtn" class="btn btn--primary" type="button">Stäng</button>
+        <a id="pdfDownloadBtn" class="btn btn btn--ghost" href="#" download>Ladda ner</a>
+        <button id="pdfCloseBtn" class="btn btn" type="button">Stäng</button>
       </div>
     </div>
     <div class="pdf-modal__body">
-      <iframe id="pdfIframe" title="CV preview" src="about:blank" loading="lazy"></iframe>
+      <iframe id="pdfIframe" class="pdf-modal__iframe" title="CV preview" src="about:blank" loading="lazy"></iframe>
       <a id="pdfFallbackDownload" class="pdf-modal__fallback" href="#" target="_blank" rel="noopener">Öppna PDF i en ny flik</a>
     </div>
   </div>
