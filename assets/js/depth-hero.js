@@ -41,42 +41,30 @@ async function initDepthHero(canvas) {
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
 
-  // Responsive point count - more points for better face coverage
+  // Responsive point count
   const isMobile = matchMedia('(max-width: 700px)').matches;
-  const columns = isMobile ? 60 : 100;
+  const columns = isMobile ? 48 : 88;
   const rows = Math.round(columns * 1.25);
   const positions = [];
   const uvs = [];
-  const seeds = [];
-  const depths = [];
 
+  // Generate full grid - let depth texture determine visibility
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
       const u = x / (columns - 1);
       const v = y / (rows - 1);
-      
-      // Sample depth at this position
-      const depth = sampleDepth(texture, u, 1 - v);
-      
-      // Only add points where there's actual face content
-      if (depth > 0.15) {
-        positions.push(
-          (u - 0.5) * aspect,
-          0.5 - v,
-          0
-        );
-        uvs.push(u, 1 - v);
-        seeds.push(Math.random());
-        depths.push(depth);
-      }
+      positions.push(
+        (u - 0.5) * aspect,
+        0.5 - v,
+        0
+      );
+      uvs.push(u, 1 - v);
     }
   }
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setAttribute('aSeed', new THREE.Float32BufferAttribute(seeds, 1));
-  geometry.setAttribute('aDepth', new THREE.Float32BufferAttribute(depths, 1));
 
   const material = new THREE.ShaderMaterial({
     transparent: true,
@@ -84,16 +72,12 @@ async function initDepthHero(canvas) {
     uniforms: {
       uDepth: { value: texture },
       uPointer: { value: new THREE.Vector2() },
-      uTime: { value: 0 },
       uPixelRatio: { value: renderer.getPixelRatio() }
     },
     vertexShader: `
       uniform sampler2D uDepth;
       uniform vec2 uPointer;
-      uniform float uTime;
       uniform float uPixelRatio;
-      attribute float aSeed;
-      attribute float aDepth;
       varying float vAlpha;
       varying float vDepth;
       
@@ -102,42 +86,33 @@ async function initDepthHero(canvas) {
         float depth = depthSample.r;
         float alpha = depthSample.a;
         
-        // LiDAR-style horizontal banding
-        float bandY = floor(uv.y * 30.0) / 30.0;
-        float bandStrength = smoothstep(0.0, 0.05, abs(uv.y - bandY));
-        
         // Seam: reconstruction zone on left, photo on right
         float enter = smoothstep(0.15, 0.28, uv.x);
         float exit = 1.0 - smoothstep(0.45, 0.58, uv.x);
         float seam = enter * exit;
         
-        // Sparse density - LiDAR scan lines
-        float lineDensity = step(0.35, fract(uv.y * 40.0 + aSeed * 0.5));
-        float pointDensity = step(0.5, fract(aSeed * 19.71));
-        float density = lineDensity * pointDensity * step(0.2, depth);
+        // Deterministic thinning based on UV position
+        float hash = fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);
+        float density = step(0.55, hash) * step(0.15, depth);
         
         vec3 p = position;
         
         // Depth displacement - stronger for near features
         float depthFactor = depth * depth;
-        p.z = (depth - 0.4) * 0.2;
+        p.z = (depth - 0.4) * 0.16;
         
         // Pointer parallax - depth-dependent
-        p.x += uPointer.x * mix(0.003, 0.02, depthFactor);
-        p.y += uPointer.y * mix(0.002, 0.012, depthFactor);
-        
-        // Subtle breathing motion
-        p.z += sin(uTime * 0.4 + aSeed * 6.0) * 0.003;
-        p.y += sin(uTime * 0.3 + uv.x * 4.0) * 0.001;
+        p.x += uPointer.x * mix(0.002, 0.018, depthFactor);
+        p.y += uPointer.y * mix(0.001, 0.009, depthFactor);
         
         vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mvPosition;
         
         // Point size varies by depth
-        gl_PointSize = mix(1.2, 2.8, depthFactor) * uPixelRatio;
+        gl_PointSize = mix(1.0, 2.5, depthFactor) * uPixelRatio;
         
         vDepth = depth;
-        vAlpha = alpha * seam * density * bandStrength;
+        vAlpha = alpha * seam * density;
       }
     `,
     fragmentShader: `
@@ -165,7 +140,7 @@ async function initDepthHero(canvas) {
           colour = mix(midColour, nearColour, (vDepth - 0.5) * 2.0);
         }
         
-        gl_FragColor = vec4(colour, vAlpha * edge * 0.65);
+        gl_FragColor = vec4(colour, vAlpha * edge * 0.6);
       }
     `
   });
@@ -178,10 +153,15 @@ async function initDepthHero(canvas) {
   let pointerX = 0;
   let pointerY = 0;
 
+  // Single pointer handler for entire hero
   function pointerMove(event) {
     const rect = stage.getBoundingClientRect();
     targetX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
     targetY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+    
+    // Update CSS custom properties for DOM layers
+    stage.style.setProperty('--px', targetX.toFixed(3));
+    stage.style.setProperty('--py', targetY.toFixed(3));
   }
   stage.addEventListener('pointermove', pointerMove, { passive: true });
 
@@ -191,7 +171,6 @@ async function initDepthHero(canvas) {
   }
   new ResizeObserver(resize).observe(model);
 
-  const clock = new THREE.Clock();
   let active = true;
   let raf = 0;
 
@@ -205,10 +184,11 @@ async function initDepthHero(canvas) {
     raf = requestAnimationFrame(render);
     if (!active) return;
     
+    // Smooth pointer interpolation
     pointerX += (targetX - pointerX) * 0.04;
     pointerY += (targetY - pointerY) * 0.04;
+    
     material.uniforms.uPointer.value.set(pointerX, -pointerY);
-    material.uniforms.uTime.value = clock.getElapsedTime();
     
     // Very subtle rotation
     cloud.rotation.y = pointerX * 0.02;
@@ -231,22 +211,4 @@ async function initDepthHero(canvas) {
 
   resize();
   start();
-}
-
-// Helper function to sample depth texture
-function sampleDepth(texture, u, v) {
-  // Approximate depth sampling - actual implementation would use canvas
-  // For now, return a value based on typical face depth distribution
-  const centerX = 0.5;
-  const centerY = 0.45;
-  const dist = Math.sqrt((u - centerX) * (u - centerX) + (v - centerY) * (v - centerY));
-  
-  // Face is closer in center, farther at edges
-  if (dist < 0.35) {
-    return 0.7 + Math.random() * 0.3;
-  } else if (dist < 0.5) {
-    return 0.4 + Math.random() * 0.3;
-  } else {
-    return 0.1 + Math.random() * 0.2;
-  }
 }
