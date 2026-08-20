@@ -1,127 +1,148 @@
 // main.js — progressive enhancement only.
-// Every word of content is already in the HTML. Nothing here is required to
-// read the page; if this file fails to load, the site still works.
+// Content and primary navigation still work if JavaScript fails.
 
 const root = document.documentElement;
 root.classList.remove('no-js');
 root.classList.add('js');
 
-const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-
-/* -------------------------------------------------------------------------
-   Reveal on scroll
-   ------------------------------------------------------------------------- */
+/* Reveal --------------------------------------------------------------- */
 
 const revealables = document.querySelectorAll('.reveal');
-if (revealables.length) {
-  const observer = new IntersectionObserver((entries, obs) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      entry.target.classList.add('is-visible');
-      obs.unobserve(entry.target);
-    }
-  }, { rootMargin: '0px 0px -7% 0px', threshold: 0.06 });
 
-  revealables.forEach((el) => observer.observe(el));
+if (revealables.length && 'IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(
+    (entries, obs) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('is-visible');
+        obs.unobserve(entry.target);
+      }
+    },
+    { rootMargin: '0px 0px -7% 0px', threshold: 0.06 }
+  );
+
+  revealables.forEach((element) => observer.observe(element));
+} else {
+  revealables.forEach((element) => element.classList.add('is-visible'));
 }
 
-/* -------------------------------------------------------------------------
-   Scroll spy for same-page anchors
-   ------------------------------------------------------------------------- */
+/* Scroll spy ----------------------------------------------------------- */
 
 const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')]
   .filter((link) => {
     const hash = link.getAttribute('href');
     return hash && hash.length > 1;
   });
+
 const sections = navLinks
-  .map((link) => {
-    const id = link.getAttribute('href').slice(1);
-    return document.getElementById(id);
-  })
+  .map((link) => document.getElementById(link.getAttribute('href').slice(1)))
   .filter(Boolean);
 
-if (sections.length) {
-  const spy = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
+if (sections.length && 'IntersectionObserver' in window) {
+  const spy = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (!visible) return;
+
       for (const link of navLinks) {
-        if (link.getAttribute('href') === `#${entry.target.id}`) {
-          link.setAttribute('aria-current', 'true');
-        } else {
-          link.removeAttribute('aria-current');
-        }
+        const active = link.getAttribute('href') === `#${visible.target.id}`;
+        link.toggleAttribute('aria-current', active);
+        if (active) link.setAttribute('aria-current', 'true');
       }
+    },
+    {
+      rootMargin: '-38% 0px -52% 0px',
+      threshold: [0, 0.2, 0.5, 0.8]
     }
-  }, { rootMargin: '-45% 0px -50% 0px' });
+  );
 
   sections.forEach((section) => spy.observe(section));
 }
 
-/* -------------------------------------------------------------------------
-   Header scroll state
-   ------------------------------------------------------------------------- */
+/* Header --------------------------------------------------------------- */
 
 const masthead = document.querySelector('.masthead');
-if (masthead) {
-  addEventListener('scroll', () => {
-    masthead.dataset.scrolled = String(scrollY > 8);
-  }, { passive: true });
+
+function updateHeader() {
+  if (!masthead) return;
+  masthead.dataset.scrolled = String(window.scrollY > 8);
 }
 
-/* -------------------------------------------------------------------------
-   PDF Modal
-   ------------------------------------------------------------------------- */
+updateHeader();
+addEventListener('scroll', updateHeader, { passive: true });
+
+/* PDF modal ------------------------------------------------------------ */
 
 const pdfModal = document.getElementById('pdfModal');
 const pdfIframe = document.getElementById('pdfIframe');
 const pdfCloseBtn = document.getElementById('pdfCloseBtn');
 const pdfDownloadBtn = document.getElementById('pdfDownloadBtn');
 const pdfFallbackDownload = document.getElementById('pdfFallbackDownload');
+const pdfTitle = document.getElementById('pdfModalTitle');
 const openPdfBtns = document.querySelectorAll('.pdf-modal-trigger');
 
-function openPdfModal(pdfUrl, title) {
-  if (!pdfModal || !pdfIframe) return;
-  
+let lastFocusedElement = null;
+
+function openPdfModal(pdfUrl, title = 'CV — Anton Smedberg') {
+  if (!pdfModal || !pdfIframe || !pdfUrl) return;
+
+  lastFocusedElement = document.activeElement;
+
   pdfIframe.src = pdfUrl;
   if (pdfDownloadBtn) pdfDownloadBtn.href = pdfUrl;
   if (pdfFallbackDownload) pdfFallbackDownload.href = pdfUrl;
-  if (pdfTitle && title) pdfTitle.textContent = title;
-  
+  if (pdfTitle) pdfTitle.textContent = title;
+
   pdfModal.classList.add('is-open');
   pdfModal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-  
-  if (pdfCloseBtn) pdfCloseBtn.focus();
+
+  requestAnimationFrame(() => pdfCloseBtn?.focus());
 }
 
 function closePdfModal() {
   if (!pdfModal) return;
+
   pdfModal.classList.remove('is-open');
   pdfModal.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
-  
-  if (pdfIframe) pdfIframe.src = '';
+
+  if (pdfIframe) pdfIframe.src = 'about:blank';
+
+  if (lastFocusedElement instanceof HTMLElement) {
+    lastFocusedElement.focus();
+  }
+
+  lastFocusedElement = null;
 }
 
 if (pdfModal) {
-  openPdfBtns.forEach((btn) => {
-    btn.addEventListener('click', (event) => {
+  openPdfBtns.forEach((button) => {
+    button.addEventListener('click', (event) => {
       event.preventDefault();
-      const url = btn.dataset.pdf || btn.href;
-      const title = btn.dataset.title || 'CV — Anton Smedberg';
-      openPdfModal(url, title);
+
+      const url = button.dataset.pdf || button.getAttribute('href');
+
+      // If the progressive modal cannot be used, the real href remains a
+      // valid PDF fallback in the HTML.
+      if (!url) return;
+
+      openPdfModal(
+        url,
+        button.dataset.title || 'CV — Anton Smedberg'
+      );
     });
   });
-  
-  if (pdfCloseBtn) {
-    pdfCloseBtn.addEventListener('click', closePdfModal);
-  }
-  
+
+  pdfCloseBtn?.addEventListener('click', closePdfModal);
+
   pdfModal.addEventListener('click', (event) => {
     if (event.target === pdfModal) closePdfModal();
   });
-  
+
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && pdfModal.classList.contains('is-open')) {
       closePdfModal();
@@ -129,10 +150,8 @@ if (pdfModal) {
   });
 }
 
-/* -------------------------------------------------------------------------
-   Housekeeping
-   ------------------------------------------------------------------------- */
+/* Housekeeping --------------------------------------------------------- */
 
-document.querySelectorAll('[data-year]').forEach((el) => {
-  el.textContent = String(new Date().getFullYear());
+document.querySelectorAll('[data-year]').forEach((element) => {
+  element.textContent = String(new Date().getFullYear());
 });
