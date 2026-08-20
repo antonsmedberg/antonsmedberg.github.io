@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="/assets/css/style.css">
 <link rel="stylesheet" href="/assets/css/pdf-modal.css">
 <script type="module" src="/assets/js/main.js"></script>
+<script type="module" src="/assets/js/depth-hero.js"></script>
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Anton Smedberg — iOS-utvecklare i Malmö">
 <meta property="og:description" content="Swift, SwiftUI, Swift Concurrency, lokal mediebearbetning och Metal. Produktionserfarenhet från Axis Communications i Lund.">
@@ -92,9 +93,22 @@
       <div class="hero__actions"><a class="btn btn--primary" href="#work">Se utvalda projekt</a><a class="btn btn--quiet btn-open-pdf" href="/assets/cv/Anton-Smedberg-CV-SV.pdf" data-title="CV — Anton Smedberg">Öppna CV<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
     </div>
     <aside class="identity-stage" aria-label="Professionell översikt" data-depth-stage>
-      <div class="identity-scene" data-depth-stage>
+      <div class="identity-scene">
         <div class="identity-layer identity-bg"></div>
         <div class="identity-layer identity-scan"></div>
+        <svg class="identity-aperture" viewBox="0 0 500 500" aria-hidden="true">
+          <defs>
+            <linearGradient id="depthArc" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#a9bacd" stop-opacity="0"/>
+              <stop offset=".48" stop-color="#6974df" stop-opacity=".45"/>
+              <stop offset="1" stop-color="#2f4bd8" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M 105 398 A 190 190 0 0 1 402 104" fill="none" stroke="url(#depthArc)" stroke-width="1"/>
+        </svg>
+        <div class="identity-layer identity-depth" aria-hidden="true">
+          <canvas class="identity-depth__canvas" data-depth-canvas></canvas>
+        </div>
         <div class="identity-layer identity-portrait-wrap">
           <picture>
             <source media="(max-width: 640px)" srcset="/assets/img/portrait@2x-small.webp" type="image/webp">
