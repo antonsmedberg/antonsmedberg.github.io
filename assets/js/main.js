@@ -78,8 +78,22 @@ if (sections.length && 'IntersectionObserver' in window) {
 const masthead = document.querySelector('.masthead');
 
 if (masthead) {
+  const hero = document.querySelector('.hero');
+
+  // The bar floats over a dark hero, then lands on light paper. Switch it at
+  // the boundary rather than at a fixed scroll offset, so it stays correct at
+  // every viewport height.
   const updateHeader = () => {
     masthead.dataset.scrolled = String(scrollY > 8);
+
+    const boundary = hero
+      ? hero.getBoundingClientRect().bottom - masthead.offsetHeight - 8
+      : -1;
+
+    masthead.dataset.theme = boundary > 0 ? 'dark' : 'light';
+
+    const scrollable = document.documentElement.scrollHeight - innerHeight;
+    masthead.style.setProperty('--progress', scrollable > 0 ? (scrollY / scrollable).toFixed(4) : '0');
   };
 
   updateHeader();

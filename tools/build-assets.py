@@ -108,7 +108,7 @@ def build_portrait():
               + (" / portrait.png (560w fallback)" if suffix == "" else ""))
 
 
-def build_depth_map(portrait_rgba, out_path, width=240):
+def build_depth_map(portrait_rgba, out_path, width=340):
     """Bake a depth map for the point cloud.
 
     Luminance alone is not depth: dark hair is not far away and a bright collar
@@ -127,7 +127,7 @@ def build_depth_map(portrait_rgba, out_path, width=240):
       3. A gentle vertical falloff, because in a three-quarter portrait the
          chin and neck sit behind the brow.
     """
-    from scipy.ndimage import distance_transform_edt, gaussian_filter
+    from scipy.ndimage import distance_transform_edt, gaussian_filter, sobel
 
     ratio = portrait_rgba.size[1] / portrait_rgba.size[0]
     small = portrait_rgba.resize((width, round(width * ratio)), Image.LANCZOS)
@@ -159,11 +159,39 @@ def build_depth_map(portrait_rgba, out_path, width=240):
         lo, hi = np.percentile(depth[inside], (2, 98))
         depth = np.clip((depth - lo) / max(1e-5, hi - lo), 0, 1)
 
-    out = np.zeros((h, w, 2), dtype=np.uint8)
-    out[..., 0] = (depth * 255).astype(np.uint8)      # L
-    out[..., 1] = (alpha * 255).astype(np.uint8)      # A
-    Image.fromarray(out, mode="LA").save(out_path, optimize=True)
-    print(f"  depth map {small.size} -> {os.path.basename(out_path)}")
+    # 4. Feature detail. The renderer only knows depth, so it spends the same
+    #    number of points on a flat cheek as on an eyelid — which is why the
+    #    eye and mouth dissolve into the cloud. Bake a structure map so the
+    #    point distribution can follow the face instead of a uniform grid.
+    #
+    #    A plain Sobel is the wrong tool on its own: it fires hardest on the
+    #    silhouette and on hair texture, not on the features we care about. So
+    #    band-pass first (features live at a known scale), then suppress the
+    #    outline, which the alpha channel already describes perfectly well.
+    band = gaussian_filter(luma, sigma=0.7) - gaussian_filter(luma, sigma=3.4)
+    edges = np.hypot(sobel(band, axis=1, mode="nearest"),
+                     sobel(band, axis=0, mode="nearest"))
+
+    rim = np.clip(dist / 3.0, 0, 1)                   # 0 at the outline
+    edges *= inside * rim
+
+    if inside.any():
+        hi_e = np.percentile(edges[inside], 97.0)
+        edges = np.clip(edges / max(hi_e, 1e-5), 0, 1)
+    edges = gaussian_filter(edges, sigma=0.6)
+    # Skin texture sits around 0.3 and real structure around 0.9, so a hard
+    # S-curve keeps eyelids, lips and the jawline while dropping pore noise.
+    edges = np.clip((edges - 0.22) / 0.48, 0, 1)
+    edges = edges * edges * (3.0 - 2.0 * edges)
+
+    out = np.zeros((h, w, 4), dtype=np.uint8)
+    out[..., 0] = (depth * 255).astype(np.uint8)      # depth
+    out[..., 1] = (edges * 255).astype(np.uint8)      # feature detail
+    out[..., 2] = (rim * 255).astype(np.uint8)        # silhouette proximity
+    out[..., 3] = (alpha * 255).astype(np.uint8)      # portrait mask
+    Image.fromarray(out, mode="RGBA").save(out_path, optimize=True)
+    print(f"  depth map {small.size} -> {os.path.basename(out_path)} "
+          f"(depth + detail + rim)")
 
 
 def _chaikin(points, rounds=2):
@@ -246,7 +274,7 @@ def build_scan(portrait_rgba, out_path, width=240, spacing=11, amplitude=32):
         d = " ".join(f"{x},{yy:.1f}" for x, yy in kept)
         body.append(
             f'<polygon points="{d} {w+w//2},{h+60} {-w//2},{h+60}" '
-            f'fill="var(--scan-fill, #f4f6f9)" stroke="none"/>')
+            f'fill="none" stroke="none"/>')
         body.append(f'<polyline points="{d}"/>')
 
     svg = (

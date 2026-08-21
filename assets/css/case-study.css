@@ -2,7 +2,7 @@
    Case study pages — layered on style.css, same tokens, no redefinitions.
    ========================================================================== */
 
-.case-page .section { padding-block: clamp(2rem, 4vw, 3.25rem) var(--section-y); }
+.case-page .section { padding-block: calc(var(--header-h) + clamp(1.5rem, 3vw, 2.5rem)) var(--section-y); }
 
 .breadcrumbs {
   margin-bottom: clamp(1.75rem, 4vw, 3rem);
@@ -55,7 +55,7 @@
   border: 1px solid var(--line);
   border-radius: var(--r-xl);
   background:
-    radial-gradient(70% 90% at 50% 0%, var(--accent-soft), transparent 70%),
+    radial-gradient(70% 90% at 50% 0%, color-mix(in srgb, var(--d-far) 20%, transparent), transparent 70%),
     linear-gradient(180deg, var(--surface), var(--surface-2));
   box-shadow: var(--shadow-2), var(--inner-hi);
 }
@@ -125,7 +125,7 @@
   padding: 1.35rem 1.4rem 1.5rem;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: linear-gradient(170deg, var(--surface), var(--surface-2));
+  background: linear-gradient(170deg, var(--surface-2), var(--surface));
   box-shadow: var(--shadow-1), var(--inner-hi);
 }
 
@@ -154,7 +154,7 @@
   padding: .26rem .55rem;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: var(--surface);
+  background: rgb(255 255 255 / .04);
   color: var(--ink-2);
   font: 400 var(--t-2xs)/1.5 var(--font-mono);
   letter-spacing: .02em;
@@ -169,5 +169,5 @@
 
 @media (min-width: 900px) {
   .case-body { grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); }
-  .case-meta { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  .case-meta { position: sticky; top: calc(var(--header-h) + 2rem); }
 }
