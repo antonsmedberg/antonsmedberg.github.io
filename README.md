@@ -1,62 +1,80 @@
 # antonsmedberg.github.io
 
-Portfolio for Anton Smedberg — iOS developer, Malmö.
-Static site, no build step, deployed straight from `main` by GitHub Pages.
+My portfolio. I'm Anton Smedberg — iOS developer in Malmö, currently looking
+for a junior role somewhere around Skåne, Öresund or Copenhagen.
 
-## Structure
+Static HTML, CSS and JavaScript. No framework, no build step, no npm install.
+GitHub Pages serves `main` directly. If you clone it, opening `index.html`
+through a local server is the whole setup.
+
+```bash
+python3 -m http.server 8000
+```
+
+## Layout
 
 ```
-index.html              English homepage
-sv/index.html           Swedish homepage (full parity)
+index.html              English
+sv/index.html           Swedish — full parity, written in Swedish, not translated
 work/*.html             Case studies
-404.html                Not-found page
-assets/css/style.css    Design tokens + all components (single layer, no overrides)
+404.html
+assets/css/style.css    Tokens first, then components. One layer, no overrides.
 assets/css/case-study.css
-assets/js/main.js       Reveal, scroll spy, nav sheet, CV modal, header state
-assets/js/depth-hero.js Raw-WebGL point cloud (no framework)
-assets/img/             Portrait, depth map, icons, OG image
-assets/fonts/           Self-hosted woff2 (Schibsted Grotesk, IBM Plex Mono)
-assets/cv/              CV PDFs (EN + SV)
-tools/build-assets.py   Regenerates portrait derivatives + depth map
+assets/js/main.js       Reveal, scroll spy, mobile nav, CV modal
+assets/js/depth-hero.js The hero point cloud. Raw WebGL, ~15 KB.
+assets/img/             Portrait, depth map, icons
+assets/fonts/           Self-hosted woff2
+assets/cv/              CV, English and Swedish
+tools/build-assets.py   Rebuilds the portrait derivatives and the depth map
 ```
 
-## The hero
+## About the hero
 
-`portrait-depth.png` is an RGBA map, one channel per job:
+The face on the front page is half photograph, half point cloud. The point
+cloud reads from `portrait-depth.png`, which packs four things into one image:
 
-| channel | meaning                                        |
-|---------|------------------------------------------------|
-| R       | depth                                          |
-| G       | facial detail (band-passed edge response)      |
-| B       | silhouette proximity                           |
-| A       | portrait alpha                                 |
+| channel | what it holds |
+|---------|---------------|
+| R | depth |
+| G | facial detail — band-passed edge response |
+| B | distance from the silhouette |
+| A | the portrait mask |
 
-`depth-hero.js` uses G to decide where to spend points — dense and fine on
-eyelids, lips and jaw; sparse and coarse on flat skin — and samples the
-portrait itself for per-point colour.
+The G channel is the part I'd point at. A uniform grid of points spends as
+much on a flat cheek as on an eyelid, which is why early versions had a face
+you couldn't read. Baking edge detail into the image lets the shader put small
+dense points where the face has structure and cull most of them where it
+doesn't. Each point also samples the photograph for its own colour, so the
+pupils and lips keep the contrast that makes them recognisable.
 
-**If you replace the portrait, regenerate the map:**
+None of that costs a network request at runtime — it's all in one 70 KB PNG
+and a texture the browser has already downloaded for the `<picture>` element.
+
+**Swap the portrait and you have to rebuild the map:**
 
 ```bash
 pip install pillow numpy scipy rembg
 python3 tools/build-assets.py
 ```
 
-The detail channel is baked per image. A new photo against the old map will
-look wrong.
+The detail channel is baked per photograph. A new face against the old map
+looks wrong.
 
-## Local preview
+## Decisions worth knowing
 
-```bash
-python3 -m http.server 8000
-```
+- **Colours come from the magma colormap** — the ramp used to visualise depth
+  and thermal data. Felt more honest than picking a palette off a mood board.
+  Every token sits at the top of `style.css`.
+- **The dark theme is checked, not eyeballed.** Twelve text styles are audited
+  against WCAG AA. Dark themes fail contrast more often than light ones,
+  because mid-grey looks fine on a good monitor and vanishes on a phone
+  outdoors.
+- **Almost nothing animates.** There was a rotating gradient border and a
+  scroll progress bar. Both were decoration and both are gone. What's left is
+  the point cloud, hover states, and a 1px press on buttons.
+- **No third-party anything.** No CDN, no analytics, no fonts from Google.
+  13 requests, ~355 KB on desktop.
 
-## Notes
+## Licence
 
-- No dependencies, no bundler, no CDN. Everything is self-hosted.
-- `.png` copies of images exist only as `<picture>` fallbacks; WebP-capable
-  browsers never fetch them.
-- Colours come from the magma colormap (the depth-visualisation standard).
-  All tokens live at the top of `style.css`.
-- Motion respects `prefers-reduced-motion`; the point cloud falls back to a
-  plain portrait when WebGL is unavailable.
+Code under MIT. The photograph and the CVs are mine — please don't reuse those.

@@ -1080,8 +1080,8 @@ button { font: inherit; }
   position: relative;
   display: grid;
   place-items: end center;
-  min-height: 210px;
-  padding: 1.6rem 1.4rem 0;
+  min-height: 168px;
+  padding: 1.15rem 1.2rem 0;
   overflow: hidden;
   border-block-end: 1px solid var(--line-soft);
   background:
@@ -1106,8 +1106,8 @@ button { font: inherit; }
 
 .project-card__media img {
   width: auto;
-  max-height: 250px;
-  border-radius: 12px 12px 0 0;
+  max-height: 190px;
+  border-radius: 10px 10px 0 0;
   box-shadow: 0 -1px 0 rgb(255 255 255 / .1), 0 20px 44px -14px rgb(0 0 0 / .75);
   transition: transform .5s var(--ease-out);
 }
@@ -1132,8 +1132,8 @@ button { font: inherit; }
 .project-card__body {
   display: grid;
   align-content: start;
-  gap: .7rem;
-  padding: 1.35rem 1.4rem 1.5rem;
+  gap: .55rem;
+  padding: 1rem 1.15rem 1.15rem;
 }
 
 .project-card__top {
@@ -1187,8 +1187,8 @@ button { font: inherit; }
 
 .project-card__body p {
   color: var(--ink-2);
-  font-size: var(--t-sm);
-  line-height: 1.58;
+  font-size: var(--t-xs);
+  line-height: 1.55;
   text-wrap: pretty;
 }
 
@@ -1200,7 +1200,7 @@ button { font: inherit; }
 }
 
 .project-card__tech {
-  padding-top: .7rem;
+  padding-top: .55rem;
   border-top: 1px solid var(--line-soft);
   color: var(--ink-3);
   font: 400 var(--t-2xs)/1.6 var(--font-mono);
@@ -1210,8 +1210,8 @@ button { font: inherit; }
 .project-card__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.1rem;
-  margin-top: .2rem;
+  gap: .9rem;
+  margin-top: .15rem;
 }
 
 /* Schematic — stands in where there is no screenshot yet */
@@ -1219,7 +1219,7 @@ button { font: inherit; }
   display: grid;
   gap: .9rem;
   width: 100%;
-  padding: 1.3rem 1.1rem;
+  padding: 1rem .9rem;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background:
@@ -1363,88 +1363,74 @@ button { font: inherit; }
 }
 
 /* --------------------------------------------------------------------------
-   12. Toolkit
+   12. Technical profile — spec sheet
    -------------------------------------------------------------------------- */
 
-.toolkit-grid {
+.spec {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--line);
-  box-shadow: var(--shadow-1);
-}
-
-.toolkit-group {
-  display: grid;
-  align-content: start;
-  gap: .6rem;
-  padding: .95rem 1rem 1.05rem;
+  border-radius: var(--r-md);
   background: var(--surface);
-  transition: background .28s var(--ease);
 }
 
-.toolkit-group:hover { background: var(--surface-2); }
+.spec__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .3rem .9rem;
+  padding: .7rem .95rem;
+  border-block-start: 1px solid var(--line-soft);
+  transition: background .2s var(--ease);
+}
 
-.toolkit-head {
+.spec__row:first-child { border-block-start: 0; }
+
+.spec__row:hover { background: var(--surface-2); }
+
+.spec__key {
   display: flex;
   align-items: center;
-  gap: .55rem;
+  gap: .5rem;
+  color: var(--ink);
+  font-size: var(--t-xs);
+  font-weight: 580;
+  letter-spacing: -.012em;
 }
 
-.toolkit-mark {
+.spec__mark {
   display: grid;
   place-items: center;
-  width: 1.55rem;
-  height: 1.55rem;
+  width: 1.3rem;
+  height: 1.3rem;
   flex: none;
-  border: 1px solid var(--accent-line);
-  border-radius: 7px;
-  background: linear-gradient(160deg, var(--surface-2), var(--accent-soft));
+  border-radius: 5px;
+  background: var(--accent-soft);
   color: var(--accent-ink);
-  box-shadow: var(--inner-hi);
 }
 
-.toolkit-mark svg { width: .85rem; height: .85rem; }
+.spec__mark svg { width: .78rem; height: .78rem; }
 
-.toolkit-head h3 {
-  font-size: var(--t-xs);
-  font-weight: 600;
-  letter-spacing: -.014em;
-}
-
-.toolkit-index {
+.spec__n {
   margin-inline-start: auto;
   color: var(--line-strong);
   font: 500 var(--t-2xs)/1 var(--font-mono);
   letter-spacing: .08em;
 }
 
-.skill-rows { display: grid; }
-
-.skill-row {
-  display: grid;
-  grid-template-columns: minmax(4.6rem, .38fr) 1fr;
-  gap: .65rem;
-  padding: .32rem 0;
-  border-block-start: 1px solid var(--line-soft);
+.spec__val {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+  padding-inline-start: 1.8rem;
 }
 
-.skill-row:first-child { border-block-start: 0; }
-
-.skill-row dt {
-  color: var(--ink-3);
-  font: 400 var(--t-2xs)/1.6 var(--font-mono);
-  letter-spacing: .04em;
-}
-
-.skill-row dd {
-  color: var(--ink);
-  font-size: var(--t-xs);
-  font-weight: 480;
-  line-height: 1.5;
+.spec__val span {
+  padding: .16rem .42rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--ink-2);
+  font: 400 var(--t-2xs)/1.5 var(--font-mono);
+  letter-spacing: .01em;
 }
 
 /* --------------------------------------------------------------------------
@@ -1770,17 +1756,15 @@ button { font: inherit; }
 
   .identity-model { inset-inline-end: 6%; }
   .proof-strip__inner { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .toolkit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .spec__row { grid-template-columns: minmax(12.8rem, 17%) 1fr; align-items: center; }
+  .spec__key { align-items: center; }
+  .spec__n { margin-inline-start: .35rem; }
+  .spec__val { padding-inline-start: 0; }
   .experience-layout { grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr); }
   .about-grid { grid-template-columns: minmax(0, .85fr) minmax(0, 1.55fr); }
 }
 
 @media (min-width: 1024px) {
-  .toolkit-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
-@media (min-width: 1500px) {
-  .toolkit-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 }
 
 @media (min-width: 1140px) {
@@ -1840,9 +1824,7 @@ button { font: inherit; }
   .project-card__media img { max-height: 200px; }
   .project-card__body { padding: 1.15rem 1.15rem 1.3rem; }
 
-  .skill-row { grid-template-columns: 1fr; gap: .1rem; }
-
-  .footer__inner { flex-direction: column; align-items: flex-start; }
+    .footer__inner { flex-direction: column; align-items: flex-start; }
 }
 
 @media (max-width: 1080px) {
