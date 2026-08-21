@@ -381,9 +381,8 @@ button { font: inherit; }
   position: relative;
   border: 1px solid rgb(255 255 255 / .08);
   border-radius: 14px;
-  background: rgb(255 255 255 / .05);
+  background: color-mix(in srgb, #191122 88%, transparent);
   transform: translateZ(0);
-  will-change: background-color;
   backdrop-filter: blur(24px) saturate(165%);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
   box-shadow: 0 1px 0 rgb(255 255 255 / .06) inset, 0 12px 34px -20px rgb(0 0 0 / .8);
@@ -399,7 +398,7 @@ button { font: inherit; }
 
 .masthead[data-theme="light"] .masthead__inner {
   border-color: var(--line-strong);
-  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  background: color-mix(in srgb, #1a1424 94%, transparent);
   box-shadow: var(--inner-hi), 0 14px 34px -20px rgb(0 0 0 / .8);
 }
 
@@ -659,10 +658,25 @@ button { font: inherit; }
 .hero__inner {
   display: grid;
   grid-template-columns: 1fr;
-  gap: clamp(1.75rem, 4vw, 3.5rem);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
   align-items: center;
-  padding-block: clamp(2.25rem, 5vw, 4.5rem);
+  justify-items: center;
+  padding-block: clamp(2rem, 5vw, 4.5rem);
+  text-align: center;
 }
+
+/* Stacked layout is centred; the split layout below 860px+ goes left-aligned. */
+.hero__copy { display: contents; }
+
+.hero__inner > div { max-width: 40rem; }
+
+.hero__eyebrow { margin-inline: auto; }
+
+.hero h1,
+.hero__lede { margin-inline: auto; }
+
+.hero-tech,
+.hero__actions { justify-content: center; }
 
 .hero__eyebrow {
   display: inline-flex;
@@ -807,41 +821,44 @@ button { font: inherit; }
   transform: perspective(900px) rotateX(4deg);
 }
 
-/* Depth planes. Successive slices receding into the frame — the geometry a
-   depth sensor actually returns, and calmer than concentric circles. */
-.depth-planes {
+/* Volumetric capture field: a soft light volume behind the head plus faint
+   vertical sampling columns. Lives inside .identity-field (z-index 0) and the
+   portrait is z-index 2, so it is structurally incapable of covering the face. */
+.depth-field {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  display: grid;
-  align-content: center;
-  gap: clamp(1.4rem, 3.4vw, 2.8rem);
-  perspective: 800px;
+  z-index: 0;
   pointer-events: none;
-  /* Fade the planes out where the head sits so they read as background
-     geometry rather than lines drawn across the face. */
-  mask-image: radial-gradient(58% 62% at 72% 50%, transparent 18%, #000 66%);
-  -webkit-mask-image: radial-gradient(58% 62% at 72% 50%, transparent 18%, #000 66%);
-  transform: translate3d(calc(var(--px) * 4px), calc(var(--py) * 2px), 0);
+  transform: translate3d(calc(var(--px) * 5px), calc(var(--py) * 2.5px), 0);
   will-change: transform;
 }
 
-.depth-planes span {
-  height: 1px;
-  transform-origin: center;
-  background: linear-gradient(90deg,
-    transparent,
-    color-mix(in srgb, var(--d-far) 85%, transparent) 18%,
-    color-mix(in srgb, var(--d-mid) 90%, transparent) 52%,
-    color-mix(in srgb, var(--d-near) 60%, transparent) 76%,
-    transparent 96%);
+.depth-field::before {
+  content: "";
+  position: absolute;
+  inset: 12% 6% 6% 18%;
+  border-radius: 46% 54% 42% 58% / 52% 44% 56% 48%;
+  background:
+    radial-gradient(58% 54% at 62% 42%, color-mix(in srgb, var(--d-mid) 34%, transparent), transparent 72%),
+    radial-gradient(44% 40% at 34% 72%, color-mix(in srgb, var(--d-far) 30%, transparent), transparent 74%);
+  filter: blur(34px);
 }
 
-.depth-planes span:nth-child(1) { opacity: .38; transform: rotateX(54deg) scaleX(.68); }
-.depth-planes span:nth-child(2) { opacity: .62; transform: rotateX(38deg) scaleX(.82); }
-.depth-planes span:nth-child(3) { opacity: .95; transform: rotateX(20deg) scaleX(.94); height: 1.5px; }
-.depth-planes span:nth-child(4) { opacity: .62; transform: rotateX(-38deg) scaleX(.82); }
-.depth-planes span:nth-child(5) { opacity: .38; transform: rotateX(-54deg) scaleX(.68); }
+.depth-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg,
+    color-mix(in srgb, var(--d-mid) 20%, transparent) 0 1px,
+    transparent 1px 46px);
+  mask-image: linear-gradient(180deg, transparent, #000 28%, #000 62%, transparent),
+              radial-gradient(52% 56% at 70% 50%, transparent 24%, #000 68%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 28%, #000 62%, transparent),
+                      radial-gradient(52% 56% at 70% 50%, transparent 24%, #000 68%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+  opacity: .5;
+}
 
 .identity-model {
   position: absolute;
@@ -1659,7 +1676,16 @@ button { font: inherit; }
 @media (min-width: 860px) {
   :root { --header-h: 3.55rem; }
 
-  .hero__inner { grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr); }
+  .hero__inner {
+    grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr);
+    justify-items: stretch;
+    text-align: start;
+  }
+
+  .hero__inner > div { max-width: none; }
+  .hero__eyebrow { margin-inline: 0; }
+  .hero h1, .hero__lede { margin-inline: 0; }
+  .hero-tech, .hero__actions { justify-content: flex-start; }
 
   .identity-stage {
     --bleed: calc(max((100vw - var(--shell)) / 2, 0px) + var(--gutter));
@@ -1741,15 +1767,17 @@ button { font: inherit; }
   .brand__role { display: none; }
 }
 
-@media (max-width: 700px) {
-  .identity-stage { height: clamp(280px, 70vw, 340px); }
+@media (max-width: 859px) {
+  .identity-stage {
+    height: clamp(300px, 62vw, 400px);
+    max-width: 30rem;
+  }
 
-  /* Centre the portrait rather than bleeding it off one edge — at this width
-     the off-centre composition just reads as misalignment. */
+  /* Stacked layout: the portrait sits on the centre line with the text. */
   .identity-model {
     inset-inline: 0;
     margin-inline: auto;
-    max-width: 78%;
+    max-width: 82%;
   }
 
   .identity-model__portrait,
@@ -1759,12 +1787,6 @@ button { font: inherit; }
   }
 
   .identity-seam { inset-inline-start: 40%; }
-  .depth-planes {
-    gap: 1.1rem;
-    opacity: .55;
-    mask-image: radial-gradient(62% 54% at 50% 58%, transparent 22%, #000 72%);
-    -webkit-mask-image: radial-gradient(62% 54% at 50% 58%, transparent 22%, #000 72%);
-  }
 
 
   .hero__inner { padding-block: clamp(1.5rem, 4vw, 2.5rem) 1rem; }
@@ -1797,7 +1819,7 @@ button { font: inherit; }
 
   .identity-field,
   .identity-model,
-  .depth-planes { transform: none; }
+  .depth-field { transform: none; }
 }
 
 @media print {

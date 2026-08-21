@@ -126,6 +126,7 @@ if (masthead) {
 
       if (y <= 40) {
         masthead.dataset.hidden = 'false';
+        masthead.dataset.condensed = 'false';
         lastY = y;
         return;
       }
