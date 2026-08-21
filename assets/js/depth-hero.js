@@ -43,6 +43,13 @@ varying vec3 vAlbedo;
 
 void main() {
   vec4 sampled = texture2D(uDepth, aUv);
+
+  // Local depth gradient — steep change means an edge or a turning surface.
+  vec2 step0 = vec2(0.0045, 0.0);
+  vec2 step1 = vec2(0.0, 0.0045);
+  float gx = texture2D(uDepth, aUv + step0).r - texture2D(uDepth, aUv - step0).r;
+  float gy = texture2D(uDepth, aUv + step1).r - texture2D(uDepth, aUv - step1).r;
+  float slope = clamp(length(vec2(gx, gy)) * 9.0, 0.0, 1.0);
   float depth = sampled.r;
   float detail = sampled.g;   // eyelids, lips, nostril, jaw
   float rim = sampled.b;      // 0 on the silhouette
@@ -84,7 +91,7 @@ void main() {
   // cheek as on an eyelid, which is why the eye used to dissolve. Cull most
   // points in smooth areas and keep nearly all of them where the face has
   // structure — same total count, distributed by information instead.
-  float keep = step(mix(0.58, 0.0, detail), aSeed);
+  float keep = step(mix(0.42, 0.0, detail), aSeed);
 
   // Depth of field: far points swell and soften, near points stay tight.
   float far = 1.0 - near;
@@ -93,6 +100,7 @@ void main() {
   // Detailed structures resolve with fine points; smooth skin can afford
   // coarser ones, which also keeps the cheek from reading as flat noise.
   size *= mix(1.2, 0.42, detail);
+  size *= mix(1.0, 0.8, slope);
   size *= mix(0.75, 1.0, rim);
 
   gl_PointSize = size * uPointScale * (0.7 + aSeed * 0.34) * local * keep;
@@ -109,15 +117,15 @@ void main() {
   vAlbedo = texture2D(uPhoto, aUv).rgb;
 
   vSoft = far;
-  vDetail = detail;
+  vDetail = max(detail, slope * 0.75);
   vDepth = depth;
   // Density falls off toward the photographic side so the cloud reads as a
   // scan crossing the face rather than a curtain hung over it.
-  float overlap = 1.0 - smoothstep(0.26, 0.60, aUv.x) * 0.78;
+  float overlap = 1.0 - smoothstep(0.30, 0.50, aUv.x) * 0.94;
 
   vAlpha = mask * visible * edgeIn * local * keep * overlap
-         * (0.42 + aSeed * 0.38)
-         * mix(0.38, 1.0, detail)
+         * (0.58 + aSeed * 0.46)
+         * mix(0.42, 1.0, detail)
          * mix(0.5, 1.0, near);
 }
 `;
@@ -216,9 +224,9 @@ function start() {
   const program = build(gl);
   if (!program) return false;
 
-  const dense = !matchMedia('(max-width: 700px)').matches;
-  const columns = dense ? 320 : 210;
+  const columns = 320;
   const rows = Math.round(columns * 1.25);
+  const dense = !matchMedia('(max-width: 700px)').matches;
 
   const uvs = new Float32Array(columns * rows * 2);
   const seeds = new Float32Array(columns * rows);
@@ -226,8 +234,9 @@ function start() {
   let i = 0;
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
-      const jx = (hash(x, y) - 0.5) * 0.7;
-      const jy = (hash(y, x) - 0.5) * 0.7;
+      const stagger = (y * 0.6180339887) % 1;
+      const jx = (hash(x, y) - 0.5) * 0.85 + stagger;
+      const jy = (hash(y, x) - 0.5) * 0.85;
       uvs[i * 2] = (x + jx) / (columns - 1);
       uvs[i * 2 + 1] = (y + jy) / (rows - 1);
       seeds[i] = hash(x * 1.7, y * 2.3);
@@ -341,7 +350,7 @@ function start() {
     const reveal = 1 - Math.pow(1 - linear, 3);
 
     // The seam sweeps right during the reveal, then settles at the mask edge.
-    const seam = 0.10 + reveal * 0.54;
+    const seam = 0.10 + reveal * 0.58;
 
     // Publish the eased values to CSS so the aperture, grid and badges move
     // on exactly the same curve as the point cloud, one frame at a time.

@@ -82,15 +82,15 @@
   --t-2xs: clamp(0.6875rem, 0.665rem + 0.09vw, 0.75rem);
   --t-xs: clamp(0.78rem, 0.757rem + 0.11vw, 0.845rem);
   --t-sm: clamp(0.875rem, 0.851rem + 0.12vw, 0.94rem);
-  --t-md: clamp(1rem, 0.964rem + 0.17vw, 1.08rem);
-  --t-lg: clamp(1.12rem, 1.04rem + 0.36vw, 1.36rem);
+  --t-md: clamp(0.955rem, 0.93rem + 0.13vw, 1.02rem);
+  --t-lg: clamp(1.06rem, 1rem + 0.3vw, 1.26rem);
   --t-xl: clamp(1.45rem, 1.26rem + 0.88vw, 2.05rem);
-  --t-2xl: clamp(1.95rem, 1.55rem + 1.75vw, 3.05rem);
-  --t-3xl: clamp(2.6rem, 1.85rem + 3.3vw, 4.6rem);
+  --t-2xl: clamp(1.8rem, 1.5rem + 1.4vw, 2.65rem);
+  --t-3xl: clamp(2.3rem, 1.7rem + 2.7vw, 3.9rem);
 
   --shell: 1240px;
   --gutter: clamp(1.15rem, 4vw, 3rem);
-  --header-h: 2.6rem;
+  --header-h: 2.5rem;
   --section-y: clamp(3.75rem, 7vw, 7rem);
 
   --r-sm: 8px;
@@ -358,7 +358,7 @@ button { font: inherit; }
 .masthead {
   isolation: isolate;
   position: fixed;
-  transition: transform .68s cubic-bezier(0.22, 0.61, 0.24, 1);
+  transition: transform .8s cubic-bezier(0.32, 0.72, 0.2, 1);
   inset-block-start: 0;
   inset-inline: 0;
   z-index: 500;
@@ -366,7 +366,10 @@ button { font: inherit; }
   pointer-events: none;
 }
 
-.masthead[data-hidden="true"] { transform: translate3d(0, calc(-100% - .6rem), 0); }
+.masthead[data-hidden="true"] {
+  transform: translate3d(0, calc(-100% - .8rem), 0);
+  transition-duration: 1s;
+}
 
 .masthead__inner {
   pointer-events: auto;
@@ -538,6 +541,13 @@ button { font: inherit; }
   background: color-mix(in srgb, #191122 92%, transparent);
   box-shadow: 0 16px 40px -14px rgb(0 0 0 / .95);
   transform: translateZ(0);
+  transition: transform .55s cubic-bezier(0.22, 0.61, 0.24, 1), opacity .4s var(--ease);
+}
+
+.dock[data-stowed="true"] {
+  transform: translate3d(0, calc(100% + 1.6rem), 0);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .dock a {
@@ -561,15 +571,7 @@ button { font: inherit; }
 
 .dock__cta:hover { background: #8d55d8 !important; }
 
-.footer__inner { padding-block-end: 4.6rem; }
-
-@media (max-width: 520px) {
-  .hero-social {
-    margin-inline-start: 0;
-    padding-inline-start: 0;
-    border-inline-start: 0;
-  }
-}
+.footer__inner { padding-block-end: 1.6rem; }
 
 @media (max-width: 430px) {
   .dock { gap: 0; padding: .24rem; }
@@ -762,26 +764,25 @@ button { font: inherit; }
 .hero-social {
   display: inline-flex;
   align-items: center;
-  gap: .35rem;
-  margin-inline-start: .35rem;
-  padding-inline-start: .8rem;
-  border-inline-start: 1px solid rgb(255 255 255 / .14);
+  gap: .3rem;
+  margin-inline-start: .15rem;
 }
 
+/* Same notched radius and height as the buttons beside them, so they read as
+   one control family rather than two round pucks bolted on. */
 .hero-social .icon-link {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border: 1px solid rgb(255 255 255 / .16);
-  border-radius: 50%;
-  background: rgb(255 255 255 / .04);
+  border-radius: 10px 3px 10px 3px;
+  background: rgb(255 255 255 / .035);
   color: var(--stage-ink-2);
-  transition: transform .18s var(--ease-out), border-color .18s, background .18s, color .18s;
+  transition: border-color .18s, background .18s, color .18s;
 }
 
-.hero-social .icon-link svg { width: 1.05rem; height: 1.05rem; }
+.hero-social .icon-link svg { width: .95rem; height: .95rem; }
 
 .hero-social .icon-link:hover {
-  transform: translateY(-2px);
   border-color: rgb(255 255 255 / .4);
   background: rgb(255 255 255 / .09);
   color: #fff;

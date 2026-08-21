@@ -251,6 +251,22 @@ if (pdfModal) {
    Housekeeping
    ------------------------------------------------------------------------- */
 
+/* -------------------------------------------------------------------------
+   Dock yields to the footer
+   ------------------------------------------------------------------------- */
+
+const dock = document.querySelector('.dock');
+const footer = document.querySelector('.footer');
+
+if (dock && footer && 'IntersectionObserver' in window) {
+  // Once the footer is on screen the visitor has reached the end, so the dock
+  // has nothing left to navigate to — it steps aside instead of covering it.
+  new IntersectionObserver(
+    ([entry]) => { dock.dataset.stowed = String(entry.isIntersecting); },
+    { rootMargin: '0px 0px -8% 0px', threshold: 0 }
+  ).observe(footer);
+}
+
 document.querySelectorAll('[data-year]').forEach((el) => {
   el.textContent = String(new Date().getFullYear());
 });
