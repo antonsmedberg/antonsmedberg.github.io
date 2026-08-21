@@ -281,7 +281,6 @@ function start() {
   gl.uniform1i(u('uDepth'), 0);
   gl.uniform1i(u('uPhoto'), 1);
 
-  // The portrait is already in cache from the <img>, so this costs no request.
   const photo = gl.createTexture();
   gl.activeTexture(gl.TEXTURE1);
   gl.bindTexture(gl.TEXTURE_2D, photo);
@@ -299,7 +298,11 @@ function start() {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, photoImg);
     request();
   };
-  photoImg.src = '/assets/img/portrait.png';
+  // Match the <picture> media query exactly so this reuses the file the
+  // browser has already downloaded rather than pulling the 412 KB PNG.
+  photoImg.src = matchMedia('(max-width: 640px)').matches
+    ? '/assets/img/portrait@2x-small.webp'
+    : '/assets/img/portrait.webp';
   gl.activeTexture(gl.TEXTURE0);
 
   let onscreen = true;

@@ -108,7 +108,7 @@ def build_portrait():
               + (" / portrait.png (560w fallback)" if suffix == "" else ""))
 
 
-def build_depth_map(portrait_rgba, out_path, width=340):
+def build_depth_map(portrait_rgba, out_path, width=300):
     """Bake a depth map for the point cloud.
 
     Luminance alone is not depth: dark hair is not far away and a bright collar
