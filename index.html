@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Anton Smedberg — iOS Developer in Malmö | Swift, SwiftUI & Metal</title>
-<meta name="description" content="iOS developer in Malmö, open to roles across Skåne, Öresund and Copenhagen. Five months of production Swift and SwiftUI at Axis Communications, plus Swift Concurrency, AVFoundation, Metal and ARKit in my own projects.">
+<meta name="description" content="iOS developer in Malmö working in Swift, SwiftUI and Swift Concurrency. Five months shipping production code with the Mobile Apps team at Axis Communications in Lund, plus AVFoundation, Metal and ARKit in my own Swift Packages. Open to roles across Skåne, Öresund and Copenhagen.">
 <meta name="author" content="Anton Smedberg">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#0b0710">
@@ -59,14 +59,8 @@
 </svg>
 <header class="masthead">
   <div class="masthead__inner">
-    <a class="brand" href="/" aria-label="Anton Smedberg — home"><span class="brand__monogram"><svg aria-hidden="true"><use href="#i-mark"/></svg></span><span class="brand__name">Anton Smedberg</span><span class="brand__role">iOS Developer</span></a>
-    <nav class="nav" aria-label="Primary navigation"><a href="#work">Work</a><a href="#experience">Experience</a><a href="#toolkit">Skills</a><a href="/assets/cv/Anton-Smedberg-CV.pdf" class="pdf-modal-trigger" data-pdf="/assets/cv/Anton-Smedberg-CV.pdf">CV</a></nav>
-    <div class="header-actions">
-      <a class="icon-link" href="https://github.com/antonsmedberg" target="_blank" rel="me noopener" aria-label="GitHub"><svg><use href="#i-github"/></svg></a>
-      <a class="icon-link" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" rel="me noopener" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a>
-      <nav class="language-switch" aria-label="Language"><span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="/sv/" hreflang="sv">SV</a></nav>
-      <a class="btn" href="mailto:anton@smedberg.eu?subject=iOS%20role%20%E2%80%94%20Anton%20Smedberg">Contact<svg aria-hidden="true"><use href="#i-out"/></svg></a>
-          </div>
+    <a class="brand" href="/" aria-label="Anton Smedberg"><span class="brand__monogram"><svg aria-hidden="true"><use href="#i-mark"/></svg></span><span class="brand__name">Anton Smedberg</span></a>
+    <span class="language-switch"><span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="/sv/" hreflang="sv">SV</a></span>
   </div>
 </header>
 <div class="pdf-modal" id="pdfModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
@@ -137,7 +131,7 @@
 </div></section>
 
 <section class="section section--border" id="experience"><div class="shell experience-layout">
-  <div class="experience-intro"><p class="section-kicker">Experience</p><h2>Work inside real product teams.</h2><p>My most useful experience is working in existing codebases where changes need to survive review, QA, observability and other people's code.</p></div>
+  <div class="experience-intro"><p class="section-kicker">Experience</p><h2>Work inside real product teams.</h2><p>The experience I lean on most is working inside an existing codebase, where a change has to survive review, QA, instrumentation and everyone else's assumptions.</p></div>
   <ol class="timeline">
     <li class="timeline-item"><p class="timeline-date">Jan — May 2026</p><div class="timeline-content"><h3>iOS Developer Intern (LIA) — Mobile Apps</h3><p class="timeline-org">Axis Communications · Lund</p><ul><li>Delivered Swift and SwiftUI changes in an established production iOS application, including connected-device and live-video UI work.</li><li>Migrated selected asynchronous flows to async/await under strict Swift Concurrency requirements.</li><li>Worked on live-video controls for microphone, speaker and PTZ interactions.</li><li>Added Datadog and OpenTelemetry instrumentation for traceability and troubleshooting.</li><li>Worked with Jira, pull requests, code review, testing and QA alongside iOS and Android colleagues.</li></ul></div></li>
     <li class="timeline-item"><p class="timeline-date">Jun 2026 — present</p><div class="timeline-content"><h3>Independent iOS Development</h3><p class="timeline-org">Personal products & open source · Malmö</p><ul><li>Building native iOS products in Swift 6 and SwiftUI, including architecture, testing, instrumentation and release preparation.</li><li>Developing on-device speech/video pipelines with AVFoundation and graphics work with Metal and ARKit.</li><li>Maintaining MetalVisualKit as a documented Swift Package with tests, example code and CI.</li></ul></div></li>
@@ -146,7 +140,7 @@
 </div></section>
 
 <section class="section section--border" id="toolkit"><div class="shell">
-  <header class="section-head"><p class="section-kicker">Technical profile</p><h2>The tools I use and where they fit.</h2><p>Native iOS is the core. Everything around it is there to ship, profile and keep real applications running.</p></header>
+  <header class="section-head"><p class="section-kicker">Technical profile</p><h2>The tools I use and where they fit.</h2><p>Native iOS is the core. Everything around it earns its place by helping me ship, profile and keep real applications running.</p></header>
   <dl class="spec reveal">
     <div class="spec__row"><dt class="spec__key"><span class="spec__mark"><svg aria-hidden="true"><use href="#g-device"/></svg></span>Core iOS<span class="spec__n">01</span></dt><dd class="spec__val"><span>Swift 6</span><span>SwiftUI</span><span>UIKit</span><span>async/await</span><span>actors</span><span>SwiftData</span><span>Combine</span></dd></div>
     <div class="spec__row"><dt class="spec__key"><span class="spec__mark"><svg aria-hidden="true"><use href="#g-arch"/></svg></span>Architecture<span class="spec__n">02</span></dt><dd class="spec__val"><span>MVVM</span><span>dependency injection</span><span>XCTest</span><span>unit testing</span><span>Apple HIG</span></dd></div>
@@ -159,10 +153,11 @@
 
 <section class="section section--border" id="about"><div class="shell about-grid"><div><p class="section-kicker">About</p><h2 class="about-title">Native mobile, with a systems background.</h2></div><div class="about-copy"><p>I focus on native iOS because that is where my strongest production experience and my best work are. My Java backend degree and my Android and Kotlin background mean I can read an API, follow the data through it, and avoid treating every problem as a UI problem.</p><p>I am looking for an <strong>iOS or mobile developer role</strong> in Malmö, Lund or Copenhagen. I want to work on software that ships, alongside engineers who have done it longer than I have. After years of competitive sport I am used to working toward a set target and choosing the route there myself.</p><div class="fact-grid"><div class="fact"><span>Based</span><strong>Malmö, Sweden</strong></div><div class="fact"><span>Open to</span><strong>Malmö · Lund · Copenhagen</strong></div><div class="fact"><span>Work mode</span><strong>On-site · hybrid · remote</strong></div><div class="fact"><span>Languages</span><strong>Swedish · English</strong></div></div></div></div></section>
 
-<section class="section" id="contact"><div class="shell"><div class="contact-card"><div><p class="section-kicker">Contact</p><h2>Want to talk iOS?</h2><p>Happy to walk through the public repositories, the architecture decisions behind them, and whatever I am allowed to say about the production work.</p></div><div class="contact-actions"><a class="btn" href="mailto:anton@smedberg.eu?subject=iOS%20role%20%E2%80%94%20Anton%20Smedberg"><svg><use href="#i-mail"/></svg>Email</a><a class="btn btn--ghost pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV.pdf">CV</a><a class="btn btn--ghost" href="/sv/">Svenska</a></div></div></div></section>
+<section class="section" id="contact"><div class="shell"><div class="contact-card"><div><p class="section-kicker">Contact</p><h2>Want to talk iOS?</h2><p>Happy to walk through the public repositories, the architecture decisions behind them, and whatever I am allowed to say about the production work.</p></div><div class="contact-actions"><a class="btn" href="mailto:anton@smedberg.eu?subject=iOS%20role%20%E2%80%94%20Anton%20Smedberg"><svg><use href="#i-mail"/></svg>Email</a><a class="btn btn--ghost pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV.pdf">CV</a><a class="btn btn--ghost" href="/sv/">Svenska</a><span class="contact-social"><a class="icon-link" href="https://github.com/antonsmedberg" target="_blank" rel="me noopener" aria-label="GitHub"><svg><use href="#i-github"/></svg></a><a class="icon-link" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" target="_blank" rel="me noopener" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a></span></div></div></div></section>
 </main>
 <footer class="footer"><div class="shell footer__inner"><span>© <span data-year>2026</span> Anton Smedberg · Malmö</span><div class="footer__links"><a class="pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV.pdf">CV</a><span class="footer__sep">·</span><a href="https://github.com/antonsmedberg/antonsmedberg.github.io" target="_blank" rel="noopener">Source</a><span class="footer__sep">·</span><a href="/sv/">Svenska</a></div></div></footer>
-<nav class="dock" aria-label="Section navigation"><a href="#work">Work</a><a href="#experience">Experience</a><a href="#toolkit">Skills</a><a class="pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV.pdf">CV</a></nav>
+<nav class="dock" aria-label="Sections"><a href="#work">Work</a><a href="#experience">Experience</a><a href="#toolkit">Skills</a><a class="pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV.pdf">CV</a><a class="dock__cta" href="mailto:anton@smedberg.eu?subject=iOS%20role%20%E2%80%94%20Anton%20Smedberg">Contact</a></nav>
+
 
 <script type="module" src="/assets/js/depth-hero.js"></script>
 </body>

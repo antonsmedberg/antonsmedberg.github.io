@@ -213,7 +213,7 @@ function start() {
   if (!program) return false;
 
   const dense = !matchMedia('(max-width: 700px)').matches;
-  const columns = dense ? 260 : 132;
+  const columns = dense ? 260 : 200;
   const rows = Math.round(columns * 1.25);
 
   const uvs = new Float32Array(columns * rows * 2);
@@ -377,7 +377,9 @@ function start() {
     }
 
     // Point size tracks resolution so density looks the same at every size.
-    gl.uniform1f(uPointScale, (h / 620) * 2.6);
+    // Point size tracked canvas height directly, so the cloud thinned out to
+  // dust on phones. Weight it toward DPR instead and hold a floor.
+  gl.uniform1f(uPointScale, Math.max(1.5, Math.pow(h / 620, 0.55) * 2.6 * Math.min(dpr, 1.6)));
     request();
   }
 
