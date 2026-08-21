@@ -86,7 +86,11 @@ if (masthead) {
   const updateHeader = () => {
     masthead.dataset.scrolled = String(scrollY > 8);
 
-    if (!hero) return;
+    // Pages without a dark hero (case studies, 404) always use the light bar.
+    if (!hero) {
+      masthead.dataset.theme = 'light';
+      return;
+    }
 
     // Hysteresis. Without a dead band the theme flips back and forth while the
     // hero's bottom edge sits under the bar, which is the flicker.
@@ -99,8 +103,43 @@ if (masthead) {
 
   };
 
+  // Auto-hide: retreat on scroll down, return on scroll up. A small threshold
+  // stops trackpad jitter from toggling it, and it always returns near the top.
+  let lastY = scrollY;
+  let ticking = false;
+
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+
+    requestAnimationFrame(() => {
+      ticking = false;
+      updateHeader();
+
+      const y = Math.max(0, scrollY);
+      const delta = y - lastY;
+
+      // Condense tracks absolute position, so it must update even when the
+      // delta is below the jitter threshold — otherwise a smooth-scroll that
+      // settles gently leaves the bar stuck in its narrow state.
+      masthead.dataset.condensed = String(y > 40);
+
+      if (y <= 40) {
+        masthead.dataset.hidden = 'false';
+        lastY = y;
+        return;
+      }
+
+      if (Math.abs(delta) < 6) return;
+
+      masthead.dataset.hidden = String(delta > 0 && y > 140);
+      lastY = y;
+    });
+  };
+
   updateHeader();
-  addEventListener('scroll', updateHeader, { passive: true });
+  masthead.dataset.condensed = String(scrollY > 40);
+  addEventListener('scroll', onScroll, { passive: true });
 }
 
 /* -------------------------------------------------------------------------

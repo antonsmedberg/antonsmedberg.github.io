@@ -208,7 +208,7 @@ button { font: inherit; }
 }
 
 /* Every section opens with a faint depth-shell arc behind the kicker — the
-   same geometry as the hero aperture, reused as a structural signature. */
+   same depth geometry as the hero, reused as a structural signature. */
 .section--border > .shell { position: relative; }
 
 .section--border > .shell::before {
@@ -280,7 +280,7 @@ button { font: inherit; }
   min-height: 2.25rem;
   padding: .48rem .9rem;
   border: 1px solid transparent;
-  border-radius: 9px 9px 9px 2px;
+  border-radius: 10px 3px 10px 3px;
   background: #f4f0f6;
   color: #140f1c;
   font-size: var(--t-xs);
@@ -365,12 +365,15 @@ button { font: inherit; }
 .masthead {
   isolation: isolate;
   position: fixed;
+  transition: transform .42s var(--ease-out);
   inset-block-start: 0;
   inset-inline: 0;
   z-index: 500;
   padding-block-start: clamp(.45rem, 1vw, .7rem);
   pointer-events: none;
 }
+
+.masthead[data-hidden="true"] { transform: translate3d(0, calc(-100% - .6rem), 0); }
 
 .masthead__inner {
   pointer-events: auto;
@@ -388,6 +391,12 @@ button { font: inherit; }
 }
 
 /* Past the hero the bar lands on paper and inverts. */
+@media (min-width: 900px) {
+  .masthead[data-condensed="true"] .masthead__inner {
+    width: min(100% - var(--gutter) * 2, calc(var(--shell) - 13rem));
+  }
+}
+
 .masthead[data-theme="light"] .masthead__inner {
   border-color: var(--line-strong);
   background: color-mix(in srgb, var(--surface) 86%, transparent);
@@ -400,6 +409,7 @@ button { font: inherit; }
   gap: 1rem;
   height: var(--header-h);
   width: min(100% - var(--gutter) * 2, var(--shell));
+  transition: width .42s var(--ease-out), background .35s var(--ease), border-color .35s var(--ease);
   margin-inline: auto;
   padding-inline: clamp(.65rem, 1.3vw, .95rem) clamp(.4rem, .8vw, .5rem);
 }
@@ -606,17 +616,12 @@ button { font: inherit; }
   position: absolute;
   inset: -20% -10% 0;
   z-index: -2;
+  filter: blur(18px);
   background:
     /* Conic sweep gives the wash a direction, so it reads as light falling
        from the sensor rather than as three stacked blobs. */
-    conic-gradient(from 200deg at 74% 22%,
-      transparent 0%,
-      color-mix(in srgb, #ff5f9e 15%, transparent) 14%,
-      transparent 34%,
-      transparent 56%,
-      color-mix(in srgb, #7b3fd4 16%, transparent) 76%,
-      transparent 94%,
-      transparent 100%),
+    radial-gradient(46% 42% at 78% 16%, color-mix(in srgb, #ff5f9e 16%, transparent), transparent 72%),
+    radial-gradient(50% 44% at 92% 44%, color-mix(in srgb, #7b3fd4 17%, transparent), transparent 74%),
     radial-gradient(56% 48% at 20% 78%, color-mix(in srgb, #4a2a9c 22%, transparent), transparent 72%),
     radial-gradient(34% 30% at 94% 86%, color-mix(in srgb, var(--neon-amber) 12%, transparent), transparent 66%),
     /* Sensor readout lines — 3px pitch, almost subliminal. */
@@ -749,9 +754,11 @@ button { font: inherit; }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: .7rem;
+  gap: .6rem;
   margin-top: 1.9rem;
 }
+
+.hero__actions .btn { min-height: 2.75rem; padding-inline: 1.15rem; }
 
 /* --------------------------------------------------------------------------
    8. Identity stage — the signature element
@@ -800,50 +807,41 @@ button { font: inherit; }
   transform: perspective(900px) rotateX(4deg);
 }
 
-/* Sensor aperture — real arc strokes */
-.identity-aperture {
+/* Depth planes. Successive slices receding into the frame — the geometry a
+   depth sensor actually returns, and calmer than concentric circles. */
+.depth-planes {
   position: absolute;
-  inset-inline-end: -18%;
-  inset-block-start: -12%;
+  inset: 0;
   z-index: 1;
-  width: 124%;
-  height: 124%;
-  overflow: visible;
+  display: grid;
+  align-content: center;
+  gap: clamp(1.4rem, 3.4vw, 2.8rem);
+  perspective: 800px;
   pointer-events: none;
-  transform: rotate(-6deg) translate3d(calc(var(--px) * 5px), calc(var(--py) * 2.8px), 0);
+  /* Fade the planes out where the head sits so they read as background
+     geometry rather than lines drawn across the face. */
+  mask-image: radial-gradient(58% 62% at 72% 50%, transparent 18%, #000 66%);
+  -webkit-mask-image: radial-gradient(58% 62% at 72% 50%, transparent 18%, #000 66%);
+  transform: translate3d(calc(var(--px) * 4px), calc(var(--py) * 2px), 0);
   will-change: transform;
 }
 
-.aperture {
-  fill: none;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
+.depth-planes span {
+  height: 1px;
+  transform-origin: center;
+  background: linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--d-far) 85%, transparent) 18%,
+    color-mix(in srgb, var(--d-mid) 90%, transparent) 52%,
+    color-mix(in srgb, var(--d-near) 60%, transparent) 76%,
+    transparent 96%);
 }
 
-.aperture--far {
-  stroke: color-mix(in srgb, #7b3fd4 62%, transparent);
-  stroke-width: 9;
-  opacity: .34;
-}
-
-.aperture--near {
-  stroke: var(--neon-teal);
-  stroke-width: 3;
-  opacity: .45;
-}
-
-.aperture--fine {
-  stroke: var(--neon-amber);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 9;
-  opacity: .5;
-}
-
-.aperture--hairline {
-  stroke: rgb(255 255 255 / .16);
-  stroke-width: 1;
-  opacity: 1;
-}
+.depth-planes span:nth-child(1) { opacity: .38; transform: rotateX(54deg) scaleX(.68); }
+.depth-planes span:nth-child(2) { opacity: .62; transform: rotateX(38deg) scaleX(.82); }
+.depth-planes span:nth-child(3) { opacity: .95; transform: rotateX(20deg) scaleX(.94); height: 1.5px; }
+.depth-planes span:nth-child(4) { opacity: .62; transform: rotateX(-38deg) scaleX(.82); }
+.depth-planes span:nth-child(5) { opacity: .38; transform: rotateX(-54deg) scaleX(.68); }
 
 .identity-model {
   position: absolute;
@@ -856,8 +854,7 @@ button { font: inherit; }
   aspect-ratio: 4 / 5;
   transform-style: preserve-3d;
   transform:
-    translate3d(calc(var(--px) * 1.5px), calc(var(--py) * 1px + var(--sy) * -14px), 0)
-    rotateY(calc(var(--px) * .28deg));
+    translate3d(calc(var(--px) * 2px), calc(var(--py) * 1.2px + var(--sy) * -14px), 0);
   transform-origin: 58% 50%;
   will-change: transform;
   mask-image: linear-gradient(180deg, #000 68%, rgb(0 0 0 / .55) 86%, transparent 99%);
@@ -912,44 +909,6 @@ button { font: inherit; }
     color-mix(in srgb, var(--d-far) 35%, transparent) 68%, transparent);
   opacity: .2;
   pointer-events: none;
-}
-
-.identity-chip,
-.identity-readout {
-  position: absolute;
-  z-index: 4;
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  padding: .34rem .58rem;
-  border: 1px solid var(--stage-line);
-  border-radius: 7px;
-  background: rgb(255 255 255 / .06);
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  color: var(--stage-ink-2);
-  font: 500 var(--t-2xs)/1.35 var(--font-mono);
-  letter-spacing: .05em;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 10px 26px -16px rgb(0 0 0 / .8);
-  white-space: nowrap;
-}
-
-.identity-chip {
-  inset-inline-start: 0;
-  inset-block-end: 11%;
-}
-
-.identity-readout {
-  inset-inline-start: 0;
-  inset-block-start: 4%;
-}
-
-.identity-readout::before {
-  content: "";
-  width: .4rem;
-  height: .4rem;
-  border-radius: 1px;
-  background: linear-gradient(135deg, var(--d-mid), var(--d-near));
 }
 
 /* --------------------------------------------------------------------------
@@ -1032,7 +991,7 @@ button { font: inherit; }
 .project-card__media {
   position: relative;
   display: grid;
-  place-items: end center;
+  place-items: center;
   min-height: 168px;
   padding: 1.15rem 1.2rem 0;
   overflow: hidden;
@@ -1058,6 +1017,7 @@ button { font: inherit; }
 }
 
 .project-card__media img {
+  align-self: end;
   width: auto;
   max-height: 190px;
   border-radius: 10px 10px 0 0;
@@ -1170,7 +1130,8 @@ button { font: inherit; }
 /* Schematic — stands in where there is no screenshot yet */
 .project-schematic {
   display: grid;
-  gap: .9rem;
+  align-content: center;
+  gap: .8rem;
   width: 100%;
   padding: 1rem .9rem;
   border: 1px solid var(--line);
@@ -1781,19 +1742,30 @@ button { font: inherit; }
 }
 
 @media (max-width: 700px) {
-  .identity-stage { height: clamp(260px, 64vw, 320px); }
-  .identity-model { inset-inline-end: -4%; max-width: 96%; }
+  .identity-stage { height: clamp(280px, 70vw, 340px); }
 
-  /* Stack the readouts on one side instead of straddling the face. */
-  .identity-chip,
-  .identity-readout {
-    inset-inline-start: 0;
-    inset-inline-end: auto;
-    padding: .26rem .46rem;
+  /* Centre the portrait rather than bleeding it off one edge — at this width
+     the off-centre composition just reads as misalignment. */
+  .identity-model {
+    inset-inline: 0;
+    margin-inline: auto;
+    max-width: 78%;
   }
 
-  .identity-readout { inset-block-start: 2%; }
-  .identity-chip { inset-block-end: 22%; }
+  .identity-model__portrait,
+  .identity-stage[data-depth="off"] .identity-model__portrait {
+    mask-image: linear-gradient(90deg, transparent 20%, rgb(0 0 0 / .5) 36%, #000 52%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 20%, rgb(0 0 0 / .5) 36%, #000 52%);
+  }
+
+  .identity-seam { inset-inline-start: 40%; }
+  .depth-planes {
+    gap: 1.1rem;
+    opacity: .55;
+    mask-image: radial-gradient(62% 54% at 50% 58%, transparent 22%, #000 72%);
+    -webkit-mask-image: radial-gradient(62% 54% at 50% 58%, transparent 22%, #000 72%);
+  }
+
 
   .hero__inner { padding-block: clamp(1.5rem, 4vw, 2.5rem) 1rem; }
   .hero__actions { margin-top: 1.4rem; }
@@ -1801,7 +1773,6 @@ button { font: inherit; }
 
 @media (max-width: 360px) {
 
-  .identity-readout { display: none; }
   .brand__name { display: none; }
 }
 
@@ -1811,6 +1782,8 @@ button { font: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+
+  .masthead[data-hidden="true"] { transform: none; }
 
   *,
   *::before,
@@ -1824,9 +1797,7 @@ button { font: inherit; }
 
   .identity-field,
   .identity-model,
-  .identity-aperture,
-  .identity-chip,
-  .identity-readout { transform: none; }
+  .depth-planes { transform: none; }
 }
 
 @media print {

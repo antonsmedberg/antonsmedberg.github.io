@@ -98,13 +98,9 @@
       <div class="identity-field" aria-hidden="true">
         <div class="identity-haze"></div>
         <div class="identity-bg"></div>
-        <svg class="identity-aperture" viewBox="0 0 500 500" fill="none" aria-hidden="true">
-          <circle class="aperture aperture--hairline" cx="250" cy="250" r="238"/>
-          <path class="aperture aperture--far" d="M 315 35 A 215 215 0 0 1 476 208"/>
-          <path class="aperture aperture--near" d="M 476 283 A 215 215 0 0 1 350 461"/>
-          <path class="aperture aperture--fine" d="M 291 61 A 188 188 0 0 1 447 220"/>
-          <path class="aperture aperture--fine" d="M 60 300 A 200 200 0 0 0 150 430"/>
-        </svg>
+        <div class="depth-planes">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
       </div>
       <div class="identity-model">
         <canvas class="identity-model__depth" data-depth-canvas aria-hidden="true"></canvas>
@@ -115,8 +111,6 @@
         </picture>
         <div class="identity-seam" aria-hidden="true"></div>
       </div>
-      <span class="identity-chip">DEPTH · iOS</span>
-      <span class="identity-readout">MALMÖ / LUND / CPH</span>
     </aside>
   </div>
 </section>
