@@ -43,7 +43,7 @@ if (!revealables.length) {
    Scroll spy
    ------------------------------------------------------------------------- */
 
-const navLinks = [...document.querySelectorAll('.nav a[href^="#"]')];
+const navLinks = [...document.querySelectorAll('.nav a[href^="#"], .dock a[href^="#"]')];
 const sections = navLinks
   .map((link) => document.getElementById(link.getAttribute('href').slice(1)))
   .filter(Boolean);
@@ -86,46 +86,21 @@ if (masthead) {
   const updateHeader = () => {
     masthead.dataset.scrolled = String(scrollY > 8);
 
-    const boundary = hero
-      ? hero.getBoundingClientRect().bottom - masthead.offsetHeight - 8
-      : -1;
+    if (!hero) return;
 
-    masthead.dataset.theme = boundary > 0 ? 'dark' : 'light';
+    // Hysteresis. Without a dead band the theme flips back and forth while the
+    // hero's bottom edge sits under the bar, which is the flicker.
+    const edge = hero.getBoundingClientRect().bottom - masthead.offsetHeight - 8;
+    const current = masthead.dataset.theme;
+
+    if (current !== 'light' && edge < -24) masthead.dataset.theme = 'light';
+    else if (current !== 'dark' && edge > 24) masthead.dataset.theme = 'dark';
+    else if (!current) masthead.dataset.theme = edge > 0 ? 'dark' : 'light';
 
   };
 
   updateHeader();
   addEventListener('scroll', updateHeader, { passive: true });
-}
-
-/* -------------------------------------------------------------------------
-   Mobile nav sheet
-   ------------------------------------------------------------------------- */
-
-const navToggle = document.querySelector('[data-nav-toggle]');
-const navSheet = document.getElementById('navSheet');
-
-if (navToggle && navSheet) {
-  const setNav = (open) => {
-    navToggle.setAttribute('aria-expanded', String(open));
-    navSheet.dataset.open = String(open);
-  };
-
-  navToggle.addEventListener('click', () => {
-    setNav(navToggle.getAttribute('aria-expanded') !== 'true');
-  });
-
-  navSheet.addEventListener('click', (event) => {
-    if (event.target.closest('a')) setNav(false);
-  });
-
-  addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') setNav(false);
-  });
-
-  matchMedia('(min-width: 900px)').addEventListener('change', (event) => {
-    if (event.matches) setNav(false);
-  });
 }
 
 /* -------------------------------------------------------------------------

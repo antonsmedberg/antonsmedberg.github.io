@@ -1,7 +1,7 @@
 # antonsmedberg.github.io
 
 My portfolio. I'm Anton Smedberg — iOS developer in Malmö, currently looking
-for a junior role somewhere around Skåne, Öresund or Copenhagen.
+for a role somewhere around Skåne, Öresund or Copenhagen.
 
 Static HTML, CSS and JavaScript. No framework, no build step, no npm install.
 GitHub Pages serves `main` directly. If you clone it, opening `index.html`

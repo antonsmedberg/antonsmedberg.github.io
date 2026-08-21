@@ -329,14 +329,20 @@ function start() {
     const elapsed = (now - started) / 1000;
 
     // Ease the pointer so the cloud lags the cursor slightly.
-    pointerX += (targetX - pointerX) * 0.07;
-    pointerY += (targetY - pointerY) * 0.07;
+    // Critically-damped-ish follow. Lower factor = heavier, calmer motion.
+    pointerX += (targetX - pointerX) * 0.055;
+    pointerY += (targetY - pointerY) * 0.055;
 
     const linear = Math.min(1, elapsed / 1.15);
     const reveal = 1 - Math.pow(1 - linear, 3);
 
     // The seam sweeps right during the reveal, then settles at the mask edge.
     const seam = 0.12 + reveal * 0.50;
+
+    // Publish the eased values to CSS so the aperture, grid and badges move
+    // on exactly the same curve as the point cloud, one frame at a time.
+    stage.style.setProperty('--px', pointerX.toFixed(4));
+    stage.style.setProperty('--py', pointerY.toFixed(4));
 
     gl.uniform2f(uPointer, pointerX, -pointerY);
     gl.uniform1f(uTime, elapsed);
@@ -349,7 +355,7 @@ function start() {
     gl.drawArrays(gl.POINTS, 0, columns * rows);
 
     const settling =
-      Math.abs(targetX - pointerX) > 0.0015 || Math.abs(targetY - pointerY) > 0.0015;
+      Math.abs(targetX - pointerX) > 0.0008 || Math.abs(targetY - pointerY) > 0.0008;
 
     // Render only while something is actually changing. Pointer and scroll
     // events schedule their own frames, so idle costs zero GPU time.
@@ -398,23 +404,25 @@ function start() {
 
   const setPointer = (event) => {
     const rect = stage.getBoundingClientRect();
-    targetX = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - 0.5) * 2));
-    targetY = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - 0.5) * 2));
+    const nx = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - 0.5) * 2));
+    const ny = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - 0.5) * 2));
 
-    stage.style.setProperty('--px', targetX.toFixed(3));
-    stage.style.setProperty('--py', targetY.toFixed(3));
+    // Soften the extremes so the edges of the stage don't yank the layers.
+    targetX = Math.sign(nx) * Math.pow(Math.abs(nx), 1.35);
+    targetY = Math.sign(ny) * Math.pow(Math.abs(ny), 1.35);
+
     request();
   };
 
   const resetPointer = () => {
     targetX = 0;
     targetY = 0;
-    stage.style.setProperty('--px', '0');
-    stage.style.setProperty('--py', '0');
     request();
   };
 
-  stage.addEventListener('pointermove', setPointer, { passive: true });
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    stage.addEventListener('pointermove', setPointer, { passive: true });
+  }
   stage.addEventListener('pointerleave', resetPointer, { passive: true });
 
   let scrollQueued = false;
