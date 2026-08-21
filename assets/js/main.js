@@ -106,6 +106,7 @@ if (masthead) {
   // Auto-hide: retreat on scroll down, return on scroll up. A small threshold
   // stops trackpad jitter from toggling it, and it always returns near the top.
   let lastY = scrollY;
+  let intent = 0;
   let ticking = false;
 
   const onScroll = () => {
@@ -131,9 +132,20 @@ if (masthead) {
         return;
       }
 
-      if (Math.abs(delta) < 6) return;
+      // Accumulate intent rather than reacting to every frame: the bar only
+      // moves after a sustained ~90px of travel in one direction, so a nudge
+      // of the trackpad never flips it.
+      if (Math.sign(delta) !== Math.sign(intent)) intent = 0;
+      intent += delta;
 
-      masthead.dataset.hidden = String(delta > 0 && y > 140);
+      if (intent > 90 && y > 260) {
+        masthead.dataset.hidden = 'true';
+        intent = 0;
+      } else if (intent < -70) {
+        masthead.dataset.hidden = 'false';
+        intent = 0;
+      }
+
       lastY = y;
     });
   };

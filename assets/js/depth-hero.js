@@ -92,7 +92,7 @@ void main() {
 
   // Detailed structures resolve with fine points; smooth skin can afford
   // coarser ones, which also keeps the cheek from reading as flat noise.
-  size *= mix(1.35, 0.5, detail);
+  size *= mix(1.2, 0.42, detail);
   size *= mix(0.75, 1.0, rim);
 
   gl_PointSize = size * uPointScale * (0.7 + aSeed * 0.34) * local * keep;
@@ -111,7 +111,11 @@ void main() {
   vSoft = far;
   vDetail = detail;
   vDepth = depth;
-  vAlpha = mask * visible * edgeIn * local * keep
+  // Density falls off toward the photographic side so the cloud reads as a
+  // scan crossing the face rather than a curtain hung over it.
+  float overlap = 1.0 - smoothstep(0.26, 0.60, aUv.x) * 0.78;
+
+  vAlpha = mask * visible * edgeIn * local * keep * overlap
          * (0.42 + aSeed * 0.38)
          * mix(0.38, 1.0, detail)
          * mix(0.5, 1.0, near);
@@ -140,9 +144,9 @@ void main() {
   // Two-part sprite: a hot core plus a wide halo. Under additive blending the
   // halos of neighbouring points sum into bloom, so the bright structures
   // glow without a separate post-process pass.
-  float core = 1.0 - smoothstep(0.0, mix(0.16, 0.30, vSoft), dist);
+  float core = 1.0 - smoothstep(0.0, mix(0.11, 0.24, vSoft), dist);
   float halo = 1.0 - smoothstep(0.0, 0.5, dist);
-  float shape = core * 0.85 + halo * halo * 0.35;
+  float shape = core * 0.95 + halo * halo * 0.22;
 
   // Amber is held back for the true foreground so it reads as depth cue
   // rather than a stray highlight across the hairline.
@@ -213,7 +217,7 @@ function start() {
   if (!program) return false;
 
   const dense = !matchMedia('(max-width: 700px)').matches;
-  const columns = dense ? 260 : 200;
+  const columns = dense ? 320 : 210;
   const rows = Math.round(columns * 1.25);
 
   const uvs = new Float32Array(columns * rows * 2);
@@ -337,7 +341,7 @@ function start() {
     const reveal = 1 - Math.pow(1 - linear, 3);
 
     // The seam sweeps right during the reveal, then settles at the mask edge.
-    const seam = 0.12 + reveal * 0.50;
+    const seam = 0.10 + reveal * 0.54;
 
     // Publish the eased values to CSS so the aperture, grid and badges move
     // on exactly the same curve as the point cloud, one frame at a time.

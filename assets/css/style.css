@@ -358,7 +358,7 @@ button { font: inherit; }
 .masthead {
   isolation: isolate;
   position: fixed;
-  transition: transform .42s var(--ease-out);
+  transition: transform .68s cubic-bezier(0.22, 0.61, 0.24, 1);
   inset-block-start: 0;
   inset-inline: 0;
   z-index: 500;
@@ -383,7 +383,7 @@ button { font: inherit; }
 }
 
 /* Past the hero the bar lands on paper and inverts. */
-.masthead[data-condensed="true"] .masthead__inner { transform: scale(.94); }
+.masthead[data-condensed="true"] .masthead__inner { transform: scale(.93); }
 
 .masthead[data-theme="light"] .masthead__inner {
   border-color: var(--line-strong);
@@ -398,7 +398,7 @@ button { font: inherit; }
   height: var(--header-h);
   width: fit-content;
   max-width: calc(100% - var(--gutter) * 2);
-  transition: transform .42s var(--ease-out), background .35s var(--ease), border-color .35s var(--ease);
+  transition: transform .68s cubic-bezier(0.22, 0.61, 0.24, 1), background .45s var(--ease), border-color .45s var(--ease);
   margin-inline: auto;
   padding-inline: .75rem .8rem;
 }
@@ -563,6 +563,14 @@ button { font: inherit; }
 
 .footer__inner { padding-block-end: 4.6rem; }
 
+@media (max-width: 520px) {
+  .hero-social {
+    margin-inline-start: 0;
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+}
+
 @media (max-width: 430px) {
   .dock { gap: 0; padding: .24rem; }
   .dock a { padding: .44rem .58rem; font-size: var(--t-2xs); }
@@ -576,7 +584,7 @@ button { font: inherit; }
   position: relative;
   isolation: isolate;
   overflow: clip;
-  padding-block-start: calc(var(--header-h) + .8rem);
+  padding-block-start: calc(var(--header-h) + .4rem);
   background: var(--stage);
   color: var(--stage-ink);
 }
@@ -636,7 +644,7 @@ button { font: inherit; }
   gap: clamp(1.5rem, 4vw, 3.5rem);
   align-items: center;
   justify-items: center;
-  padding-block: clamp(2rem, 5vw, 4.5rem);
+  padding-block: clamp(1.5rem, 3.6vw, 3.25rem);
   text-align: center;
 }
 
@@ -748,6 +756,36 @@ button { font: inherit; }
 }
 
 .hero__actions .btn { min-height: 2.75rem; padding-inline: 1.15rem; }
+
+/* Proof links sit with the calls to action, separated by a hairline so they
+   read as a secondary group rather than two more buttons. */
+.hero-social {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  margin-inline-start: .35rem;
+  padding-inline-start: .8rem;
+  border-inline-start: 1px solid rgb(255 255 255 / .14);
+}
+
+.hero-social .icon-link {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgb(255 255 255 / .16);
+  border-radius: 50%;
+  background: rgb(255 255 255 / .04);
+  color: var(--stage-ink-2);
+  transition: transform .18s var(--ease-out), border-color .18s, background .18s, color .18s;
+}
+
+.hero-social .icon-link svg { width: 1.05rem; height: 1.05rem; }
+
+.hero-social .icon-link:hover {
+  transform: translateY(-2px);
+  border-color: rgb(255 255 255 / .4);
+  background: rgb(255 255 255 / .09);
+  color: #fff;
+}
 
 /* --------------------------------------------------------------------------
    8. Identity stage — the signature element
@@ -893,7 +931,7 @@ button { font: inherit; }
 .identity-seam {
   position: absolute;
   inset-block: 6%;
-  inset-inline-start: 48%;
+  inset-inline-start: 36%;
   z-index: 3;
   width: 1px;
   background: linear-gradient(180deg, transparent,
@@ -1452,27 +1490,6 @@ button { font: inherit; }
   font-size: var(--t-sm);
 }
 
-.contact-social {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  margin-inline-start: .3rem;
-}
-
-.contact-social .icon-link {
-  width: 2.4rem;
-  height: 2.4rem;
-  border-color: rgb(255 255 255 / .18);
-  background: transparent;
-  color: var(--stage-ink-2);
-}
-
-.contact-social .icon-link:hover {
-  border-color: rgb(255 255 255 / .38);
-  background: rgb(255 255 255 / .07);
-  color: #fff;
-}
-
 .contact-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1666,28 +1683,7 @@ button { font: inherit; }
   .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .fact-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .contact-card { grid-template-columns: 1fr auto; }
-  .contact-social {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  margin-inline-start: .3rem;
-}
-
-.contact-social .icon-link {
-  width: 2.4rem;
-  height: 2.4rem;
-  border-color: rgb(255 255 255 / .18);
-  background: transparent;
-  color: var(--stage-ink-2);
-}
-
-.contact-social .icon-link:hover {
-  border-color: rgb(255 255 255 / .38);
-  background: rgb(255 255 255 / .07);
-  color: #fff;
-}
-
-.contact-actions { justify-content: flex-end; }
+  .contact-actions { justify-content: flex-end; }
 }
 
 @media (min-width: 860px) {
