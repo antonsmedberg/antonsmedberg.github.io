@@ -92,8 +92,6 @@ if (masthead) {
 
     masthead.dataset.theme = boundary > 0 ? 'dark' : 'light';
 
-    const scrollable = document.documentElement.scrollHeight - innerHeight;
-    masthead.style.setProperty('--progress', scrollable > 0 ? (scrollY / scrollable).toFixed(4) : '0');
   };
 
   updateHeader();

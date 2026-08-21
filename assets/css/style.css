@@ -280,16 +280,16 @@ button { font: inherit; }
   min-height: 2.25rem;
   padding: .48rem .9rem;
   border: 1px solid transparent;
-  border-radius: 10px;
-  background: linear-gradient(180deg, #f7f3f8, #ded5e6);
+  border-radius: 9px 9px 9px 2px;
+  background: #f4f0f6;
   color: #140f1c;
   font-size: var(--t-xs);
   font-weight: 560;
   letter-spacing: -.005em;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: var(--shadow-1), inset 0 1px 0 rgb(255 255 255 / .18);
-  transition: transform .18s var(--ease-out), box-shadow .18s var(--ease-out), background .18s;
+  box-shadow: none;
+  transition: background .16s var(--ease), border-color .16s var(--ease), transform .08s var(--ease), color .16s;
 }
 
 .btn:hover {
@@ -301,13 +301,13 @@ button { font: inherit; }
 /* Accent is spent once, on the single action that matters most. */
 .header-actions > .btn,
 .nav-sheet__meta > .btn {
-  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
-  background: linear-gradient(180deg, #a870e6, #7b45c4);
+  border-color: transparent;
+  background: #7b45c4;
   color: #fff;
 }
 
 .header-actions > .btn:hover,
-.nav-sheet__meta > .btn:hover { background: linear-gradient(180deg, #b781f0, #8a4fd6); }
+.nav-sheet__meta > .btn:hover { background: #8d55d8; }
 
 .btn:active { transform: translateY(0); box-shadow: var(--shadow-1); }
 
@@ -324,16 +324,14 @@ button { font: inherit; }
 
 .btn--ghost {
   border-color: var(--line-strong);
-  background: rgb(255 255 255 / .045);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: transparent;
   color: var(--ink);
-  box-shadow: var(--shadow-1), var(--inner-hi);
+  box-shadow: none;
 }
 
 .btn--ghost:hover {
-  border-color: var(--accent);
-  background: rgb(255 255 255 / .08);
+  border-color: rgb(255 255 255 / .3);
+  background: rgb(255 255 255 / .05);
   color: #fff;
 }
 
@@ -371,14 +369,6 @@ button { font: inherit; }
 
 .text-link--internal { color: var(--ink-2); }
 
-@property --bar-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes bar-sweep { to { --bar-angle: 360deg; } }
-
 /* --------------------------------------------------------------------------
    6. Masthead
    -------------------------------------------------------------------------- */
@@ -397,8 +387,9 @@ button { font: inherit; }
   pointer-events: auto;
   border: 1px solid var(--stage-line);
   position: relative;
+  border: 1px solid rgb(255 255 255 / .08);
   border-radius: 14px;
-  background: linear-gradient(180deg, rgb(255 255 255 / .075), rgb(255 255 255 / .035));
+  background: rgb(255 255 255 / .05);
   backdrop-filter: blur(24px) saturate(165%);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
   box-shadow: 0 1px 0 rgb(255 255 255 / .06) inset, 0 12px 34px -20px rgb(0 0 0 / .8);
@@ -420,53 +411,6 @@ button { font: inherit; }
   width: min(100% - var(--gutter) * 2, var(--shell));
   margin-inline: auto;
   padding-inline: clamp(.65rem, 1.3vw, .95rem) clamp(.4rem, .8vw, .5rem);
-}
-
-/* Gradient hairline that slowly rotates. Masked to a 1px ring so the glass
-   behind it stays transparent — a padding-box layer would show through. */
-.masthead__inner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-  background: conic-gradient(from var(--bar-angle),
-    #6d4fd6, #d1418c 20%, #f0a95c 34%,
-    rgb(255 255 255 / .12) 52%, rgb(255 255 255 / .12) 66%,
-    #6d4fd6 84%, #d1418c);
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
-  animation: bar-sweep 18s linear infinite;
-  pointer-events: none;
-}
-
-/* Bloom cast beneath the bar. */
-.masthead::before {
-  content: "";
-  position: absolute;
-  inset-block-start: 55%;
-  inset-inline: calc(var(--gutter) + 3%);
-  height: 2.2rem;
-  z-index: -1;
-  background: linear-gradient(90deg, #6d4fd6, #d1418c 45%, #f0a95c);
-  filter: blur(22px);
-  opacity: .2;
-  pointer-events: none;
-}
-
-/* Reading progress. */
-.masthead__inner::after {
-  content: "";
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline-start: 0;
-  height: 1.5px;
-  width: calc(var(--progress, 0) * 100%);
-  border-end-start-radius: 14px;
-  background: linear-gradient(90deg, var(--d-far), var(--d-mid) 55%, var(--d-near));
-  transition: width .1s linear;
 }
 
 .masthead .brand {
@@ -559,22 +503,11 @@ button { font: inherit; }
 .nav a[aria-current="true"] { color: var(--ink); }
 
 .nav a[aria-current="true"] {
-  background: rgb(255 255 255 / .07);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .09), 0 2px 8px -4px rgb(0 0 0 / .6);
+  background: rgb(255 255 255 / .085);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .07);
 }
 
-.nav a[aria-current="true"]::after {
-  content: "";
-  position: absolute;
-  inset-inline-start: 50%;
-  inset-block-end: -.42rem;
-  width: 4px;
-  height: 4px;
-  margin-inline-start: -2px;
-  border-radius: 50%;
-  background: var(--d-mid);
-  box-shadow: 0 0 8px var(--d-mid);
-}
+
 
 .header-actions {
   display: flex;
@@ -847,16 +780,9 @@ button { font: inherit; }
   letter-spacing: .03em;
 }
 
-.hero__actions .btn {
-  border-color: rgb(255 255 255 / .92);
-  background: #fff;
-  color: #0a1016;
-}
+.hero__actions .btn { background: #f7f4f8; color: #140f1c; }
 
-.hero__actions .btn:hover {
-  background: #e8eef2;
-  box-shadow: 0 14px 32px -18px rgb(77 232 255 / .5);
-}
+.hero__actions .btn:hover { background: #fff; }
 
 .hero__actions .btn--text {
   border-color: transparent;
@@ -1454,8 +1380,8 @@ button { font: inherit; }
 .toolkit-group {
   display: grid;
   align-content: start;
-  gap: .9rem;
-  padding: 1.3rem 1.35rem 1.45rem;
+  gap: .6rem;
+  padding: .95rem 1rem 1.05rem;
   background: var(--surface);
   transition: background .28s var(--ease);
 }
@@ -1465,26 +1391,26 @@ button { font: inherit; }
 .toolkit-head {
   display: flex;
   align-items: center;
-  gap: .65rem;
+  gap: .55rem;
 }
 
 .toolkit-mark {
   display: grid;
   place-items: center;
-  width: 2.05rem;
-  height: 2.05rem;
+  width: 1.55rem;
+  height: 1.55rem;
   flex: none;
   border: 1px solid var(--accent-line);
-  border-radius: 9px;
+  border-radius: 7px;
   background: linear-gradient(160deg, var(--surface-2), var(--accent-soft));
   color: var(--accent-ink);
   box-shadow: var(--inner-hi);
 }
 
-.toolkit-mark svg { width: 1.05rem; height: 1.05rem; }
+.toolkit-mark svg { width: .85rem; height: .85rem; }
 
 .toolkit-head h3 {
-  font-size: var(--t-sm);
+  font-size: var(--t-xs);
   font-weight: 600;
   letter-spacing: -.014em;
 }
@@ -1500,9 +1426,9 @@ button { font: inherit; }
 
 .skill-row {
   display: grid;
-  grid-template-columns: minmax(5.5rem, .42fr) 1fr;
-  gap: .8rem;
-  padding: .48rem 0;
+  grid-template-columns: minmax(4.6rem, .38fr) 1fr;
+  gap: .65rem;
+  padding: .32rem 0;
   border-block-start: 1px solid var(--line-soft);
 }
 
@@ -1518,7 +1444,7 @@ button { font: inherit; }
   color: var(--ink);
   font-size: var(--t-xs);
   font-weight: 480;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* --------------------------------------------------------------------------
@@ -1619,15 +1545,11 @@ button { font: inherit; }
 
 .contact-card .section-kicker { color: var(--neon-teal); }
 
-.contact-card .btn {
-  border-color: rgb(255 255 255 / .9);
-  background: #fff;
-  color: #0a1016;
-}
+.contact-card .btn { background: #f7f4f8; color: #140f1c; }
 
 .contact-card .btn--ghost {
-  border-color: rgb(255 255 255 / .18);
-  background: rgb(255 255 255 / .06);
+  border-color: rgb(255 255 255 / .2);
+  background: transparent;
   color: var(--stage-ink);
 }
 
@@ -1857,6 +1779,10 @@ button { font: inherit; }
   .toolkit-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
+@media (min-width: 1500px) {
+  .toolkit-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
 @media (min-width: 1140px) {
   .identity-stage { height: 510px; }
   .hero__inner { grid-template-columns: minmax(0, 1fr) minmax(400px, .96fr); }
@@ -1936,7 +1862,6 @@ button { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 
-  .masthead__inner { animation: none; }
 
   *,
   *::before,
