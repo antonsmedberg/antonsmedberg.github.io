@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Subtl — primary mark
+  Anton Smedberg · 2026
+
+  Structure note: the two crescents are an exact 180° rotation of each other
+  about (500,500). The path is therefore defined once and reused, which halves
+  the file, makes the symmetry self-documenting, and removes any chance of the
+  two halves drifting apart when the geometry is edited.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"
+     width="1000" height="1000" role="img" aria-labelledby="title desc">
+  <title id="title">Subtl</title>
+  <desc id="desc">Two interlocking crescents forming a rotational mark.</desc>
+
+  <defs>
+    <path id="blade"
+          d="M 726.611 255.884
+             A 243.51 243.51 0 1 0 414 601.272
+             A 393.835 393.835 0 0 1 726.611 255.884 Z"/>
+  </defs>
+
+  <use href="#blade" fill="#8ECAF0"/>
+  <use href="#blade" fill="#F4F2EF" transform="rotate(180 500 500)"/>
+</svg>
