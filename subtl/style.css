@@ -47,6 +47,13 @@ footer a { display:inline-flex; align-items:center; min-height:44px; }
 footer span { display:flex; align-items:center; }
 footer p { flex-basis:100%; max-width:700px; margin:0; }
 footer p a { display:inline; }
+.policy { max-width:720px; padding-block:64px; }
+.policy h1 { font-size:clamp(40px,5vw,56px); letter-spacing:-2px; }
+.policy h2 { font-size:25px; margin-bottom:16px; }
+.policy section { padding-top:28px; margin-top:28px; border-top:1px solid var(--line); }
+.policy p { color:var(--secondary); }
+.policy strong { color:var(--ink); }
+.policy-date { font-size:14px; margin-bottom:32px; }
 @media (max-width:760px) {
   .masthead,main,footer { width:calc(100% - 40px); }
   .masthead { padding-block:16px; }
