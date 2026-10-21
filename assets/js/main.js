@@ -41,7 +41,6 @@ function themeState() {
 function syncTheme() {
   const state = themeState();
   if (themeButton) {
-    themeButton.dataset.state = state;
     themeButton.setAttribute('aria-label', themeLabels[lang][state]);
   }
   // Browser chrome follows the paper colour that is actually in effect.
@@ -68,7 +67,9 @@ syncTheme();
 
 /* -------------------------------------------------------------------------
    Scroll spy — one observer over the sections, both navigation sets.
-   When no section is in the band (the hero, the footer) nothing is current.
+   When no section is in the band (the hero, the footer) nothing is current;
+   at the end of the page the last section is, since it may never reach the
+   band.
    ------------------------------------------------------------------------- */
 
 const navLinks = [...document.querySelectorAll('.nav a[href^="#"], .folio a[href^="#"]')];
@@ -76,25 +77,35 @@ const sections = [...new Set(navLinks.map((a) => document.getElementById(a.hash.
 
 if (sections.length && 'IntersectionObserver' in window) {
   const visible = new Map();
+  const last = sections[sections.length - 1];
+  const mark = () => {
+    let current = null;
+    let best = -1;
+    for (const [section, ratio] of visible) {
+      if (ratio > best) { best = ratio; current = section; }
+    }
+    const atEnd = innerHeight + scrollY >= root.scrollHeight - 2;
+    if (atEnd && last.getBoundingClientRect().top < innerHeight) current = last;
+    for (const link of navLinks) {
+      if (current && link.hash === `#${current.id}`) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    }
+  };
   const spy = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) visible.set(entry.target, entry.intersectionRatio);
         else visible.delete(entry.target);
       }
-      let current = null;
-      let best = -1;
-      for (const [section, ratio] of visible) {
-        if (ratio > best) { best = ratio; current = section; }
-      }
-      for (const link of navLinks) {
-        if (current && link.hash === `#${current.id}`) link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      }
+      mark();
     },
     { rootMargin: '-35% 0px -55% 0px', threshold: [0, 0.1, 0.5] }
   );
   sections.forEach((section) => spy.observe(section));
+  let spyFrame = 0;
+  addEventListener('scroll', () => {
+    if (!spyFrame) spyFrame = requestAnimationFrame(() => { spyFrame = 0; mark(); });
+  }, { passive: true });
 }
 
 /* -------------------------------------------------------------------------
@@ -140,6 +151,9 @@ if (fig) {
     cloud: fig.querySelector('[data-caption-cloud]'),
   };
   const buttons = [...fig.querySelectorAll('[data-mode-btn]')];
+  const cloudButton = buttons.find((b) => b.dataset.modeBtn === 'cloud');
+  const lostNote = fig.querySelector('[data-cloud-lost]');
+  const stoppedNote = fig.querySelector('[data-cloud-stopped]');
   const photoURL = fig.dataset.sampler;
   const depthURL = fig.dataset.depth;
 
@@ -162,8 +176,10 @@ if (fig) {
     for (const [key, el] of Object.entries(captions)) {
       if (el) el.hidden = key !== mode;
     }
-    if (mode === 'cloud') showCloud();
-    else if (cloud) cloud.pause();
+    if (mode === 'cloud') {
+      if (stoppedNote) stoppedNote.hidden = true;
+      showCloud();
+    } else if (cloud) cloud.pause();
   };
 
   // a) The stipple: computed once, drawn top to bottom over 1.1 s.
@@ -185,9 +201,10 @@ if (fig) {
       requestAnimationFrame(step);
     })
     .catch(() => {
-      // Without the sampler images the photograph stays, as a drawing.
-      fig.dataset.mode = 'loading';
+      // Without the sampler images there is no stipple and no cloud: the
+      // photograph stays, unless the reader has already chosen it.
       buttons.forEach((b) => { b.disabled = true; });
+      if (fig.dataset.mode === 'loading' || fig.dataset.mode === 'stipple') setMode('photo');
     });
 
   let resizeTimer = 0;
@@ -242,19 +259,22 @@ if (fig) {
             fig.querySelectorAll('[data-kept]').forEach((el) => { el.textContent = groupDigits(kept); });
             fig.querySelectorAll('[data-total]').forEach((el) => { el.textContent = groupDigits(total); });
           },
+          // The GPU context went away (iOS does this to background tabs).
+          // A lost context cannot be reused, so the next request mounts on
+          // a fresh canvas.
           onLost: () => {
-            setMode('stipple');
-            const lost = fig.querySelector('[data-cloud-lost]');
-            if (lost) lost.hidden = false;
-            buttons.find((b) => b.dataset.modeBtn === 'cloud')?.setAttribute('disabled', '');
+            const stopped = cloud;
             cloud = null;
+            stopped?.destroy();
+            cloudBox.querySelector('canvas')?.replaceWith(document.createElement('canvas'));
+            if (fig.dataset.mode === 'cloud') setMode('stipple');
+            if (stoppedNote) stoppedNote.hidden = false;
           },
         });
         if (!cloud) {
           setMode('stipple');
-          buttons.find((b) => b.dataset.modeBtn === 'cloud')?.setAttribute('disabled', '');
-          const lost = fig.querySelector('[data-cloud-lost]');
-          if (lost) lost.hidden = false;
+          cloudButton?.setAttribute('disabled', '');
+          if (lostNote) lostNote.hidden = false;
         }
       })
       .catch(() => setMode('stipple'))

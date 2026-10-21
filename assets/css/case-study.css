@@ -3,7 +3,7 @@
 
 .breadcrumb { border-bottom: 1px solid var(--rule); font: 400 var(--t-caption) / 1.4 var(--font-mono); }
 
-.breadcrumb a { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 2.5rem; color: var(--ink-2); transition: color 0.2s; }
+.breadcrumb a { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 2.75rem; color: var(--ink-2); transition: color 0.2s; }
 
 .breadcrumb svg,
 .case-aside a svg { display: inline; width: 0.85em; height: 0.85em; }
@@ -18,7 +18,7 @@
 .nf h1 { font-family: var(--font-display); font-size: var(--t-h2); font-weight: 400; line-height: 1.04; letter-spacing: -0.02em; }
 
 .case-head .deck,
-.nf p { max-width: 56ch; color: var(--ink-2); font-size: var(--t-lede); line-height: 1.5; }
+.nf__copy { max-width: 56ch; color: var(--ink-2); font-size: var(--t-lede); line-height: 1.5; }
 
 .case-fig { margin-top: clamp(1.75rem, 4vw, 3rem); }
 
@@ -66,7 +66,7 @@
 
 .nf { display: grid; gap: 2.5rem; padding-block: clamp(2rem, 5vw, 4rem) var(--section-y); }
 
-.nf h1, .nf p { margin-top: 1rem; }
+.nf h1, .nf__copy { margin-top: 1rem; }
 
 .nf .actions { margin-top: 1.5rem; }
 

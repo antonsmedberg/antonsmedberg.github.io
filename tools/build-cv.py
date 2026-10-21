@@ -32,6 +32,8 @@ PAGES = {
         "other": "/sv/cv/",
         "other_lang": "sv",
         "home": "/",
+        "job_title": "iOS Developer",
+        "og_alt": "Anton Smedberg, iOS developer in Malmö, next to a stippled ink portrait.",
         "pdf": "/assets/cv/Anton-Smedberg-CV.pdf",
         "locale": "en_GB",
         "in_language": "en-GB",
@@ -65,6 +67,8 @@ PAGES = {
         "other": "/cv/",
         "other_lang": "en",
         "home": "/sv/",
+        "job_title": "iOS-utvecklare",
+        "og_alt": "Anton Smedberg, iOS-utvecklare i Malmö, bredvid ett punktat bläckporträtt.",
         "pdf": "/assets/cv/Anton-Smedberg-CV-SV.pdf",
         "locale": "sv_SE",
         "in_language": "sv-SE",
@@ -106,7 +110,7 @@ PAGE = Template("""<!DOCTYPE html>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f2ed">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#100f0d">
-<link rel="canonical" href="$site/cv/">
+<link rel="canonical" href="$site$url">
 <link rel="alternate" hreflang="en" href="$site/cv/">
 <link rel="alternate" hreflang="sv" href="$site/sv/cv/">
 <link rel="alternate" hreflang="x-default" href="$site/cv/">
@@ -114,13 +118,14 @@ PAGE = Template("""<!DOCTYPE html>
 <link rel="icon" href="/assets/img/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <meta property="og:type" content="profile">
-<meta property="og:site_name" content="Anton Smedberg — iOS Developer">
+<meta property="og:site_name" content="Anton Smedberg — $job_title">
 <meta property="og:title" content="$title">
 <meta property="og:description" content="$description">
 <meta property="og:url" content="$site$url">
 <meta property="og:image" content="$site/assets/img/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="$og_alt">
 <meta property="og:locale" content="$locale">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="$title">
@@ -164,7 +169,7 @@ $jsonld
     </nav>
     <div class="tools">
       <span class="lang">$lang_switch</span>
-      <button class="theme" type="button" data-theme-toggle data-state="auto" aria-label="$theme"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+      <button class="theme" type="button" data-theme-toggle aria-label="$theme"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
       <a class="btn btn--sm" href="$url" aria-current="page"><svg aria-hidden="true"><use href="#i-doc"/></svg>CV</a>
     </div>
   </div>
@@ -375,7 +380,7 @@ def jsonld(person, page, build):
                 "name": page["title"],
                 "inLanguage": page["in_language"],
                 "dateModified": build,
-                "isPartOf": {"@id": SITE + "/#page"},
+                "isPartOf": {"@id": SITE + page["home"] + "#page"},
                 "mainEntity": {"@id": PERSON_ID},
             },
             {
@@ -384,7 +389,7 @@ def jsonld(person, page, build):
                 "name": person["name"],
                 "givenName": person["name"].split()[0],
                 "familyName": person["name"].split()[-1],
-                "jobTitle": "iOS Developer",
+                "jobTitle": page["job_title"],
                 "url": SITE + "/",
                 "email": "mailto:" + person["email"],
                 "telephone": person["phone"],
@@ -415,6 +420,8 @@ def render(lang, data, build):
         "title": attr(page["title"]),
         "description": attr(page["description"]),
         "jsonld": jsonld(person, page, build),
+        "job_title": attr(page["job_title"]),
+        "og_alt": attr(page["og_alt"]),
         "skip": html.escape(page["skip"]),
         "brand": attr(page["brand"]),
         "nav_label": attr(page["nav_label"]),

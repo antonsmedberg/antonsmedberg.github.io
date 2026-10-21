@@ -6,6 +6,7 @@
 .cv__contact{margin-top:.6rem;color:var(--ink-2);font:400 var(--t-caption)/1.7 var(--font-mono)}
 .cv__contact+.cv__contact{margin-top:0}
 .cv__contact span{display:inline-block;overflow-wrap:anywhere}
+.cv__contact a{display:inline-block;padding-block:.35rem;margin-block:-.35rem}
 .cv__contact span::after{content:"·";margin-inline:.5rem;color:var(--ink-3)}
 .cv__contact span:last-child::after{content:none}
 .cv__contact a,.cv__row h3 a{text-decoration:underline var(--rule);text-underline-offset:.3em}
@@ -19,7 +20,7 @@
 .cv__row h3{font-size:var(--t-body);font-weight:600;line-height:1.45}
 .cv__org{margin-top:.15rem;line-height:1.5}
 .cv__stack{margin-top:.3rem;max-width:none;color:var(--ink-3);font:400 var(--t-caption)/1.6 var(--font-mono)}
-.cv__row ul,.cv__row p{max-width:66ch;color:var(--ink-2)}
+.cv__row ul,.cv__p,.cv__org{max-width:66ch;color:var(--ink-2)}
 .cv__row ul,.cv__p{margin-top:.5rem}
 .cv__row ul{display:grid;gap:.3rem}
 .cv__row li{position:relative;padding-inline-start:1.2rem}

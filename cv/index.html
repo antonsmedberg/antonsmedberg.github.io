@@ -25,6 +25,7 @@
 <meta property="og:image" content="https://antonsmedberg.github.io/assets/img/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Anton Smedberg, iOS developer in Malmö, next to a stippled ink portrait.">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Anton Smedberg — CV">
@@ -111,7 +112,7 @@
     </nav>
     <div class="tools">
       <span class="lang"><span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="/sv/cv/" hreflang="sv" lang="sv" aria-label="Svenska">SV</a></span>
-      <button class="theme" type="button" data-theme-toggle data-state="auto" aria-label="Theme: follows the system. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+      <button class="theme" type="button" data-theme-toggle aria-label="Theme: follows the system. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
       <a class="btn btn--sm" href="/cv/" aria-current="page"><svg aria-hidden="true"><use href="#i-doc"/></svg>CV</a>
     </div>
   </div>
@@ -155,7 +156,7 @@
     <h2 class="label" id="cv-projects">Projects</h2>
     <ul class="cv__rows">
       <li class="cv__row"><p class="when label">Open source</p><div><h3><a href="https://github.com/antonsmedberg/MetalVisualKit">MetalVisualKit</a></h3><p class="cv__stack">Swift 6 · Metal · SwiftUI · ARKit · SPM · DocC · GitHub Actions</p><p class="cv__p">MIT-licensed Swift package of GPU-backed SwiftUI views: a compute-shader particle loader (about 1&#160;400 particles) and an ARKit LiDAR point-cloud renderer (about 49&#160;000 points per frame) that samples camera colour per point. Swift 6, iOS 17+, <span data-stamp="tests">71</span> tests, example app, DocC and CI on every push.</p></div></li>
-      <li class="cv__row"><p class="when label">Public repo</p><div><h3><a href="https://github.com/antonsmedberg/DeviceMonitor">DeviceMonitor</a></h3><p class="cv__stack">Swift 6 · SwiftUI · SwiftData · XCTest · XCUITest · GitHub Actions</p><p class="cv__p">Degree project: a network-device dashboard with status history, filtering and search. Service, storage and view-model layers behind protocols, actor-safe SwiftData persistence under Swift 6 strict concurrency, 6 unit and 2 UI tests in GitHub Actions. iOS 26.2+.</p></div></li>
+      <li class="cv__row"><p class="when label">Public repo</p><div><h3><a href="https://github.com/antonsmedberg/DeviceMonitor">DeviceMonitor</a></h3><p class="cv__stack">Swift 6 · SwiftUI · SwiftData · XCTest · XCUITest · GitHub Actions</p><p class="cv__p">Degree project: a network-device dashboard with status history, filtering and search. Service, storage and view-model layers behind protocols, actor-safe SwiftData persistence under Swift 6 strict concurrency, 6 unit tests in GitHub Actions and 2 UI tests. iOS 26.2+.</p></div></li>
       <li class="cv__row"><p class="when label">In development</p><div><h3><a href="https://antonsmedberg.github.io/subtl/">Subtl</a></h3><p class="cv__stack">Swift 6 · SpeechAnalyzer · AVFoundation · Core Animation · StoreKit 2</p><p class="cv__p">Captioning for short-form video with transcription on the device, so nothing leaves the phone. One caption-style model drives both the live preview and the AVFoundation export, so the exported file matches what was edited. Actor-isolated transcription engine; in development, with the support site and privacy policy published.</p></div></li>
     </ul>
   </section>

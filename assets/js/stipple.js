@@ -132,7 +132,7 @@ export function paintDots(canvas, dots, ink, progress = 1, cols = COLS) {
 export function fitCanvas(canvas) {
   const rect = canvas.getBoundingClientRect();
   if (!rect.width || !rect.height) return false;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
   const w = Math.round(rect.width * dpr);
   const h = Math.round(rect.height * dpr);
   if (canvas.width !== w || canvas.height !== h) {

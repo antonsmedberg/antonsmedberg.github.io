@@ -154,7 +154,7 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
     --paper: #100f0d;
@@ -185,33 +185,35 @@
   }
 }
 
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --paper: #100f0d;
-  --paper-2: #1e1c18;
-  --paper-3: #2a2722;
-  --card: #191714;
-  --card-edge: rgb(255 255 255 / 0.07);
-  --ink: #f1ebe0;
-  --ink-2: #b9b1a5;
-  --ink-3: #958d81;
-  --rule: #2c2823;
-  --rule-strong: #f1ebe0;
-  --tint: rgb(241 235 224 / 0.08);
-  --tint-2: rgb(241 235 224 / 0.13);
-  --accent: #ff8257;
-  --accent-ink: #ff8c64;
-  --accent-inv: #b5341a;
-  --live: #5bcb85;
-  --live-ink: #5bcb85;
-  --warn-ink: #e8b86a;
-  --bezel: #000;
-  --bezel-edge: var(--rule);
-  --photo-filter: brightness(0.92);
-  --glass: rgb(28 26 23 / 0.74);
-  --glass-edge: rgb(255 255 255 / 0.09);
-  --shadow-1: none;
-  --shadow-3: 0 22px 48px -20px rgb(0 0 0 / 0.7);
+@media screen {
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #100f0d;
+    --paper-2: #1e1c18;
+    --paper-3: #2a2722;
+    --card: #191714;
+    --card-edge: rgb(255 255 255 / 0.07);
+    --ink: #f1ebe0;
+    --ink-2: #b9b1a5;
+    --ink-3: #958d81;
+    --rule: #2c2823;
+    --rule-strong: #f1ebe0;
+    --tint: rgb(241 235 224 / 0.08);
+    --tint-2: rgb(241 235 224 / 0.13);
+    --accent: #ff8257;
+    --accent-ink: #ff8c64;
+    --accent-inv: #b5341a;
+    --live: #5bcb85;
+    --live-ink: #5bcb85;
+    --warn-ink: #e8b86a;
+    --bezel: #000;
+    --bezel-edge: var(--rule);
+    --photo-filter: brightness(0.92);
+    --glass: rgb(28 26 23 / 0.74);
+    --glass-edge: rgb(255 255 255 / 0.09);
+    --shadow-1: none;
+    --shadow-3: 0 22px 48px -20px rgb(0 0 0 / 0.7);
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -221,6 +223,8 @@
 *,
 *::before,
 *::after { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
 
 html {
   -webkit-text-size-adjust: 100%;
@@ -239,7 +243,6 @@ body {
   background: var(--paper);
   color: var(--ink);
   font: 400 var(--t-body) / 1.6 var(--font-text);
-  overflow-x: hidden;
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
@@ -407,8 +410,6 @@ h1, h2, h3 { text-wrap: balance; }
 }
 
 .text-link svg { width: 0.85em; height: 0.85em; flex: none; }
-
-.text-link--small { min-height: 0; font-size: var(--t-small); }
 
 .status {
   display: inline-flex;
@@ -599,9 +600,10 @@ h1, h2, h3 { text-wrap: balance; }
 
 .theme svg { width: 1.0625rem; height: 1.0625rem; display: none; }
 
-.theme[data-state="auto"] .i-auto,
-.theme[data-state="light"] .i-sun,
-.theme[data-state="dark"] .i-moon { display: block; }
+/* Keyed off the root, which the inline head script sets before first paint. */
+:root:not([data-theme]) .theme .i-auto,
+:root[data-theme="light"] .theme .i-sun,
+:root[data-theme="dark"] .theme .i-moon { display: block; }
 
 .tools .btn { display: none; }
 
@@ -660,7 +662,7 @@ h1, h2, h3 { text-wrap: balance; }
 
 .folio svg { width: 1.375rem; height: 1.375rem; }
 
-.folio span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folio a > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .folio a[aria-current] { background: var(--tint); color: var(--accent-ink); }
 
@@ -757,16 +759,14 @@ h1, h2, h3 { text-wrap: balance; }
   background: var(--paper-2);
 }
 
-figcaption,
-.caption {
+figcaption {
   margin-top: 0.75rem;
   max-width: 56ch;
   color: var(--ink-3);
   font: 400 var(--t-caption) / 1.5 var(--font-mono);
 }
 
-figcaption b,
-.caption b { font-weight: 400; color: var(--ink); }
+figcaption b { font-weight: 400; color: var(--ink); }
 
 /* Fig. 0 — one portrait, three renderings from the same depth map. */
 .fig--0 { width: 100%; max-width: 30rem; margin-inline: auto; }
@@ -1187,7 +1187,7 @@ figcaption b,
   text-transform: none;
 }
 
-.timeline h3 {
+.timeline :is(h3, h4) {
   font-family: var(--font-display);
   font-size: var(--t-h3);
   font-weight: 400;
@@ -1230,7 +1230,7 @@ figcaption b,
 
 .edu > h3 { margin-bottom: 0.75rem; color: var(--ink-3); font-size: var(--t-small); font-weight: 600; }
 
-.edu .timeline h3 { font-size: 1.375rem; }
+.edu .timeline h4 { font-size: 1.375rem; }
 
 /* --------------------------------------------------------------------------
    14. Skills — a spec sheet on a card, with "where it was used"
@@ -1482,7 +1482,7 @@ figcaption b,
 
 /* Touch: every control is at least 44 px. */
 @media (pointer: coarse) {
-  .brand, .lang a, .lang span[aria-current], .text-link--small { min-height: 2.75rem; }
+  .brand, .lang a, .lang span[aria-current] { min-height: 2.75rem; }
   .theme { width: 2.75rem; height: 2.75rem; }
   .tools .btn { min-height: 2.75rem; }
   .seg button { min-height: 2.5rem; }
@@ -1530,13 +1530,16 @@ figcaption b,
 }
 
 @media (prefers-contrast: more) {
-  :root { --rule: var(--rule-strong); --ink-3: var(--ink-2); --card-edge: var(--ink-3); --glass: var(--paper); }
+  :root,
+  :root[data-theme],
+  :root:not([data-theme="light"]) { --rule: var(--rule-strong); --ink-3: var(--ink-2); --card-edge: var(--ink-3); --glass: var(--paper); }
 }
 
 @media (forced-colors: active) {
   .badge .dot, .status::before { border: 1px solid CanvasText; }
   .btn, .seg button, .status, .card, .folio, .node { border: 1px solid ButtonText; }
   .nav a[aria-current], .folio a[aria-current] { outline: 2px solid Highlight; }
+  .seg button[aria-pressed="true"] { forced-color-adjust: none; border-color: Highlight; background: Highlight; color: HighlightText; }
 }
 
 @media print {
@@ -1548,6 +1551,7 @@ figcaption b,
   .plate--0 img { opacity: 1 !important; filter: none !important; }
   .io .reveal { opacity: 1; transform: none; }
   .cta { background: #fff; color: #000; box-shadow: 0 0 0 1px #000; }
-  .section, .project { break-inside: avoid; }
+  .project, .card, figure, .timeline > li { break-inside: avoid; }
+  .head, h2, h3 { break-after: avoid; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.75em; color: #444; }
 }

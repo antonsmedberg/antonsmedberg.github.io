@@ -38,6 +38,7 @@ subtl/                       Subtl support site and privacy policy, with its own
 robots.txt, sitemap.xml
 assets/css/style.css         Fonts, tokens, base, components. One layer, no overrides.
 assets/css/case-study.css    Case-study page styles
+assets/css/cv.css            CV page and its A4 print styles
 assets/js/main.js            Theme toggle, scroll spy, reveal, Fig. 0 control, copy button
 assets/js/stipple.js         Fig. 0 stipple: sample, computeDots, paintDots, fitCanvas
 assets/js/depth-cloud.js     Fig. 0 depth cloud. Raw WebGL, imported on request.
@@ -73,7 +74,7 @@ fine pointer, or press-and-hold on touch fades it in over the dots. It is
 also what you get without JavaScript.
 
 **Depth cloud.** `depth-cloud.js` is imported the first time the button is
-pressed, so nothing WebGL runs before that. A 320×400 lattice of 128 000
+pressed, so nothing WebGL runs before that. A 320×400 lattice of 128 000
 candidate points reads the depth map on the GPU; points are culled where the
 face is smooth and kept where it has structure, and the script counts the
 kept points on the CPU for the caption. One reveal sweep, then the loop
@@ -113,15 +114,17 @@ to 4:5, feathers the shoulders, writes the three portrait sizes and the depth
 map, and resizes the two app captures to the widths the `<img srcset>` lists.
 
 `render-images.js` and `build-cv-pdf.js` need Node with Playwright and its
-Chromium on `NODE_PATH`. The icons are rendered from `favicon.svg`; the OG
+Chromium on `NODE_PATH`; `build-cv-pdf.js` also runs poppler's `pdfinfo` to
+check that each PDF is one A4 page. The icons are rendered from `favicon.svg`; the OG
 image from `tools/og.html`, which loads the site's own fonts and draws the
 stipple with the same `stipple.js` the page uses.
 
 `stamp.py` (stdlib only) rewrites every `<span data-stamp="…">` in the pages
-before a commit: the build date, the date of the last commit, the number of
-`func test` in a local MetalVisualKit checkout together with the short hash
-it was counted at (`--mvk` points at the checkout), and the request count and
-weight of a first view of `index.html`, measured from the files on disk. It
+before a commit: the build date, the number of `func test` in a local
+MetalVisualKit checkout together with the short hash it was counted at
+(`--mvk` points at the checkout; by default it is looked for next to this
+repository), and the request count and weight of a phone's first view of
+`index.html`, measured from the files on disk. It
 only ever replaces the text inside those spans, and running it twice changes
 nothing.
 

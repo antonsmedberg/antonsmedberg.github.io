@@ -7,10 +7,9 @@ else in a file is touched, pages that do not exist yet are skipped, and a
 second run with the same inputs changes nothing.
 
   build     today's ISO date (--date overrides)
-  commit    date of this repository's last commit (git log -1 --format=%as)
   tests     number of `func test` in a local MetalVisualKit checkout
   hash      that checkout's short HEAD, so the count is tied to a revision
-  requests  first-view requests of index.html (the list in FIRST_VIEW)
+  requests  requests of index.html's first view on a phone (FIRST_VIEW)
   weight    their size on disk, in KB (1 000 bytes, as DevTools counts)
 
 Run from anywhere:
@@ -30,9 +29,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 PAGES = ["index.html", "sv/index.html", "work/*.html", "cv/index.html", "sv/cv/index.html"]
 
-# What a first view of index.html fetches: the page, its stylesheet, the two
-# modules, the four fonts, the two images the stipple samples, the favicon.
-# Lazy images (the photograph, the captures) and the depth cloud are not here.
+# What a first view of index.html fetches on a phone: the page, its
+# stylesheet, the two modules, the four fonts, the two images the stipple
+# samples, the photograph (a 2x or 3x screen picks the 840 px file) and the
+# favicon. The project captures further down and the depth cloud, which loads
+# only when asked for, are not here.
 FIRST_VIEW = [
     "index.html",
     "assets/css/style.css",
@@ -44,6 +45,7 @@ FIRST_VIEW = [
     "assets/fonts/plex-mono-400.woff2",
     "assets/img/portrait-300.webp",
     "assets/img/portrait-depth.webp",
+    "assets/img/portrait.webp",
     "assets/img/favicon.svg",
 ]
 
@@ -83,10 +85,6 @@ def first_view():
 
 def values(args):
     out = {"build": args.date}
-
-    commit = git(["log", "-1", "--format=%as"], ROOT)
-    if commit:
-        out["commit"] = commit
 
     if os.path.isdir(args.mvk):
         head = git(["rev-parse", "--short", "HEAD"], args.mvk)
@@ -136,7 +134,7 @@ def stamp(path, vals):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--date", default=datetime.date.today().isoformat(), help="build date, ISO (default: today)")
-    parser.add_argument("--mvk", default="/home/user/antonsmedberg/metalvisualkit", help="local MetalVisualKit checkout")
+    parser.add_argument("--mvk", default=os.path.join(os.path.dirname(ROOT), "metalvisualkit"), help="local MetalVisualKit checkout (default: next to this repository)")
     args = parser.parse_args()
 
     vals = values(args)

@@ -333,8 +333,7 @@ export function mount(stage, { depthURL, photoURL, reduceMotion = false, onCount
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
 
-  const onContextLost = (event) => {
-    event.preventDefault();
+  const onContextLost = () => {
     alive = false;
     if (frame) cancelAnimationFrame(frame);
     frame = 0;

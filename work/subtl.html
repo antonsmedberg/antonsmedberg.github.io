@@ -109,7 +109,7 @@
     </nav>
     <div class="tools">
       <span class="lang"><span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="/sv/" hreflang="sv" lang="sv" aria-label="Svenska">SV</a></span>
-      <button class="theme" type="button" data-theme-toggle data-state="auto" aria-label="Theme: follows the system. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+      <button class="theme" type="button" data-theme-toggle aria-label="Theme: follows the system. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
       <a class="btn btn--sm" href="/cv/"><svg aria-hidden="true"><use href="#i-doc"/></svg>CV</a>
     </div>
   </div>
@@ -125,7 +125,7 @@
     </header>
 
     <figure class="fig fig--diagram case-fig">
-      <div class="plate media--flow" data-vt="subtl"><ol class="flow" aria-label="Subtl architecture"><li><span class="node"><b>SpeechAnalyzer</b><small>on-device · no upload</small></span></li><li><span class="node"><b>Transcript</b><small>timed words · actor-isolated</small></span></li><li><span class="node node--key"><b>CaptionStyle</b><small>single source of truth</small></span></li><li class="fork"><span class="node"><b>Preview</b><small>SwiftUI · Core Animation</small></span><span class="node"><b>Export</b><small>AVFoundation</small></span></li></ol><p class="flow__note">same frames in preview and export</p></div>
+      <div class="plate media--flow" data-vt="subtl"><ol class="flow" aria-label="Subtl architecture"><li><span class="node"><b>SpeechAnalyzer</b><small>on-device · no upload</small></span></li><li><span class="node"><b>Transcript</b><small>timed words · actor-isolated</small></span></li><li><span class="node node--key"><b>CaptionStyle</b><small>single source of truth</small></span></li><li class="fork"><span class="node"><b>Preview</b><small>SwiftUI</small></span><span class="node"><b>Export</b><small>AVFoundation · Core Animation</small></span></li></ol><p class="flow__note">one style model · deterministic export</p></div>
       <figcaption><b>Fig. 3</b> — Preview/export parity: one style model, two renderers. Diagram, not a screenshot.</figcaption>
     </figure>
 
@@ -133,14 +133,14 @@
       <article class="case-body reveal">
         <h2>What it does</h2>
         <p>You choose a video from Photos or Files, and SpeechAnalyzer transcribes the speech on the device into timed words. In the editor you review the words, correct them, split or merge them and adjust their timing, then choose a caption style and set its size and position. Export writes the captioned video to Photos through AVFoundation and offers sharing from the completion screen. Apple's writing tools are optional: existing captions can still be edited and exported without enabling them.</p>
-        <p>Projects stay in local storage. A <code>.subtlproject</code> backup bundles the video, transcript and caption settings into one file you can save and restore; a deleted project sits in Recently Deleted for seven days. There are no accounts, no analytics or tracking SDK, and nothing is uploaded to a developer-operated server. Purchases go through StoreKit&#160;2.</p>
+        <p>Projects stay in local storage. A <code>.subtlproject</code> backup bundles the video, transcript and caption settings into one file you can save and restore; a deleted project sits in Recently Deleted for seven days. There are no accounts, no analytics or tracking SDK, and nothing is uploaded to a developer-operated server.</p>
 
         <h2>The decision</h2>
         <blockquote class="pull"><p>One caption-style model drives both preview and export, so nothing changes after export.</p></blockquote>
-        <p>A caption editor has two rendering paths that can drift apart: the interactive preview and the exported file. If style, timing and position are implemented twice, the user spends time refining a result that changes after export. So one <code>CaptionStyle</code> model is the single source of truth. The preview renders it with SwiftUI and Core Animation; the export renders the same model through AVFoundation into the video, deterministically, rather than capturing the live view hierarchy. The transcription engine is actor-isolated, so long-running speech work never touches view state directly.</p>
+        <p>A caption editor has two rendering paths that can drift apart: the interactive preview and the exported file. If style, timing and position are implemented twice, the user spends time refining a result that changes after export. So one <code>CaptionStyle</code> model is the single source of truth. The preview renders it in SwiftUI; the export renders the same model through AVFoundation and Core Animation into the video, deterministically, rather than capturing the live SwiftUI hierarchy. The transcription engine is actor-isolated, so long-running speech work never touches view state directly.</p>
 
-        <h2>What I would do differently</h2>
-        <p>Three of the eight answers in the support FAQ are about storage rather than captions: a save that has not finished, a library that cannot be loaded and must not be overwritten, a backup to restore, a project to recover. If I started again I would treat the project catalogue, with its saving, backup and recovery paths, as a feature with the same weight as the renderer from the first day; the FAQ shows how much of the app it turned out to be.</p>
+        <h2>What the support FAQ shows</h2>
+        <p>Three of the eight answers in the support FAQ are about storage rather than captions: changes that have not finished saving, a backup to restore, a deleted project to recover. The project catalogue, with its saving, backup and recovery paths, turned out to be as much of the app as the renderer, and it needs the same care.</p>
 
         <h2>Current state</h2>
         <p>In development. The support site and the privacy policy, effective 8 October 2026, are live and linked from the specifications. The app processes videos, audio and captions on the device; speech recognition and the optional writing features depend on the device, system version, language and an Apple model download, and the app does not fall back to a cloud model when one is unavailable.</p>
@@ -183,7 +183,7 @@
 </footer>
 
 <nav class="folio" aria-label="Sections (bottom)">
-  <a href="/#work"><svg aria-hidden="true"><use href="#i-grid"/></svg><span>Work</span></a><a href="/cv/"><svg aria-hidden="true"><use href="#i-doc"/></svg><span>CV</span></a><a href="/#contact"><svg aria-hidden="true"><use href="#i-mail"/></svg><span>Contact</span></a><a href="/work/prism-spatial.html"><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Next</span></a>
+  <a href="/#work"><svg aria-hidden="true"><use href="#i-grid"/></svg><span>Work</span></a><a href="/cv/"><svg aria-hidden="true"><use href="#i-doc"/></svg><span>CV</span></a><a href="/#contact"><svg aria-hidden="true"><use href="#i-mail"/></svg><span>Contact</span></a><a href="/work/prism-spatial.html"><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Next<span class="visually-hidden">: Prism Spatial</span></span></a>
 </nav>
 
 <script type="module" src="/assets/js/main.js"></script>

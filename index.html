@@ -34,6 +34,11 @@
 <meta name="twitter:image" content="https://antonsmedberg.github.io/assets/img/og-image.png">
 <link rel="preload" href="/assets/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-sans-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/instrument-serif-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="modulepreload" href="/assets/js/main.js">
+<link rel="modulepreload" href="/assets/js/stipple.js">
+<link rel="preload" href="/assets/img/portrait-300.webp" as="image">
+<link rel="preload" href="/assets/img/portrait-depth.webp" as="image">
 <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="stylesheet" href="/assets/css/style.css">
 <script type="application/ld+json">
@@ -102,7 +107,7 @@
     </nav>
     <div class="tools">
       <span class="lang"><span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="/sv/" hreflang="sv" lang="sv" aria-label="Svenska">SV</a></span>
-      <button class="theme" type="button" data-theme-toggle data-state="auto" aria-label="Theme: follows the system. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+      <button class="theme" type="button" data-theme-toggle aria-label="Theme: follows the system. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
       <a class="btn btn--sm" href="/cv/"><svg aria-hidden="true"><use href="#i-doc"/></svg>CV</a>
     </div>
   </div>
@@ -127,7 +132,7 @@
     <figure class="fig fig--0" data-portrait data-mode="loading" data-sampler="/assets/img/portrait-300.webp" data-depth="/assets/img/portrait-depth.webp" aria-label="Portrait of Anton Smedberg">
       <div class="plate plate--0">
         <canvas data-stipple aria-hidden="true"></canvas>
-        <img data-photo src="/assets/img/portrait-600.webp" srcset="/assets/img/portrait-600.webp 600w, /assets/img/portrait.webp 840w" sizes="(min-width: 900px) 30rem, calc(100vw - 2rem)" width="600" height="750" alt="" loading="lazy" decoding="async">
+        <img data-photo draggable="false" src="/assets/img/portrait-600.webp" srcset="/assets/img/portrait-600.webp 600w, /assets/img/portrait.webp 840w" sizes="(min-width: 900px) 30rem, calc(100vw - 2rem)" width="600" height="750" alt="" loading="lazy" decoding="async">
         <div data-cloud aria-hidden="true"><canvas></canvas><p class="hud"><b data-kept>—</b> of <span data-total>128&#160;000</span> points</p></div>
         <button class="rescan" type="button" data-rescan>Rescan</button>
         <div class="seg seg--float" role="group" aria-label="Fig. 0 rendering">
@@ -141,6 +146,7 @@
           <span data-caption-photo hidden><b>Fig. 0</b> — The photograph, unedited. Studio capture, cut out and cropped by a Python script.</span>
           <span data-caption-cloud hidden><b>Fig. 0</b> — <span data-kept>—</span> of 128&#160;000 lattice points kept by the depth map's detail channel. Raw WebGL, drawn on request.</span>
           <span data-cloud-lost hidden> Depth cloud unavailable on this device.</span>
+          <span data-cloud-stopped hidden> The depth cloud stopped; choose Depth cloud to start it again.</span>
         </figcaption>
     </figure>
   </div>
@@ -164,7 +170,7 @@
     </header>
     <div class="projects">
       <article class="project card" id="metalvisualkit">
-        <div class="project__media media--device" data-vt="metalvisualkit"><span class="media__note">iOS Simulator</span><div class="device"><img src="/work/metalvisualkit-480.webp" srcset="/work/metalvisualkit-360.webp 360w, /work/metalvisualkit-480.webp 480w, /work/metalvisualkit-644.webp 644w" sizes="(min-width: 760px) 12.5rem, 9.5rem" width="644" height="1400" alt="MetalVisualKit's particle loader at 68 percent in the iOS Simulator: a ring of about 1 400 particles on a dark background with the percentage in the centre" loading="lazy" decoding="async"></div></div>
+        <div class="project__media media--device" data-vt="metalvisualkit"><span class="media__note">iOS Simulator</span><div class="device"><img src="/work/metalvisualkit-480.webp" srcset="/work/metalvisualkit-360.webp 360w, /work/metalvisualkit-480.webp 480w, /work/metalvisualkit-644.webp 644w" sizes="(min-width: 760px) 12.5rem, 9.5rem" width="644" height="1400" alt="MetalVisualKit's particle loader at 68 percent in the iOS Simulator: a ring of about 1&#160;400 particles on a dark background with the percentage in the centre" loading="lazy" decoding="async"></div></div>
         <div class="project__body">
           <p class="project__meta"><span class="status status--live">Open source</span><span class="num">No. 01</span></p>
           <h3><a href="/work/metalvisualkit.html">MetalVisualKit</a></h3>
@@ -186,7 +192,7 @@
         </div>
       </article>
       <article class="project card" id="subtl">
-        <div class="project__media media--flow" data-vt="subtl"><span class="media__note">Diagram</span><ol class="flow" aria-label="Subtl architecture"><li><span class="node"><b>SpeechAnalyzer</b><small>on-device · no upload</small></span></li><li><span class="node"><b>Transcript</b><small>timed words · actor-isolated</small></span></li><li><span class="node node--key"><b>CaptionStyle</b><small>single source of truth</small></span></li><li class="fork"><span class="node"><b>Preview</b><small>SwiftUI · Core Animation</small></span><span class="node"><b>Export</b><small>AVFoundation</small></span></li></ol><p class="flow__note">same frames in preview and export</p></div>
+        <div class="project__media media--flow" data-vt="subtl"><span class="media__note">Diagram</span><ol class="flow" aria-label="Subtl architecture"><li><span class="node"><b>SpeechAnalyzer</b><small>on-device · no upload</small></span></li><li><span class="node"><b>Transcript</b><small>timed words · actor-isolated</small></span></li><li><span class="node node--key"><b>CaptionStyle</b><small>single source of truth</small></span></li><li class="fork"><span class="node"><b>Preview</b><small>SwiftUI</small></span><span class="node"><b>Export</b><small>AVFoundation · Core Animation</small></span></li></ol><p class="flow__note">one style model · deterministic export</p></div>
         <div class="project__body">
           <p class="project__meta"><span class="status status--warn">In development</span><span class="num">No. 03</span></p>
           <h3><a href="/work/subtl.html">Subtl</a></h3>
@@ -197,11 +203,11 @@
         </div>
       </article>
       <article class="project card" id="prism-spatial">
-        <div class="project__media media--flow" data-vt="prism-spatial"><span class="media__note">Diagram</span><ol class="flow" aria-label="Prism Spatial rendering path"><li><span class="node"><b>PLY capture</b><small>Gaussian splats</small></span></li><li><span class="node"><b>Parse · sort by depth</b><small>on the CPU, per frame</small></span></li><li><span class="node node--key"><b>Metal renderer</b><small>custom path · not RealityKit</small></span></li><li><span class="node"><b>Display</b><small>CAMetalLayer</small></span></li></ol><p class="flow__note flow__note--muted">RealityKit was tried first and set aside</p></div>
+        <div class="project__media media--flow" data-vt="prism-spatial"><span class="media__note">Diagram</span><ol class="flow" aria-label="Prism Spatial rendering path"><li><span class="node"><b>PLY capture</b><small>Gaussian-splat data</small></span></li><li><span class="node node--key"><b>Metal renderer</b><small>projection + drawing · custom path</small></span></li><li><span class="node"><b>Presentation</b><small>depth · tilt-shift · grading</small></span></li></ol><p class="flow__note flow__note--muted">RealityKit evaluated, then a custom path</p></div>
         <div class="project__body">
           <p class="project__meta"><span class="status">Experimental</span><span class="num">No. 04</span></p>
           <h3><a href="/work/prism-spatial.html">Prism Spatial</a></h3>
-          <p class="project__deck">Rendering research into Gaussian splats, with a custom Metal path where RealityKit got in the way.</p>
+          <p class="project__deck">Rendering research into Gaussian splats, with a custom Metal path where the framework abstractions became the constraint.</p>
           <blockquote class="quote"><p>When the framework becomes the constraint, rescope: a custom Metal path.</p></blockquote>
           <ul class="tags" aria-label="Stack"><li>Metal</li><li>ARKit</li><li>LiDAR</li><li>Gaussian splats</li></ul>
           <p class="project__links"><span class="text-link" aria-hidden="true">Case study <svg aria-hidden="true"><use href="#i-arrow"/></svg></span></p>
@@ -247,8 +253,8 @@
     <div class="edu reveal">
       <h3 class="label">Education</h3>
       <ol class="timeline">
-        <li><p class="when label">Aug 2024 – May 2026</p><div><h3>Java Developer — Backend &amp; Web Development, YH</h3><p class="org"><b>Grit Academy</b> · Malmö · Java, Spring Boot, JPA, SQL, REST APIs; internship (LIA) at Axis Communications</p></div></li>
-        <li><p class="when label">Sep 2022 – Dec 2023</p><div><h3>iPhone &amp; Android Application Development, YH</h3><p class="org"><b>Malmö Yrkeshögskola</b> · Swift, Kotlin, mobile development and UX, with coursework in on-device ML, testing and digital accessibility</p></div></li>
+        <li><p class="when label">Aug 2024 – May 2026</p><div><h4>Java Developer — Backend &amp; Web Development, YH</h4><p class="org"><b>Grit Academy</b> · Malmö · Java, Spring Boot, JPA, SQL, REST APIs; internship (LIA) at Axis Communications</p></div></li>
+        <li><p class="when label">Sep 2022 – Dec 2023</p><div><h4>iPhone &amp; Android Application Development, YH</h4><p class="org"><b>Malmö Yrkeshögskola</b> · Swift, Kotlin, mobile development and UX, with coursework in on-device ML, testing and digital accessibility</p></div></li>
       </ol>
     </div>
   </div>
@@ -316,7 +322,7 @@
   <div class="shell footer__inner">
     <div>
       <a class="brand" href="/" aria-label="Anton Smedberg — home"><svg aria-hidden="true"><use href="#mark"/></svg><span>Anton Smedberg</span></a>
-      <p class="colophon">Set in Instrument Serif, Instrument Sans and IBM Plex Mono, all self-hosted. No analytics, no CDN, no framework. The portrait is drawn in Canvas 2D from a depth map baked by a Python script; the depth cloud is raw WebGL, loaded only when asked for. <b>Updated <span data-stamp="build">2026-10-21</span></b> · <span data-stamp="requests">11</span> requests · <span data-stamp="weight">224 KB</span> on a phone.</p>
+      <p class="colophon">Set in Instrument Serif, Instrument Sans and IBM Plex Mono, all self-hosted. No analytics, no CDN, no framework. The portrait is drawn in Canvas 2D from a depth map baked by a Python script; the depth cloud is raw WebGL, loaded only when asked for. <b>Updated <span data-stamp="build">2026-10-21</span></b> · <span data-stamp="requests">12</span> requests · <span data-stamp="weight">300 KB</span> on a phone.</p>
     </div>
     <div class="footer__links">
       <a href="mailto:anton@smedberg.eu">anton@smedberg.eu</a>

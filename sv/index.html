@@ -34,6 +34,11 @@
 <meta name="twitter:image" content="https://antonsmedberg.github.io/assets/img/og-image.png">
 <link rel="preload" href="/assets/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-sans-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/instrument-serif-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="modulepreload" href="/assets/js/main.js">
+<link rel="modulepreload" href="/assets/js/stipple.js">
+<link rel="preload" href="/assets/img/portrait-300.webp" as="image">
+<link rel="preload" href="/assets/img/portrait-depth.webp" as="image">
 <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="stylesheet" href="/assets/css/style.css">
 <script type="application/ld+json">
@@ -102,7 +107,7 @@
     </nav>
     <div class="tools">
       <span class="lang"><span aria-current="page">SV</span><span aria-hidden="true">/</span><a href="/" hreflang="en" lang="en" aria-label="English">EN</a></span>
-      <button class="theme" type="button" data-theme-toggle data-state="auto" aria-label="Tema: följer systemet. Byt till ljust"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+      <button class="theme" type="button" data-theme-toggle aria-label="Tema: följer systemet. Byt till ljust"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
       <a class="btn btn--sm" href="/sv/cv/"><svg aria-hidden="true"><use href="#i-doc"/></svg>CV</a>
     </div>
   </div>
@@ -127,7 +132,7 @@
     <figure class="fig fig--0" data-portrait data-mode="loading" data-sampler="/assets/img/portrait-300.webp" data-depth="/assets/img/portrait-depth.webp" aria-label="Porträtt av Anton Smedberg">
       <div class="plate plate--0">
         <canvas data-stipple aria-hidden="true"></canvas>
-        <img data-photo src="/assets/img/portrait-600.webp" srcset="/assets/img/portrait-600.webp 600w, /assets/img/portrait.webp 840w" sizes="(min-width: 900px) 30rem, calc(100vw - 2rem)" width="600" height="750" alt="" loading="lazy" decoding="async">
+        <img data-photo draggable="false" src="/assets/img/portrait-600.webp" srcset="/assets/img/portrait-600.webp 600w, /assets/img/portrait.webp 840w" sizes="(min-width: 900px) 30rem, calc(100vw - 2rem)" width="600" height="750" alt="" loading="lazy" decoding="async">
         <div data-cloud aria-hidden="true"><canvas></canvas><p class="hud"><b data-kept>—</b> av <span data-total>128&#160;000</span> punkter</p></div>
         <button class="rescan" type="button" data-rescan>Skanna igen</button>
         <div class="seg seg--float" role="group" aria-label="Fig. 0, rendering">
@@ -141,6 +146,7 @@
           <span data-caption-photo hidden><b>Fig. 0</b> — Fotografiet, oredigerat. Studiotagning, frilagd och beskuren av ett Python-skript.</span>
           <span data-caption-cloud hidden><b>Fig. 0</b> — <span data-kept>—</span> av 128&#160;000 gitterpunkter som djupkartans detaljkanal behöll. Rå WebGL, ritas på begäran.</span>
           <span data-cloud-lost hidden> Djupmolnet går inte att visa på den här enheten.</span>
+          <span data-cloud-stopped hidden> Djupmolnet stannade; välj Djupmoln för att starta det igen.</span>
         </figcaption>
     </figure>
   </div>
@@ -186,7 +192,7 @@
         </div>
       </article>
       <article class="project card" id="subtl">
-        <div class="project__media media--flow" data-vt="subtl"><span class="media__note">Diagram</span><ol class="flow" aria-label="Subtls arkitektur"><li><span class="node"><b>SpeechAnalyzer</b><small>på enheten · ingen uppladdning</small></span></li><li><span class="node"><b>Transkription</b><small>tidsatta ord · actor-isolerad</small></span></li><li><span class="node node--key"><b>CaptionStyle</b><small>en enda källa</small></span></li><li class="fork"><span class="node"><b>Förhandsvisning</b><small>SwiftUI · Core Animation</small></span><span class="node"><b>Export</b><small>AVFoundation</small></span></li></ol><p class="flow__note">samma bildrutor i förhandsvisning och export</p></div>
+        <div class="project__media media--flow" data-vt="subtl"><span class="media__note">Diagram</span><ol class="flow" aria-label="Subtls arkitektur"><li><span class="node"><b>SpeechAnalyzer</b><small>på enheten · ingen uppladdning</small></span></li><li><span class="node"><b>Transkription</b><small>tidsatta ord · actor-isolerad</small></span></li><li><span class="node node--key"><b>CaptionStyle</b><small>en enda källa</small></span></li><li class="fork"><span class="node"><b>Förhandsvisning</b><small>SwiftUI</small></span><span class="node"><b>Export</b><small>AVFoundation · Core Animation</small></span></li></ol><p class="flow__note">en stilmodell · deterministisk export</p></div>
         <div class="project__body">
           <p class="project__meta"><span class="status status--warn">Under utveckling</span><span class="num">Nr 03</span></p>
           <h3><a href="/work/subtl.html" hreflang="en">Subtl<span class="visually-hidden"> (på engelska)</span></a></h3>
@@ -197,11 +203,11 @@
         </div>
       </article>
       <article class="project card" id="prism-spatial">
-        <div class="project__media media--flow" data-vt="prism-spatial"><span class="media__note">Diagram</span><ol class="flow" aria-label="Prism Spatials renderingsväg"><li><span class="node"><b>PLY-fångst</b><small>Gaussian splats</small></span></li><li><span class="node"><b>Tolka · djupsortera</b><small>på CPU:n, per bildruta</small></span></li><li><span class="node node--key"><b>Metal-renderare</b><small>egen väg · inte RealityKit</small></span></li><li><span class="node"><b>Skärm</b><small>CAMetalLayer</small></span></li></ol><p class="flow__note flow__note--muted">RealityKit prövades först och lades åt sidan</p></div>
+        <div class="project__media media--flow" data-vt="prism-spatial"><span class="media__note">Diagram</span><ol class="flow" aria-label="Prism Spatials renderingsväg"><li><span class="node"><b>PLY-fångst</b><small>Gaussian splat-data</small></span></li><li><span class="node node--key"><b>Metal-renderare</b><small>projektion + ritning · egen väg</small></span></li><li><span class="node"><b>Presentation</b><small>djup · tilt-shift · färgsättning</small></span></li></ol><p class="flow__note flow__note--muted">RealityKit utvärderades, sedan en egen väg</p></div>
         <div class="project__body">
           <p class="project__meta"><span class="status">Experimentellt</span><span class="num">Nr 04</span></p>
           <h3><a href="/work/prism-spatial.html" hreflang="en">Prism Spatial<span class="visually-hidden"> (på engelska)</span></a></h3>
-          <p class="project__deck">Renderingsexperiment med Gaussian splats, med en egen Metal-väg där RealityKit kom i vägen.</p>
+          <p class="project__deck">Renderingsexperiment med Gaussian splats, med en egen Metal-väg där ramverkens abstraktioner blev begränsningen.</p>
           <blockquote class="quote"><p>När ramverket blir begränsningen, byt väg: en egen Metal-väg.</p></blockquote>
           <ul class="tags" aria-label="Teknik"><li>Metal</li><li>ARKit</li><li>LiDAR</li><li>Gaussian splats</li></ul>
           <p class="project__links"><span class="text-link" aria-hidden="true">Fallstudie <svg aria-hidden="true"><use href="#i-arrow"/></svg></span></p>
@@ -247,8 +253,8 @@
     <div class="edu reveal">
       <h3 class="label">Utbildning</h3>
       <ol class="timeline">
-        <li><p class="when label">aug 2024 – maj 2026</p><div><h3>Javautvecklare — backend- &amp; webbutveckling, YH</h3><p class="org"><b>Grit Academy</b> · Malmö · Java, Spring Boot, JPA, SQL, REST-API:er; LIA på Axis Communications</p></div></li>
-        <li><p class="when label">sep 2022 – dec 2023</p><div><h3>Apputveckling för iPhone &amp; Android, YH</h3><p class="org"><b>Malmö Yrkeshögskola</b> · Swift, Kotlin, mobilutveckling och UX, med kurser i on-device-ML, testning och digital tillgänglighet</p></div></li>
+        <li><p class="when label">aug 2024 – maj 2026</p><div><h4>Javautvecklare — backend- och webbutveckling, YH</h4><p class="org"><b>Grit Academy</b> · Malmö · Java, Spring Boot, JPA, SQL, REST-API:er; LIA på Axis Communications</p></div></li>
+        <li><p class="when label">sep 2022 – dec 2023</p><div><h4>Programmerare iPhone och Android, YH</h4><p class="org"><b>Malmö Yrkeshögskola</b> · Swift, Kotlin, mobilutveckling och UX, med kurser i on-device-ML, testning och digital tillgänglighet</p></div></li>
       </ol>
     </div>
   </div>
@@ -316,7 +322,7 @@
   <div class="shell footer__inner">
     <div>
       <a class="brand" href="/sv/" aria-label="Anton Smedberg — startsida"><svg aria-hidden="true"><use href="#mark"/></svg><span>Anton Smedberg</span></a>
-      <p class="colophon">Satt i Instrument Serif, Instrument Sans och IBM Plex Mono, alla självhostade. Ingen besöksstatistik, inget CDN, inget ramverk. Porträttet ritas i Canvas 2D från en djupkarta som ett Python-skript bakat; djupmolnet är rå WebGL och laddas bara på begäran. <b>Uppdaterad <span data-stamp="build">2026-10-21</span></b> · <span data-stamp="requests">11</span> anrop · <span data-stamp="weight">224 KB</span> på en telefon.</p>
+      <p class="colophon">Satt i Instrument Serif, Instrument Sans och IBM Plex Mono, alla självhostade. Ingen besöksstatistik, inget CDN, inget ramverk. Porträttet ritas i Canvas 2D från en djupkarta som ett Python-skript bakat; djupmolnet är rå WebGL och laddas bara på begäran. <b>Uppdaterad <span data-stamp="build">2026-10-21</span></b> · <span data-stamp="requests">12</span> anrop · <span data-stamp="weight">300 KB</span> på en telefon.</p>
     </div>
     <div class="footer__links">
       <a href="mailto:anton@smedberg.eu">anton@smedberg.eu</a>

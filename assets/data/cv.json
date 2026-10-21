@@ -90,7 +90,7 @@
         "status": "Public repo",
         "url": "https://github.com/antonsmedberg/DeviceMonitor",
         "stack": "Swift 6 · SwiftUI · SwiftData · XCTest · XCUITest · GitHub Actions",
-        "summary": "Degree project: a network-device dashboard with status history, filtering and search. Service, storage and view-model layers behind protocols, actor-safe SwiftData persistence under Swift 6 strict concurrency, 6 unit and 2 UI tests in GitHub Actions. iOS 26.2+."
+        "summary": "Degree project: a network-device dashboard with status history, filtering and search. Service, storage and view-model layers behind protocols, actor-safe SwiftData persistence under Swift 6 strict concurrency, 6 unit tests in GitHub Actions and 2 UI tests. iOS 26.2+."
       },
       {
         "name": "Subtl",
@@ -196,7 +196,7 @@
         "status": "Publikt repo",
         "url": "https://github.com/antonsmedberg/DeviceMonitor",
         "stack": "Swift 6 · SwiftUI · SwiftData · XCTest · XCUITest · GitHub Actions",
-        "summary": "Examensarbete: en översikt över nätverksenheter med statushistorik, filtrering och sökning. Tjänste-, lagrings- och vymodellager bakom protokoll, actor-säker SwiftData-persistens under strikt Swift 6-concurrency, 6 enhetstester och 2 UI-tester i GitHub Actions. iOS 26.2+."
+        "summary": "Examensarbete: en översikt över nätverksenheter med statushistorik, filtrering och sökning. Tjänste-, lagrings- och vymodellager bakom protokoll, actor-säker SwiftData-persistens under strikt Swift 6-concurrency, 6 enhetstester i GitHub Actions och 2 UI-tester. iOS 26.2+."
       },
       {
         "name": "Subtl",
