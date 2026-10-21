@@ -208,12 +208,17 @@ if (fig) {
       if (on) fig.dataset.peek = '';
       else delete fig.dataset.peek;
     };
+    // The rendering control floats on the plate; pointing at it never peeks.
+    const onControl = (e) => Boolean(e.target.closest && e.target.closest('.seg, .rescan'));
     if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      plate.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && fig.dataset.mode === 'stipple') peek(true); });
+      plate.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        peek(fig.dataset.mode === 'stipple' && !onControl(e));
+      }, { passive: true });
       plate.addEventListener('pointerleave', () => peek(false));
     }
     plate.addEventListener('pointerdown', (e) => {
-      if (e.pointerType === 'mouse' || fig.dataset.mode !== 'stipple') return;
+      if (e.pointerType === 'mouse' || fig.dataset.mode !== 'stipple' || onControl(e)) return;
       held = true;
       peek(true);
     });
@@ -264,13 +269,14 @@ if (fig) {
    ------------------------------------------------------------------------- */
 
 document.querySelectorAll('[data-copy]').forEach((button) => {
-  const original = button.textContent;
+  const label = button.querySelector('[data-copy-label]') || button;
+  const original = label.textContent;
   button.hidden = !navigator.clipboard;
   button.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(button.dataset.copy);
-      button.textContent = button.dataset.copied || 'Copied';
-      setTimeout(() => { button.textContent = original; }, 1600);
+      label.textContent = button.dataset.copied || 'Copied';
+      setTimeout(() => { label.textContent = original; }, 1600);
     } catch (e) { /* the address is also plain text beside the button */ }
   });
 });

@@ -127,29 +127,40 @@ nothing.
 
 ## Decisions I'd defend
 
-- **Figures say what they are.** Every figure is numbered and captioned:
-  "Unedited iOS Simulator capture, 644×1400", "Diagram, not a screenshot."
-  Two projects have real captures; the two that are not finished are drawn
-  as architecture diagrams instead of mock screens.
+- **Content on cards, navigation on glass.** Projects, the at-a-glance numbers
+  and the skills sheet sit on cards with soft corners; only the masthead and
+  the phone tab bar are translucent, because they are the only things that
+  float over content. That is the rule Apple gives for Liquid Glass in
+  iOS 26, and it keeps the page calm.
+- **It should feel like the platform it is about.** Buttons are capsules,
+  EN/SV and Fig. 0's renderings are segmented controls drawn the way iOS
+  draws them, the phone navigation is a floating tab bar with icons, and the
+  logo is an app icon: a continuous-corner tile with an A whose crossbar is a
+  red rule running past the letter.
+- **Figures say what they are.** Real captures are labelled as captures, the
+  two unfinished projects are drawn as architecture diagrams instead of mock
+  screens, and the diagrams are real text in real boxes so they reflow on a
+  phone instead of shrinking to unreadable.
 - **Numbers are counted, not typed.** The test count carries the commit hash
   it was counted at, and the footer's request count and page weight are
   measured from disk by `tools/stamp.py`. If a number goes stale, the stamp
   moves it.
-- **Motion only on request.** The stipple draws itself once; text blocks fade
-  in as they scroll into view; that is all that moves on its own. The depth
-  cloud runs only when asked for, stops after one sweep, and animates again
-  only on Rescan. Nothing loops, and `prefers-reduced-motion` turns all of
-  it off: one-frame stipple, no transitions, no pointer response.
+- **Motion only where it means something.** The stipple draws itself once;
+  text blocks fade in as they scroll into view; cards lift on hover; between
+  pages a project's figure morphs into its case study (cross-document view
+  transitions, Chrome 126+ and Safari 18.2+, a plain navigation elsewhere).
+  The depth cloud runs only when asked for and stops after one sweep.
+  `prefers-reduced-motion` turns all of it off.
 - **Light and dark from the system, with a toggle.** `color-scheme: light dark`,
   the dark tokens under `prefers-color-scheme`, and an inline script that
-  applies a stored choice before first paint so nothing flashes. Dark is the
-  paper negative: the same stipple dots, cream on near-black.
+  applies a stored choice before first paint so nothing flashes. In dark the
+  logo tile inverts so it never disappears into the page.
 - **Contrast is measured, not eyeballed.** With the shipped tokens, body ink
-  on paper is 16.6:1, secondary text 8.3:1, captions and labels 5.1:1 in
-  light and 5.6:1 in dark. The accent carries text only in the large cover
-  line (4.7:1 light, 7.6:1 dark); links and citations use the darker
-  `--accent-ink` (5.4:1 light, 8.2:1 dark). Everything that is text clears
-  WCAG AA in both themes.
+  is 16.7:1 on the page and 18.5:1 on cards, secondary text 8.4:1, captions
+  and labels 5.2:1 (5.8:1 on cards) in light and 5.8:1 in dark. The accent
+  carries text only in the large cover line (4.8:1 light, 7.8:1 dark); links
+  use the darker `--accent-ink` (5.4:1 light, 8.4:1 dark); status chips are
+  5.4:1 or better. Everything that is text clears WCAG AA in both themes.
 - **Nothing third-party.** No CDN, no analytics, no Google Fonts. The four
   font files are vendored. The footer's "n requests · n KB" line is the
   measured first view of the home page, stamped at build time.

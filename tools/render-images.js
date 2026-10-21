@@ -3,8 +3,8 @@
 // Chromium from the SVG mark and the OG template so they use the same
 // drawing, the same fonts and the same stipple as the pages.
 //
-//   assets/img/favicon-32.png        favicon.svg at 32×32 (paper tile, rounded)
-//   assets/img/apple-touch-icon.png  the same drawing on a full-bleed paper
+//   assets/img/favicon-32.png        favicon.svg at 32×32 (ink app-icon tile, rounded)
+//   assets/img/apple-touch-icon.png  the same drawing on a full-bleed ink
 //                                    square, 180×180, no rounding (iOS masks it)
 //   assets/img/og-image.png          tools/og.html at 1200×630, ≤ 120 KB
 //
@@ -51,7 +51,7 @@ function serve(root) {
 }
 
 // An HTML page holding the favicon drawing at `size` px. `square` drops the
-// rounded corners so the paper fills the bitmap.
+// rounded corners so the ink tile fills the bitmap.
 function iconPage(svg, size, square) {
   const drawing = (square ? svg.replace(/ rx="[^"]*"/, '') : svg)
     .replace('<svg ', `<svg width="${size}" height="${size}" `);
