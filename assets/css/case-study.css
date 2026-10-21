@@ -72,7 +72,19 @@
 
 .fig--404 { width: 100%; max-width: 22rem; }
 
-.ghost { width: 100%; aspect-ratio: 4 / 5; border: 1px dashed var(--rule-strong); }
+.ghost {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border: 1.5px dashed var(--rule-strong);
+  border-radius: var(--r-md);
+  color: var(--ink-3);
+  font: italic 400 clamp(4.5rem, 16vw, 7rem) / 1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 760px) { .ghost { aspect-ratio: 4 / 5; } }
 
 @media (hover: hover) {
   .breadcrumb a:hover,

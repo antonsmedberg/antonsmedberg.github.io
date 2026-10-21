@@ -4,8 +4,6 @@
 // stipple, the photograph on request, and the depth cloud loaded on request)
 // and the copy-address button.
 
-import { sample, computeDots, paintDots, fitCanvas } from './stipple.js';
-
 const root = document.documentElement;
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -157,6 +155,7 @@ if (fig) {
   const photoURL = fig.dataset.sampler;
   const depthURL = fig.dataset.depth;
 
+  let stipple = null;
   let dots = null;
   let cloud = null;
   let cloudLoading = null;
@@ -164,8 +163,8 @@ if (fig) {
   const ink = () => getComputedStyle(root).getPropertyValue('--ink').trim();
 
   const paint = (progress = 1) => {
-    if (!dots || !fitCanvas(canvas)) return;
-    paintDots(canvas, dots, ink(), progress);
+    if (!dots || !stipple.fitCanvas(canvas)) return;
+    stipple.paintDots(canvas, dots, ink(), progress);
   };
 
   const groupDigits = (n) => n.toLocaleString('en-GB').replace(/,/g, ' ');
@@ -182,10 +181,16 @@ if (fig) {
     } else if (cloud) cloud.pause();
   };
 
-  // a) The stipple: computed once, drawn top to bottom over 1.1 s.
-  sample(photoURL, depthURL)
+  // a) The stipple: computed once, drawn top to bottom over 1.1 s. The
+  //    module is imported here, so pages without Fig. 0 never fetch it; the
+  //    home pages modulepreload it.
+  import('./stipple.js')
+    .then((module) => {
+      stipple = module;
+      return stipple.sample(photoURL, depthURL);
+    })
     .then((data) => {
-      dots = computeDots(data);
+      dots = stipple.computeDots(data);
       if (countEl) countEl.textContent = groupDigits(dots.length / 3);
       if (fig.dataset.mode === 'loading') fig.dataset.mode = 'stipple';
       if (reduceMotion.matches) {

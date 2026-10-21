@@ -31,9 +31,10 @@ PAGES = ["index.html", "sv/index.html", "work/*.html", "cv/index.html", "sv/cv/i
 
 # What a first view of index.html fetches on a phone: the page, its
 # stylesheet, the two modules, the four fonts, the two images the stipple
-# samples, the photograph (a 2x or 3x screen picks the 840 px file) and the
-# favicon. The project captures further down and the depth cloud, which loads
-# only when asked for, are not here.
+# samples, the photograph (a 2x or 3x screen picks the 840 px file), the two
+# project captures (lazy, but within the browser's lazy-load distance, so
+# they load before any scroll; a 3x screen picks the 480 px files) and the
+# favicon. The depth cloud, which loads only when asked for, is not here.
 FIRST_VIEW = [
     "index.html",
     "assets/css/style.css",
@@ -46,6 +47,8 @@ FIRST_VIEW = [
     "assets/img/portrait-300.webp",
     "assets/img/portrait-depth.webp",
     "assets/img/portrait.webp",
+    "work/metalvisualkit-480.webp",
+    "work/devicemonitor-480.webp",
     "assets/img/favicon.svg",
 ]
 
