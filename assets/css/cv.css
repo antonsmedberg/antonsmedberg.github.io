@@ -1,0 +1,70 @@
+/* CV page; print = A4 PDF. Layers on style.css. */
+.cv{padding-block:clamp(2rem,5vw,4rem) clamp(2.5rem,6vw,5rem)}
+.cv__head{padding-bottom:1.5rem;border-bottom:1px solid var(--rule-strong)}
+.cv__name{margin-top:.6rem;font:400 var(--t-h2)/1.04 var(--font-display);letter-spacing:-.02em}
+.cv__role{max-width:48ch}
+.cv__contact{margin-top:.6rem;color:var(--ink-2);font:400 var(--t-caption)/1.7 var(--font-mono)}
+.cv__contact+.cv__contact{margin-top:0}
+.cv__contact span{display:inline-block;overflow-wrap:anywhere}
+.cv__contact a{display:inline-block;padding-block:.35rem;margin-block:-.35rem}
+.cv__contact span::after{content:"·";margin-inline:.5rem;color:var(--ink-3)}
+.cv__contact span:last-child::after{content:none}
+.cv__contact a,.cv__row h3 a{text-decoration:underline var(--rule);text-underline-offset:.3em}
+.cv .actions{margin-top:1.5rem}
+.cv__section{padding-top:clamp(1.5rem,3vw,2.25rem)}
+.cv__section>h2{padding-bottom:.5rem;border-bottom:1px solid var(--rule-strong)}
+.cv__text{padding-block:1rem;max-width:66ch;color:var(--ink-2)}
+.cv__row{display:grid;grid-template-columns:minmax(0,1fr);gap:.3rem 2rem;padding-block:1rem;border-bottom:1px solid var(--rule)}
+.cv__row:last-child{border-bottom:0}
+.cv__key{font-size:var(--t-small);font-weight:500;line-height:1.6}
+.cv__row h3{font-size:var(--t-body);font-weight:600;line-height:1.45}
+.cv__org{margin-top:.15rem;line-height:1.5}
+.cv__stack{margin-top:.3rem;max-width:none;color:var(--ink-3);font:400 var(--t-caption)/1.6 var(--font-mono)}
+.cv__row ul,.cv__p,.cv__org{max-width:66ch;color:var(--ink-2)}
+.cv__row ul,.cv__p{margin-top:.5rem}
+.cv__row ul{display:grid;gap:.3rem}
+.cv__row li{position:relative;padding-inline-start:1.2rem}
+.cv__row li::before{content:"—";position:absolute;inset-inline-start:0;color:var(--ink-3)}
+.cv__facts{display:grid;margin-top:1.5rem;border-block:1px solid var(--rule-strong)}
+.cv__facts>div{padding:1rem 0;border-bottom:1px solid var(--rule)}
+.cv__facts>div:last-child{border-bottom:0}
+.cv__facts dt{margin-bottom:.35rem}
+.cv__meta{margin-top:2rem}
+@media (min-width:760px){
+.cv__row{grid-template-columns:minmax(var(--margin-col),9rem) minmax(0,1fr)}
+.cv__facts{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 1.25rem}
+.cv__facts>div{padding:1.25rem 0;border-bottom:0}
+.cv__facts>div+div{padding-inline-start:1.25rem;border-inline-start:1px solid var(--rule)}
+}
+/* A4, one page per language. */
+@media print{
+@page{size:A4;margin:11mm 13mm}
+:root,:root[data-theme]{color-scheme:light;--paper:#fff;--ink:#000;--ink-2:#000;--ink-3:#000;--rule:#999;--rule-strong:#000}
+body{padding:0;font:400 8.5pt/1.27 var(--font-text)}
+.footer,.cv .actions,.cv__kicker,.cv__meta,.cv__facts dt{display:none!important}
+.cv{max-width:none;padding:0}
+.cv a,.cv__row h3 a{text-decoration:none}
+.cv a::after{content:none!important}
+.cv__head{padding-bottom:2mm;border-bottom:0}
+.cv__name{margin:0;padding-bottom:1.5mm;border-bottom:1pt solid #c33a1c;font-size:28pt;line-height:1}
+.cv__role{margin-top:1.5mm;max-width:none;font-size:10.5pt}
+.cv__contact{margin-top:1mm;font-size:8pt;line-height:1.4}
+.cv__section{padding-top:1.8mm}
+.label{font-size:7.5pt}
+.cv__section>h2{padding-bottom:.6mm;border-bottom:.5pt solid #000}
+.cv__text{padding-block:1mm;max-width:none}
+.cv__row{grid-template-columns:28mm minmax(0,1fr);gap:0 3mm;padding-block:.5mm;border-bottom:.5pt solid #999}
+.when,.cv__key{font-size:8pt;line-height:1.4}
+.cv__row h3,.cv__org,.cv__stack{display:inline;margin:0;font-size:8.5pt;line-height:1.27}
+.cv__row h3{font:400 11.5pt/1 var(--font-display)}
+.cv__key,.cv__org b{font-weight:400}
+.cv__org::before,.cv__stack::before{content:" — "}
+.cv__stack{font-size:8pt}
+.cv__row ul,.cv__row p{max-width:none}
+.cv__row ul,.cv__p{margin-top:.3mm}
+.cv__row ul{gap:0}
+.cv__facts{display:block;margin-top:1.2mm;padding:1mm 0;border-block:.5pt solid #000;font:400 8pt/1.4 var(--font-mono)}
+.cv__facts::before{content:attr(aria-label);margin-inline-end:3mm;font-size:7.5pt;letter-spacing:.08em;text-transform:uppercase}
+.cv__facts>div,.cv__facts>div+div,.cv__facts dd{display:inline;margin:0;padding:0;border:0;font:inherit}
+.cv__facts>div+div::before{content:" · "}
+}

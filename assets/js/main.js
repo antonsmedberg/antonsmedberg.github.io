@@ -1,24 +1,120 @@
 // main.js — progressive enhancement only.
-// Content and primary navigation still work if this file never runs.
+// Everything on the page reads and navigates without this file. It adds the
+// theme toggle, the scroll spy, the reveal of text blocks, Fig. 0 (the
+// stipple, the photograph on request, and the depth cloud loaded on request)
+// and the copy-address button.
 
 const root = document.documentElement;
-root.classList.remove('no-js');
-root.classList.add('js');
-
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
+root.classList.remove('no-js');
+
 /* -------------------------------------------------------------------------
-   Reveal on scroll
+   Theme: Auto → Light → Dark → Auto. The inline <head> script applied the
+   stored choice before first paint; this wires the button.
    ------------------------------------------------------------------------- */
 
-const revealables = document.querySelectorAll('.reveal');
+const themeButton = document.querySelector('[data-theme-toggle]');
+const themeMetas = [...document.querySelectorAll('meta[name="theme-color"]')];
+const lang = root.lang === 'sv' ? 'sv' : 'en';
 
-if (!revealables.length) {
-  // nothing to do
-} else if (reduceMotion.matches || !('IntersectionObserver' in window)) {
-  revealables.forEach((el) => el.classList.add('is-visible'));
-} else {
-  const revealObserver = new IntersectionObserver(
+const themeLabels = {
+  en: {
+    auto: 'Theme: follows the system. Switch to light',
+    light: 'Theme: light. Switch to dark',
+    dark: 'Theme: dark. Follow the system',
+  },
+  sv: {
+    auto: 'Tema: följer systemet. Byt till ljust',
+    light: 'Tema: ljust. Byt till mörkt',
+    dark: 'Tema: mörkt. Följ systemet',
+  },
+};
+
+function themeState() {
+  const stored = root.dataset.theme;
+  return stored === 'light' || stored === 'dark' ? stored : 'auto';
+}
+
+function syncTheme() {
+  const state = themeState();
+  if (themeButton) {
+    themeButton.setAttribute('aria-label', themeLabels[lang][state]);
+  }
+  // Browser chrome follows the paper colour that is actually in effect.
+  const paper = getComputedStyle(root).getPropertyValue('--paper').trim();
+  themeMetas.forEach((meta) => { meta.content = paper; });
+  document.dispatchEvent(new CustomEvent('themechange', { detail: { state, paper } }));
+}
+
+if (themeButton) {
+  themeButton.addEventListener('click', () => {
+    const next = { auto: 'light', light: 'dark', dark: 'auto' }[themeState()];
+    try {
+      if (next === 'auto') localStorage.removeItem('theme');
+      else localStorage.setItem('theme', next);
+    } catch (e) { /* private mode: the choice lasts for this page */ }
+    if (next === 'auto') delete root.dataset.theme;
+    else root.dataset.theme = next;
+    syncTheme();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+}
+
+syncTheme();
+
+/* -------------------------------------------------------------------------
+   Scroll spy — one observer over the sections, both navigation sets.
+   When no section is in the band (the hero, the footer) nothing is current;
+   at the end of the page the last section is, since it may never reach the
+   band.
+   ------------------------------------------------------------------------- */
+
+const navLinks = [...document.querySelectorAll('.nav a[href^="#"], .folio a[href^="#"]')];
+const sections = [...new Set(navLinks.map((a) => document.getElementById(a.hash.slice(1))).filter(Boolean))];
+
+if (sections.length && 'IntersectionObserver' in window) {
+  const visible = new Map();
+  const last = sections[sections.length - 1];
+  const mark = () => {
+    let current = null;
+    let best = -1;
+    for (const [section, ratio] of visible) {
+      if (ratio > best) { best = ratio; current = section; }
+    }
+    const atEnd = innerHeight + scrollY >= root.scrollHeight - 2;
+    if (atEnd && last.getBoundingClientRect().top < innerHeight) current = last;
+    for (const link of navLinks) {
+      if (current && link.hash === `#${current.id}`) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    }
+  };
+  const spy = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.set(entry.target, entry.intersectionRatio);
+        else visible.delete(entry.target);
+      }
+      mark();
+    },
+    { rootMargin: '-35% 0px -55% 0px', threshold: [0, 0.1, 0.5] }
+  );
+  sections.forEach((section) => spy.observe(section));
+  let spyFrame = 0;
+  addEventListener('scroll', () => {
+    if (!spyFrame) spyFrame = requestAnimationFrame(() => { spyFrame = 0; mark(); });
+  }, { passive: true });
+}
+
+/* -------------------------------------------------------------------------
+   Reveal — text blocks only. The class that hides them is added here, after
+   the observer exists, so a script failure can never hide content.
+   ------------------------------------------------------------------------- */
+
+const revealables = [...document.querySelectorAll('.reveal')];
+
+if (revealables.length && !reduceMotion.matches && 'IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(
     (entries, obs) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
@@ -26,246 +122,189 @@ if (!revealables.length) {
         obs.unobserve(entry.target);
       }
     },
-    { rootMargin: '0px 0px -8% 0px', threshold: 0.06 }
+    { rootMargin: '0px 0px -8% 0px', threshold: 0.05 }
   );
-
-  revealables.forEach((el) => revealObserver.observe(el));
-
-  // Anything already past the viewport on load should not wait for a scroll.
-  addEventListener('load', () => {
-    revealables.forEach((el) => {
-      if (el.getBoundingClientRect().top < innerHeight) el.classList.add('is-visible');
-    });
-  });
+  const fold = innerHeight;
+  root.classList.add('io');
+  for (const el of revealables) {
+    if (el.getBoundingClientRect().top < fold) el.classList.add('is-visible');
+    else observer.observe(el);
+  }
 }
 
 /* -------------------------------------------------------------------------
-   Scroll spy
+   Fig. 0 — one portrait, three renderings from the same depth map.
    ------------------------------------------------------------------------- */
 
-const navLinks = [...document.querySelectorAll('.nav a[href^="#"], .dock a[href^="#"]')];
-const sections = navLinks
-  .map((link) => document.getElementById(link.getAttribute('href').slice(1)))
-  .filter(Boolean);
+const fig = document.querySelector('[data-portrait]');
 
-if (sections.length && 'IntersectionObserver' in window) {
-  const spy = new IntersectionObserver(
-    (entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+if (fig) {
+  const canvas = fig.querySelector('[data-stipple]');
+  const photo = fig.querySelector('[data-photo]');
+  const cloudBox = fig.querySelector('[data-cloud]');
+  const countEl = fig.querySelector('[data-count]');
+  const captions = {
+    stipple: fig.querySelector('[data-caption-stipple]'),
+    photo: fig.querySelector('[data-caption-photo]'),
+    cloud: fig.querySelector('[data-caption-cloud]'),
+  };
+  const buttons = [...fig.querySelectorAll('[data-mode-btn]')];
+  const cloudButton = buttons.find((b) => b.dataset.modeBtn === 'cloud');
+  const lostNote = fig.querySelector('[data-cloud-lost]');
+  const stoppedNote = fig.querySelector('[data-cloud-stopped]');
+  const photoURL = fig.dataset.sampler;
+  const depthURL = fig.dataset.depth;
 
-      if (!visible) return;
+  let stipple = null;
+  let dots = null;
+  let cloud = null;
+  let cloudLoading = null;
 
-      for (const link of navLinks) {
-        if (link.getAttribute('href') === `#${visible.target.id}`) {
-          link.setAttribute('aria-current', 'true');
-        } else {
-          link.removeAttribute('aria-current');
-        }
-      }
-    },
-    { rootMargin: '-38% 0px -52% 0px', threshold: [0, 0.2, 0.5, 0.8] }
-  );
+  const ink = () => getComputedStyle(root).getPropertyValue('--ink').trim();
 
-  sections.forEach((section) => spy.observe(section));
-}
-
-/* -------------------------------------------------------------------------
-   Header state
-   ------------------------------------------------------------------------- */
-
-const masthead = document.querySelector('.masthead');
-
-if (masthead) {
-  const hero = document.querySelector('.hero');
-
-  // The bar floats over a dark hero, then lands on light paper. Switch it at
-  // the boundary rather than at a fixed scroll offset, so it stays correct at
-  // every viewport height.
-  const updateHeader = () => {
-    masthead.dataset.scrolled = String(scrollY > 8);
-
-    // Pages without a dark hero (case studies, 404) always use the light bar.
-    if (!hero) {
-      masthead.dataset.theme = 'light';
-      return;
-    }
-
-    // Hysteresis. Without a dead band the theme flips back and forth while the
-    // hero's bottom edge sits under the bar, which is the flicker.
-    const edge = hero.getBoundingClientRect().bottom - masthead.offsetHeight - 8;
-    const current = masthead.dataset.theme;
-
-    if (current !== 'light' && edge < -24) masthead.dataset.theme = 'light';
-    else if (current !== 'dark' && edge > 24) masthead.dataset.theme = 'dark';
-    else if (!current) masthead.dataset.theme = edge > 0 ? 'dark' : 'light';
-
+  const paint = (progress = 1) => {
+    if (!dots || !stipple.fitCanvas(canvas)) return;
+    stipple.paintDots(canvas, dots, ink(), progress);
   };
 
-  // Auto-hide: retreat on scroll down, return on scroll up. A small threshold
-  // stops trackpad jitter from toggling it, and it always returns near the top.
-  let lastY = scrollY;
-  let intent = 0;
-  let ticking = false;
+  const groupDigits = (n) => n.toLocaleString('en-GB').replace(/,/g, ' ');
 
-  const onScroll = () => {
-    if (ticking) return;
-    ticking = true;
+  const setMode = (mode) => {
+    fig.dataset.mode = mode;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modeBtn === mode)));
+    for (const [key, el] of Object.entries(captions)) {
+      if (el) el.hidden = key !== mode;
+    }
+    if (mode === 'cloud') {
+      if (stoppedNote) stoppedNote.hidden = true;
+      showCloud();
+    } else if (cloud) cloud.pause();
+  };
 
-    requestAnimationFrame(() => {
-      ticking = false;
-      updateHeader();
-
-      const y = Math.max(0, scrollY);
-      const delta = y - lastY;
-
-      // Condense tracks absolute position, so it must update even when the
-      // delta is below the jitter threshold — otherwise a smooth-scroll that
-      // settles gently leaves the bar stuck in its narrow state.
-      masthead.dataset.condensed = String(y > 40);
-
-      if (y <= 40) {
-        masthead.dataset.hidden = 'false';
-        masthead.dataset.condensed = 'false';
-        lastY = y;
+  // a) The stipple: computed once, drawn top to bottom over 1.1 s. The
+  //    module is imported here, so pages without Fig. 0 never fetch it; the
+  //    home pages modulepreload it.
+  import('./stipple.js')
+    .then((module) => {
+      stipple = module;
+      return stipple.sample(photoURL, depthURL);
+    })
+    .then((data) => {
+      dots = stipple.computeDots(data);
+      if (countEl) countEl.textContent = groupDigits(dots.length / 3);
+      if (fig.dataset.mode === 'loading') fig.dataset.mode = 'stipple';
+      if (reduceMotion.matches) {
+        paint(1);
         return;
       }
-
-      // Accumulate intent rather than reacting to every frame: the bar only
-      // moves after a sustained ~90px of travel in one direction, so a nudge
-      // of the trackpad never flips it.
-      if (Math.sign(delta) !== Math.sign(intent)) intent = 0;
-      intent += delta;
-
-      if (intent > 90 && y > 260) {
-        masthead.dataset.hidden = 'true';
-        intent = 0;
-      } else if (intent < -70) {
-        masthead.dataset.hidden = 'false';
-        intent = 0;
-      }
-
-      lastY = y;
+      const started = performance.now();
+      const step = (now) => {
+        const t = Math.min(1, (now - started) / 1100);
+        paint(1 - Math.pow(1 - t, 3));
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    })
+    .catch(() => {
+      // Without the sampler images there is no stipple and no cloud: the
+      // photograph stays, unless the reader has already chosen it.
+      buttons.forEach((b) => { b.disabled = true; });
+      if (fig.dataset.mode === 'loading' || fig.dataset.mode === 'stipple') setMode('photo');
     });
-  };
 
-  updateHeader();
-  masthead.dataset.condensed = String(scrollY > 40);
-  addEventListener('scroll', onScroll, { passive: true });
-}
+  let resizeTimer = 0;
+  addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => paint(1), 120);
+  });
+  document.addEventListener('themechange', () => paint(1));
 
-/* -------------------------------------------------------------------------
-   CV modal
-   ------------------------------------------------------------------------- */
+  // b) The photograph: a persistent state via the control, a temporary peek
+  //    on hover (fine pointers) and press-and-hold (touch).
+  buttons.forEach((b) => b.addEventListener('click', () => setMode(b.dataset.modeBtn)));
 
-const pdfModal = document.getElementById('pdfModal');
-
-if (pdfModal) {
-  const pdfIframe = document.getElementById('pdfIframe');
-  const pdfCloseBtn = document.getElementById('pdfCloseBtn');
-  const pdfDownloadBtn = document.getElementById('pdfDownloadBtn');
-  const pdfFallback = document.getElementById('pdfFallbackDownload');
-  const pdfTitle = document.getElementById('pdfModalTitle');
-
-  let lastFocused = null;
-
-  const focusables = () =>
-    [...pdfModal.querySelectorAll('a[href], button:not([disabled]), iframe')].filter(
-      (el) => el.offsetParent !== null || el === pdfIframe
-    );
-
-  const openModal = (url, title) => {
-    lastFocused = document.activeElement;
-
-    if (pdfIframe) pdfIframe.src = url;
-    if (pdfDownloadBtn) pdfDownloadBtn.href = url;
-    if (pdfFallback) pdfFallback.href = url;
-    if (pdfTitle && title) pdfTitle.textContent = title;
-
-    pdfModal.classList.add('is-open');
-    pdfModal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-
-    requestAnimationFrame(() => pdfCloseBtn?.focus());
-  };
-
-  const closeModal = () => {
-    pdfModal.classList.remove('is-open');
-    pdfModal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-
-    // Release the PDF so it stops consuming memory in the background.
-    if (pdfIframe) pdfIframe.src = 'about:blank';
-
-    if (lastFocused instanceof HTMLElement) lastFocused.focus();
-    lastFocused = null;
-  };
-
-  document.querySelectorAll('.pdf-modal-trigger').forEach((trigger) => {
-    trigger.addEventListener('click', (event) => {
-      const url = trigger.dataset.pdf || trigger.getAttribute('href');
-      if (!url) return;
-
-      // Let modifier-clicks and middle-clicks open the PDF in a new tab.
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
-
-      event.preventDefault();
-      openModal(url, trigger.dataset.title || pdfTitle?.dataset.default || 'CV');
+  const plate = fig.querySelector('.plate');
+  if (plate && photo) {
+    let held = false;
+    const peek = (on) => {
+      if (on) fig.dataset.peek = '';
+      else delete fig.dataset.peek;
+    };
+    // The rendering control floats on the plate; pointing at it never peeks.
+    const onControl = (e) => Boolean(e.target.closest && e.target.closest('.seg, .rescan'));
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      plate.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        peek(fig.dataset.mode === 'stipple' && !onControl(e));
+      }, { passive: true });
+      plate.addEventListener('pointerleave', () => peek(false));
+    }
+    plate.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' || fig.dataset.mode !== 'stipple' || onControl(e)) return;
+      held = true;
+      peek(true);
     });
-  });
+    const release = () => { if (held) { held = false; peek(false); } };
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => plate.addEventListener(type, release));
+    plate.addEventListener('contextmenu', (e) => { if (held) e.preventDefault(); });
+  }
 
-  pdfCloseBtn?.addEventListener('click', closeModal);
+  // c) The depth cloud: raw WebGL, imported the first time it is asked for.
+  function showCloud() {
+    if (cloud) { cloud.resume(); return; }
+    if (cloudLoading) return;
+    cloudLoading = import('./depth-cloud.js')
+      .then((module) => {
+        if (fig.dataset.mode !== 'cloud') return;
+        cloud = module.mount(cloudBox, {
+          depthURL,
+          photoURL,
+          reduceMotion: reduceMotion.matches,
+          onCount: (kept, total) => {
+            fig.querySelectorAll('[data-kept]').forEach((el) => { el.textContent = groupDigits(kept); });
+            fig.querySelectorAll('[data-total]').forEach((el) => { el.textContent = groupDigits(total); });
+          },
+          // The GPU context went away (iOS does this to background tabs).
+          // A lost context cannot be reused, so the next request mounts on
+          // a fresh canvas.
+          onLost: () => {
+            const stopped = cloud;
+            cloud = null;
+            stopped?.destroy();
+            cloudBox.querySelector('canvas')?.replaceWith(document.createElement('canvas'));
+            if (fig.dataset.mode === 'cloud') setMode('stipple');
+            if (stoppedNote) stoppedNote.hidden = false;
+          },
+        });
+        if (!cloud) {
+          setMode('stipple');
+          cloudButton?.setAttribute('disabled', '');
+          if (lostNote) lostNote.hidden = false;
+        }
+      })
+      .catch(() => setMode('stipple'))
+      .finally(() => { cloudLoading = null; });
+  }
 
-  pdfModal.addEventListener('click', (event) => {
-    if (event.target === pdfModal) closeModal();
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (!pdfModal.classList.contains('is-open')) return;
-
-    if (event.key === 'Escape') {
-      closeModal();
-      return;
-    }
-
-    if (event.key !== 'Tab') return;
-
-    const items = focusables();
-    if (!items.length) return;
-
-    const first = items[0];
-    const last = items[items.length - 1];
-
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  });
+  fig.querySelector('[data-rescan]')?.addEventListener('click', () => cloud?.rescan());
 }
 
 /* -------------------------------------------------------------------------
-   Housekeeping
+   Copy the e-mail address (contact section).
    ------------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------------------
-   Dock yields to the footer
-   ------------------------------------------------------------------------- */
-
-const dock = document.querySelector('.dock');
-const footer = document.querySelector('.footer');
-
-if (dock && footer && 'IntersectionObserver' in window) {
-  // Once the footer is on screen the visitor has reached the end, so the dock
-  // has nothing left to navigate to — it steps aside instead of covering it.
-  new IntersectionObserver(
-    ([entry]) => { dock.dataset.stowed = String(entry.isIntersecting); },
-    { rootMargin: '0px 0px -8% 0px', threshold: 0 }
-  ).observe(footer);
-}
+document.querySelectorAll('[data-copy]').forEach((button) => {
+  const label = button.querySelector('[data-copy-label]') || button;
+  const original = label.textContent;
+  button.hidden = !navigator.clipboard;
+  button.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(button.dataset.copy);
+      label.textContent = button.dataset.copied || 'Copied';
+      setTimeout(() => { label.textContent = original; }, 1600);
+    } catch (e) { /* the address is also plain text beside the button */ }
+  });
+});
 
 document.querySelectorAll('[data-year]').forEach((el) => {
   el.textContent = String(new Date().getFullYear());
