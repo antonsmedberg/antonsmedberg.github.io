@@ -1260,6 +1260,16 @@ figcaption b,
   .lang a, .lang span[aria-current] { min-width: 2rem; }
 }
 
+/* Narrow phones: the masthead must hold brand, EN/SV, theme and CV in 343 px. */
+@media (max-width: 419px) {
+  .brand { font-size: 1.125rem; gap: 0.45rem; }
+  .brand svg { width: 1.25rem; height: 1.25rem; }
+  .tools { gap: 0.5rem; }
+  .lang { gap: 0.2rem; }
+  .lang a, .lang span[aria-current] { min-width: 1.6rem; }
+  .tools .btn { padding-inline: 0.6rem; }
+}
+
 /* Landscape phones: the folio would eat a third of the screen. */
 @media (max-height: 420px) and (orientation: landscape) {
   .folio { display: none; }
