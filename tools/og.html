@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>OG image template — rendered by tools/render-images.js</title>
+<style>
+/* The template is served from the repo root, so the fonts and the stipple
+   module are the same files the site ships. Rendered at 1200×630, DPR 1. */
+@font-face { font-family: "Instrument Serif"; src: url("/assets/fonts/instrument-serif-400.woff2") format("woff2"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "Instrument Sans"; src: url("/assets/fonts/instrument-sans-wght.woff2") format("woff2"); font-weight: 400 700; font-style: normal; }
+html, body { margin: 0; background: #F6F1E8; }
+body { position: relative; width: 1200px; height: 630px; overflow: hidden; }
+svg { position: absolute; inset: 0; display: block; }
+/* Right third, x 760–1130. paintDots fits a 4:5 box in the canvas, centred
+   and bottom-aligned, so 370×420 puts a 336×420 figure at x 777, y 180–600. */
+canvas { position: absolute; left: 760px; top: 180px; width: 370px; height: 420px; }
+</style>
+</head>
+<body>
+<svg width="1200" height="630" viewBox="0 0 1200 630" aria-hidden="true">
+  <!-- The masthead mark (#mark in index.html) at 120 px; the nested viewBox
+       clips the apex at the top edge exactly as the page's <use> does. -->
+  <svg x="72" y="72" width="120" height="120" viewBox="0 0 32 32">
+    <path d="M3.5 29 16 3.5 28.5 29" fill="none" stroke="#15120F" stroke-width="5" stroke-linejoin="miter" stroke-miterlimit="6"/>
+    <path d="M0 20.5h32" stroke="#C33A1C" stroke-width="3"/>
+  </svg>
+  <rect x="0" y="236" width="728" height="6" fill="#C33A1C"/>
+  <text x="72" y="330" font-family="Instrument Serif" font-size="96" letter-spacing="-2.4" fill="#15120F">Anton Smedberg</text>
+  <text x="72" y="384" font-family="Instrument Sans" font-weight="500" font-size="32" fill="#4B4640">iOS developer — Malmö, Sweden</text>
+</svg>
+<canvas width="740" height="840"></canvas>
+<script type="module">
+import { sample, computeDots, paintDots } from '/assets/js/stipple.js';
+
+await Promise.all([
+  document.fonts.load('96px "Instrument Serif"'),
+  document.fonts.load('500 32px "Instrument Sans"'),
+]);
+const data = await sample('/assets/img/portrait-300.webp', '/assets/img/portrait-depth.webp');
+const dots = computeDots(data);
+// Backing store at 2× the CSS size: the dots are sub-pixel at 1×.
+paintDots(document.querySelector('canvas'), dots, '#15120F');
+document.documentElement.dataset.ready = String(dots.length / 3);
+</script>
+</body>
+</html>
