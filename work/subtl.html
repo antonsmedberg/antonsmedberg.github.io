@@ -4,93 +4,193 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Subtl — Anton Smedberg</title>
-<meta name="description" content="Privacy-first iOS video captioning project using Swift 6, SpeechAnalyzer and AVFoundation with on-device transcription and shared preview/export styling.">
-<meta name="robots" content="index,follow">
-<meta name="theme-color" content="#0b0710">
+<meta name="description" content="Captioning for short-form video with on-device transcription. One caption-style model drives both the SwiftUI preview and the AVFoundation export. In development; the support site and privacy policy are live.">
+<meta name="author" content="Anton Smedberg">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f1e8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141210">
 <link rel="canonical" href="https://antonsmedberg.github.io/work/subtl.html">
-<link rel="preload" href="/assets/fonts/schibsted-grotesk-wght.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.css">
-<link rel="stylesheet" href="/assets/css/case-study.css">
-<script type="module" src="/assets/js/main.js"></script>
+<link rel="alternate" hreflang="en" href="https://antonsmedberg.github.io/work/subtl.html">
+<link rel="alternate" hreflang="x-default" href="https://antonsmedberg.github.io/work/subtl.html">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Anton Smedberg — iOS Developer">
 <meta property="og:title" content="Subtl — Anton Smedberg">
-<meta property="og:description" content="Privacy-first iOS video captioning project using Swift 6, SpeechAnalyzer and AVFoundation with on-device transcription and shared preview/export styling.">
+<meta property="og:description" content="Captioning for short-form video with on-device transcription. One caption-style model drives both the SwiftUI preview and the AVFoundation export. In development; the support site and privacy policy are live.">
 <meta property="og:url" content="https://antonsmedberg.github.io/work/subtl.html">
 <meta property="og:image" content="https://antonsmedberg.github.io/assets/img/og-image.png">
-<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Anton Smedberg, iOS developer in Malmö, next to a stippled ink portrait.">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Subtl — Anton Smedberg">
-<meta name="twitter:description" content="Privacy-first iOS video captioning project using Swift 6, SpeechAnalyzer and AVFoundation with on-device transcription and shared preview/export styling.">
+<meta name="twitter:description" content="Captioning for short-form video with on-device transcription. One caption-style model drives both the SwiftUI preview and the AVFoundation export. In development; the support site and privacy policy are live.">
 <meta name="twitter:image" content="https://antonsmedberg.github.io/assets/img/og-image.png">
+<link rel="preload" href="/assets/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/instrument-sans-wght.woff2" as="font" type="font/woff2" crossorigin>
+<script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/case-study.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://antonsmedberg.github.io/work/subtl.html#app",
+      "name": "Subtl",
+      "url": "https://antonsmedberg.github.io/work/subtl.html",
+      "description": "Captioning for short-form video with on-device transcription. One caption-style model drives both the preview and the AVFoundation export. In development.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "iOS",
+      "author": {
+        "@type": "Person",
+        "name": "Anton Smedberg",
+        "url": "https://antonsmedberg.github.io/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://antonsmedberg.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://antonsmedberg.github.io/#work"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Subtl",
+          "item": "https://antonsmedberg.github.io/work/subtl.html"
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
-<body class="case-page">
+<body>
 <a class="skip-link" href="#main">Skip to content</a>
-<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
-  <linearGradient id="g-mark" gradientUnits="userSpaceOnUse" x1="4" y1="28" x2="28" y2="4"><stop offset="0" stop-color="#6d4fd6"/><stop offset=".52" stop-color="#d1418c"/><stop offset="1" stop-color="#f0a95c"/></linearGradient>
-  <symbol id="i-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></symbol>
-  <symbol id="i-github" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .7C5.65.7.5 5.85.5 12.2c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.14c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.05 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.22c.98 0 1.96.13 2.88.39 2.19-1.49 3.15-1.18 3.15-1.18.63 1.58.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.27 5.69.42.36.78 1.06.78 2.14v3.16c0 .3.21.66.79.55A11.51 11.51 0 0 0 23.5 12.2C23.5 5.85 18.35.7 12 .7z"/></symbol>
-  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></symbol>
-  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6 18 18"/><path d="M18 6 6 18"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></symbol>
-  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6"/><path d="m11.5 6-6 6 6 6"/></symbol>
-  <symbol id="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 16 16 8"/><path d="M9.5 8H16v6.5"/></symbol>
-  <symbol id="i-linkedin" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM2.9 21.5h4.16V9.5H2.9v12zM9.5 9.5h3.99v1.64h.06c.56-1.05 1.92-2.16 3.95-2.16 4.22 0 5 2.78 5 6.4v6.12h-4.16v-5.43c0-1.29-.02-2.96-1.8-2.96-1.8 0-2.08 1.4-2.08 2.86v5.53H9.5v-12z"/></symbol>
-  <symbol id="i-mark" viewBox="0 0 32 32" fill="none"><path d="M4.8 27.2 13.4 5.6h5.2l8.6 21.6" stroke="url(#g-mark)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.4 19.4h11.2" stroke="url(#g-mark)" stroke-width="2.6" stroke-linecap="round"/></symbol>
+<svg width="0" height="0" aria-hidden="true" focusable="false" class="visually-hidden">
+  <symbol id="mark" viewBox="0 0 32 32"><path d="M3.5 29 16 3.5 28.5 29" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="miter" stroke-miterlimit="6"/><path class="rule" d="M0 20.5h32" stroke="#c33a1c" stroke-width="3"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M9 7h8v8"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6"/><path d="m11.5 6-6 6 6 6"/></symbol>
+  <symbol id="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></symbol>
 </svg>
+
 <header class="masthead">
-  <div class="masthead__inner">
-    <a class="brand" href="/" aria-label="Anton Smedberg"><span class="brand__monogram"><svg aria-hidden="true"><use href="#i-mark"/></svg></span><span class="brand__name">Anton Smedberg</span></a>
-    <span class="language-switch"><span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="/sv/" hreflang="sv">SV</a></span>
+  <div class="shell masthead__inner">
+    <a class="brand" href="/" aria-label="Anton Smedberg — home"><svg aria-hidden="true"><use href="#mark"/></svg><span>Anton Smedberg</span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="/#work">Work</a><a href="/#experience">Experience</a><a href="/#skills">Skills</a><a href="/#about">About</a><a href="/#contact">Contact</a>
+    </nav>
+    <div class="tools">
+      <span class="lang"><span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="/sv/" hreflang="sv" lang="sv" aria-label="Svenska">SV</a></span>
+      <button class="theme" type="button" data-theme-toggle data-state="auto" aria-label="Theme: follows the system. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+      <a class="btn btn--ghost btn--sm" href="/cv/">CV</a>
+    </div>
   </div>
 </header>
-<div class="pdf-modal" id="pdfModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
-  <div class="pdf-modal__inner">
-    <div class="pdf-modal__header">
-      <h2 id="pdfModalTitle" data-default="CV">CV</h2>
-      <div class="pdf-modal__actions">
-        <a id="pdfDownloadBtn" class="btn btn--ghost" href="#" download>Download</a>
-        <button id="pdfCloseBtn" class="btn" type="button">Close</button>
+<nav class="breadcrumb" aria-label="Breadcrumb"><div class="shell"><a href="/#work"><svg aria-hidden="true"><use href="#i-back"/></svg>Work</a></div></nav>
+
+<main id="main" tabindex="-1" class="case">
+  <div class="shell">
+    <header class="case-head">
+      <p class="case-head__num"><span class="label">No. 03</span><span class="status status--warn">In development</span></p>
+      <h1>Subtl</h1>
+      <p class="deck">Captioning for short-form video with transcription on the device, so nothing leaves the phone. Preview and export read the same caption-style model, which is what stops the exported file drifting from what you edited. The support site and privacy policy are live; the app is in development.</p>
+    </header>
+
+    <figure class="fig fig--diagram case-fig">
+      <div class="plate diagram">
+        <svg viewBox="0 0 460 336" role="img" aria-labelledby="subtl-diagram-title subtl-diagram-desc">
+          <title id="subtl-diagram-title">Subtl architecture</title>
+          <desc id="subtl-diagram-desc">SpeechAnalyzer transcribes on the device and feeds a transcript of timed words into one CaptionStyle model, which drives both the SwiftUI preview and the AVFoundation export, so both render the same frames.</desc>
+          <rect class="box" x="140" y="12" width="180" height="48" rx="2"/><text class="t" x="230" y="31" text-anchor="middle">SpeechAnalyzer</text><text class="s" x="230" y="48" text-anchor="middle">on-device · no upload</text>
+          <path class="wire" d="M230 60v24"/><path class="head" d="m225 84 5 6 5-6z"/>
+          <rect class="box" x="140" y="90" width="180" height="48" rx="2"/><text class="t" x="230" y="109" text-anchor="middle">Transcript</text><text class="s" x="230" y="126" text-anchor="middle">timed words · actor-isolated</text>
+          <path class="wire" d="M230 138v24"/><path class="head" d="m225 162 5 6 5-6z"/>
+          <rect class="box box--key" x="130" y="168" width="200" height="54" rx="2"/><text class="k" x="230" y="185" text-anchor="middle">SINGLE SOURCE OF TRUTH</text><text class="t" x="230" y="207" text-anchor="middle">CaptionStyle</text>
+          <path class="wire wire--key" d="M230 222v16H110v16M230 238h120v16"/><path class="head head--key" d="m105 254 5 6 5-6zM345 254l5 6 5-6z"/>
+          <rect class="box" x="20" y="260" width="180" height="48" rx="2"/><text class="t" x="110" y="279" text-anchor="middle">Preview</text><text class="s" x="110" y="296" text-anchor="middle">SwiftUI · Core Animation</text>
+          <rect class="box" x="260" y="260" width="180" height="48" rx="2"/><text class="t" x="350" y="279" text-anchor="middle">Export</text><text class="s" x="350" y="296" text-anchor="middle">AVFoundation · deterministic</text>
+          <path class="wire" d="M110 308v10h240v-10"/><text class="g" x="230" y="331" text-anchor="middle">same frames, frame for frame</text>
+        </svg>
       </div>
+      <figcaption><b>Fig. 3</b> — Preview/export parity: one style model, two renderers. Diagram, not a screenshot.</figcaption>
+    </figure>
+
+    <div class="case-grid">
+      <article class="case-body reveal">
+        <h2>What it does</h2>
+        <p>You choose a video from Photos or Files, and SpeechAnalyzer transcribes the speech on the device into timed words. In the editor you review the words, correct them, split or merge them and adjust their timing, then choose a caption style and set its size and position. Export writes the captioned video to Photos through AVFoundation and offers sharing from the completion screen. Apple's writing tools are optional: existing captions can still be edited and exported without enabling them.</p>
+        <p>Projects stay in local storage. A <code>.subtlproject</code> backup bundles the video, transcript and caption settings into one file you can save and restore; a deleted project sits in Recently Deleted for seven days. There are no accounts, no analytics or tracking SDK, and nothing is uploaded to a developer-operated server. Purchases go through StoreKit&#160;2.</p>
+
+        <h2>The decision</h2>
+        <blockquote class="pull"><p>One caption-style model drives both preview and export, so nothing changes after export.</p></blockquote>
+        <p>A caption editor has two rendering paths that can drift apart: the interactive preview and the exported file. If style, timing and position are implemented twice, the user spends time refining a result that changes after export. So one <code>CaptionStyle</code> model is the single source of truth. The preview renders it with SwiftUI and Core Animation; the export renders the same model through AVFoundation into the video, deterministically, rather than capturing the live view hierarchy. The transcription engine is actor-isolated, so long-running speech work never touches view state directly.</p>
+
+        <h2>What I would do differently</h2>
+        <p>Three of the eight answers in the support FAQ are about storage rather than captions: a save that has not finished, a library that cannot be loaded and must not be overwritten, a backup to restore, a project to recover. If I started again I would treat the project catalogue, with its saving, backup and recovery paths, as a feature with the same weight as the renderer from the first day; the FAQ shows how much of the app it turned out to be.</p>
+
+        <h2>Current state</h2>
+        <p>In development. The support site and the privacy policy, effective 8 October 2026, are live and linked from the specifications. The app processes videos, audio and captions on the device; speech recognition and the optional writing features depend on the device, system version, language and an Apple model download, and the app does not fall back to a cloud model when one is unavailable.</p>
+      </article>
+      <aside class="case-aside reveal" aria-labelledby="spec-title">
+        <h2 id="spec-title" class="label">Specifications</h2>
+        <dl>
+          <div><dt class="label">Platform</dt><dd>iPhone · iPad</dd></div>
+          <div><dt class="label">Language</dt><dd>Swift 6</dd></div>
+          <div><dt class="label">Stack</dt><dd>SpeechAnalyzer · AVFoundation · Core Animation · actors · StoreKit 2</dd></div>
+          <div><dt class="label">Privacy</dt><dd>On-device · no accounts · no analytics</dd></div>
+          <div><dt class="label">Status</dt><dd>In development</dd></div>
+          <div><dt class="label">Support</dt><dd><a href="/subtl/">Support site&#160;<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></dd></div>
+          <div><dt class="label">Policy</dt><dd><a href="/subtl/privacy.html">Privacy policy&#160;<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></dd></div>
+        </dl>
+      </aside>
     </div>
-    <div class="pdf-modal__body">
-      <iframe id="pdfIframe" class="pdf-modal__iframe" title="CV preview" src="about:blank" loading="lazy"></iframe>
-      <a id="pdfFallbackDownload" class="pdf-modal__fallback" href="#" target="_blank" rel="noopener">Open PDF in a new tab</a>
-    </div>
+
+    <nav class="case-nav" aria-label="Case studies">
+      <a href="/work/devicemonitor.html" rel="prev"><span class="label">Previous · No. 02</span><span class="case-nav__title"><svg aria-hidden="true"><use href="#i-back"/></svg>DeviceMonitor</span></a>
+      <a href="/work/prism-spatial.html" rel="next"><span class="label">Next · No. 04</span><span class="case-nav__title">Prism Spatial<svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
+    </nav>
   </div>
-</div>
-<main id="main">
-<section class="section"><div class="shell">
-  <p class="breadcrumbs"><a href="/"><svg aria-hidden="true"><use href="#i-back"/></svg>Back to portfolio</a></p>
-  <header class="case-head reveal"><p class="section-kicker">In development · Personal product</p><h1>Subtl</h1><p class="case-subtitle">Privacy-first captioning for short-form video, built around on-device transcription and a shared rendering model for preview and export.</p></header>
-  <figure class="case-hero reveal"><div class="project-schematic" role="img" aria-label="Subtl architecture"><span class="schematic-label">Preview / export parity</span><div class="schematic-flow"><div class="schematic-node"><strong>SpeechAnalyzer</strong><span>on-device transcript</span></div><span class="schematic-arrow" aria-hidden="true"></span><div class="schematic-node"><strong>CaptionStyle</strong><span>single source of truth</span></div><span class="schematic-arrow" aria-hidden="true"></span><div class="schematic-node"><strong>AVFoundation</strong><span>deterministic export</span></div></div></div></figure>
-  <div class="case-body">
-    <div class="case-main">
-      <h2>The product problem</h2>
-      <p>A caption editor has two rendering paths that can drift apart: the interactive preview and the exported video. If style, timing or positioning are implemented twice, the user can spend time refining a result that changes after export.</p>
-      <h2>Engineering approach</h2>
-      <ul>
-        <li>Use a shared caption-style model as the source of truth for preview and export.</li>
-        <li>Keep transcription work isolated with Swift concurrency instead of tying long-running speech work directly to view state.</li>
-        <li>Use AVFoundation and Core Animation for deterministic export rather than depending on the live SwiftUI hierarchy.</li>
-        <li>Keep transcription on-device and avoid requiring an account or upload pipeline.</li>
-      </ul>
-      <h2>Current state</h2>
-      <p>Subtl is still in development, so I describe the architecture and current constraints without presenting it as a shipped App Store product.</p>
-    </div>
-    <aside class="case-meta">
-      <h3>Stack</h3>
-      <div class="tech-list"><span class="tech">Swift 6</span><span class="tech">SpeechAnalyzer</span><span class="tech">AVFoundation</span><span class="tech">Core Animation</span><span class="tech">Actors</span><span class="tech">StoreKit 2</span></div>
-      <h3>Status</h3>
-      <p>In development</p>
-    </aside>
-  </div>
-</div></section>
 </main>
-<footer class="footer"><div class="shell footer__inner"><span>© <span data-year>2026</span> Anton Smedberg · Malmö</span><div class="footer__links"><a class="pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV.pdf">CV</a><span class="footer__sep">·</span><a href="https://github.com/antonsmedberg" target="_blank" rel="noopener">GitHub</a><span class="footer__sep">·</span><a href="/sv/">Svenska</a></div></div></footer>
-<nav class="dock" aria-label="Sections"><a href="/#work">Work</a><a href="/#experience">Experience</a><a href="/#toolkit">Skills</a><a class="pdf-modal-trigger" href="/assets/cv/Anton-Smedberg-CV.pdf" data-pdf="/assets/cv/Anton-Smedberg-CV.pdf">CV</a><a class="dock__cta" href="mailto:anton@smedberg.eu?subject=iOS%20role%20%E2%80%94%20Anton%20Smedberg">Contact</a></nav>
 
+<footer class="footer">
+  <div class="shell footer__inner">
+    <div>
+      <a class="brand" href="/" aria-label="Anton Smedberg — home"><svg aria-hidden="true"><use href="#mark"/></svg><span>Anton Smedberg</span></a>
+      <p class="colophon">Set in Instrument Serif, Instrument Sans and IBM Plex Mono, all self-hosted. No analytics, no CDN, no framework. <b>Updated <span data-stamp="build">2026-10-21</span></b>.</p>
+    </div>
+    <div class="footer__links">
+      <a href="mailto:anton@smedberg.eu">anton@smedberg.eu</a>
+      <a href="/assets/cv/Anton-Smedberg-CV.pdf">CV (PDF)</a>
+      <a href="https://github.com/antonsmedberg/antonsmedberg.github.io">Source</a>
+      <a href="/sv/" hreflang="sv" lang="sv">Svenska</a>
+      <span>© <span data-year>2026</span> Anton Smedberg · Malmö</span>
+    </div>
+  </div>
+</footer>
 
+<nav class="folio" aria-label="Sections (bottom)">
+  <a href="/#work">Work</a><a href="/cv/">CV</a><a href="/#contact">Contact</a><a href="/work/prism-spatial.html">Next</a>
+</nav>
+
+<script type="module" src="/assets/js/main.js"></script>
 </body>
 </html>
