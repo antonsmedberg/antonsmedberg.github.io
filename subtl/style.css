@@ -1,6 +1,6 @@
 :root { color-scheme: light dark; --canvas:#f0f7fb; --surface:#fafbfc; --ink:#102334; --secondary:#4c6274; --accent:#1b6398; --line:#c5d6e0; --sky:#8ecaf0; }
 * { box-sizing:border-box; }
-html { scroll-behavior:smooth; scroll-padding-top:24px; }
+html { scroll-behavior:smooth; scroll-padding-top:24px; overflow-x:clip; }
 body { margin:0; background:var(--canvas); color:var(--ink); font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; -webkit-text-size-adjust:100%; }
 a { color:var(--accent); text-underline-offset:4px; }
 a:focus-visible, summary:focus-visible { outline:3px solid var(--accent); outline-offset:5px; border-radius:5px; }
@@ -11,7 +11,11 @@ a:focus-visible, summary:focus-visible { outline:3px solid var(--accent); outlin
 .brand { display:flex; align-items:center; gap:10px; font-size:27px; font-weight:650; letter-spacing:-1px; color:var(--ink); text-decoration:none; }
 .brand img { background:#102334; border-radius:14px; }
 .contact-link { display:inline-flex; align-items:center; gap:14px; min-height:44px; font-size:15px; font-weight:600; text-decoration:none; }
-.intro { display:grid; grid-template-columns:1.1fr .9fr; gap:64px; align-items:center; padding:80px 0; }
+.hero { position:relative; display:flex; align-items:center; min-height:clamp(440px,42vw,680px); margin-inline:calc(50% - 50vw); }
+.hero-art img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:right center; }
+.hero .intro-copy { position:relative; width:min(1120px, calc(100% - 80px)); margin-inline:auto; padding-block:48px; }
+.intro { padding:8px 0 80px; }
+.intro .quick-start { max-width:620px; }
 .eyebrow,.step-label { font-size:11px; font-weight:700; letter-spacing:2px; color:var(--accent); }
 h1,h2,h3,p { margin-top:0; }
 h1 { font-size:clamp(44px,5.3vw,68px); line-height:1.08; letter-spacing:-3px; font-weight:650; margin-bottom:24px; }
@@ -59,7 +63,10 @@ footer p a { display:inline; }
   .masthead { padding-block:16px; }
   .brand { font-size:24px; }
   .contact-link { font-size:13px; gap:8px; }
-  .intro { grid-template-columns:1fr; gap:36px; padding:48px 0; }
+  .hero { display:block; min-height:0; margin-inline:0; }
+  .hero-art { display:none; }
+  .hero .intro-copy { width:auto; padding-block:48px 36px; }
+  .intro { padding:0 0 48px; }
   h1 { letter-spacing:-2px; }
   .lead { max-width:100%; }
   .quick-start { padding:26px; }
