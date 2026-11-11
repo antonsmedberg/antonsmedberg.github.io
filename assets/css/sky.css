@@ -1,0 +1,12 @@
+/* What weather.js writes into the almanac, loaded with it once the page has loaded: the hour's symbol,
+   its temperature and its word. A new symbol or figure comes in softly; nothing moves while the sun is
+   held, or for a reader who asks for less motion. */
+.alm__wx svg { width: 1em; height: 1em; flex: none; }
+.alm__wx b { font-weight: inherit; }
+.alm__wx span { overflow: hidden; text-overflow: ellipsis; }
+.alm__wx > * { transition: opacity 0.3s ease; }
+@starting-style { .alm__wx > * { opacity: 0; } }
+.alm.is-held .alm__wx > * { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .alm__wx > * { transition: none; }
+}

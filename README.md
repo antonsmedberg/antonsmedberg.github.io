@@ -1,24 +1,12 @@
 # antonsmedberg.github.io
 
-I'm Anton Smedberg, an iOS developer in Malmö. I write Swift, SwiftUI and
-Swift Concurrency, and I spent five months on the Mobile Apps team at Axis
-Communications in Lund putting changes into an app that real customers use.
-This repository is my portfolio. It's live at
-[antonsmedberg.github.io](https://antonsmedberg.github.io/).
+I'm Anton Smedberg, an iOS developer in Malmö with a focus on UI and UX. This repository is my portfolio, live at [antonsmedberg.github.io](https://antonsmedberg.github.io/).
 
-I'm open to iOS and mobile developer roles in Malmö, Lund and Copenhagen —
-on-site, hybrid or remote. Swedish and English.
-
-**Stack across this site and my projects:** Swift 6 · SwiftUI · UIKit ·
-Swift Concurrency (async/await, actors) · SwiftData · Combine · AVFoundation ·
-Metal · ARKit · RealityKit · SpeechAnalyzer · XCTest · Xcode · Swift Package
-Manager · Instruments · StoreKit 2 · TestFlight · Git · GitHub Actions ·
-Kotlin · Jetpack Compose · Java · Spring Boot · REST · GraphQL
+I'm looking for a first junior role in iOS, Android or Java, in Skåne, Copenhagen or remote. I work in Swedish and English.
 
 ## Running it
 
-Static HTML, CSS and JavaScript. No framework, no build step, no
-`npm install`. GitHub Pages serves `main` as-is.
+Static HTML, CSS and JavaScript. No framework, no build step, no `npm install`. GitHub Pages serves `main` as it is.
 
 ```bash
 python3 -m http.server 8000
@@ -27,146 +15,74 @@ python3 -m http.server 8000
 ## Layout
 
 ```
-index.html                   English
-sv/index.html                Swedish — written in Swedish, not translated
-cv/index.html                CV, English
-sv/cv/index.html             CV, Swedish
-work/*.html                  Case studies: MetalVisualKit, DeviceMonitor, Subtl, Prism Spatial
-work/*-{360,480,…}.webp      The two app captures at the widths the srcset lists
-subtl/                       Subtl support site and privacy policy, with its own stylesheet
-404.html
-robots.txt, sitemap.xml
-assets/css/style.css         Fonts, tokens, base, components. One layer, no overrides.
-assets/css/case-study.css    Case-study page styles
-assets/css/cv.css            CV page and its A4 print styles
-assets/js/main.js            Theme toggle, scroll spy, reveal, Fig. 0 control, copy button
-assets/js/stipple.js         Fig. 0 stipple: sample, computeDots, paintDots, fitCanvas
-assets/js/depth-cloud.js     Fig. 0 depth cloud. Raw WebGL, imported on request.
-assets/img/                  Portrait (300/600/840 w), depth map, mark, icons, OG image
-assets/fonts/                Instrument Serif, Instrument Sans, IBM Plex Mono + LICENSE.md
-assets/cv/                   CV PDFs, English and Swedish
-assets/data/cv.json          The CV content the CV pages and PDFs are built from
-tools/build-assets.py        Portrait derivatives, the depth map, the capture sizes
-tools/render-images.js       favicon-32.png, apple-touch-icon.png, og-image.png
-tools/og.html                Template for the OG image
-tools/build-cv.py            cv/ and sv/cv/ from assets/data/cv.json
-tools/build-cv-pdf.js        The two PDFs, from the CV pages
-tools/stamp.py               Writes the counted numbers into the pages
-tools/source/                Studio shot, cut-out cache, the two unedited captures
+index.html                 English home page
+sv/index.html              Swedish home page, written in Swedish rather than translated
+cv/, sv/cv/                CV pages, built from assets/data/cv.json
+work/*.html                Case studies: Subtl, Giggle Dash, DeviceMonitor, MetalVisualKit
+work/img/                  Project screenshots and app icons, built by tools/build-images.sh
+subtl/                     Subtl support site and privacy policy, with its own stylesheet
+assets/css/style.css       Tokens, type, the glass material, controls, the bar and the app window
+assets/css/home.css        The home screen: the name, the almanac, the sun's room and the apps, at every size of window
+assets/css/sky.css         What the weather writes into the almanac, loaded with it
+assets/css/case-study.css  Case studies, which are also what a project's window shows, and the 404
+assets/css/cv.css          CV pages: the section index, the timeline, the skill chips, the print layout
+assets/js/main.js          Springs, swiped pages, the bar, the app window, the sun as the clock, the CV index
+assets/js/sky.js           The forecast's symbols, loaded with the weather
+assets/js/weather.js       Malmö's weather from SMHI, fetched after the page has loaded
+assets/js/city.js          The 3D Malmö, rendered in pixels with WebGL, with its sun and moon
+assets/js/city-sky.js      The city's clouds, rain, snow, lightning and water, loaded after the city's first frames
+assets/js/glass.js         Liquid Glass: one shader for every glass shape over the city
+assets/js/smed3d.js        Bit, the mascot, drawn live in 3D
+assets/art/                Section marks, the city still shown before the city starts, a still of Bit
+assets/img/icons.svg       Every icon, in one sprite
+assets/fonts/              Bricolage Grotesque, Inter, Pixelify Sans and their licences
+assets/cv/                 CV PDFs, English and Swedish
+assets/data/cv.json        CV content for the CV pages
+tools/art/sprites.py       Draws the MetalVisualKit tile
+tools/build-cv.py          Builds cv/ and sv/cv/ from cv.json
+tools/build-images.sh      Builds every raster image from the project checkouts
+tools/stamp.py             Writes the build date and page weight into the pages
+tools/source/              Portrait cutout, Giggle Dash captures
 ```
 
-## Fig. 0
-
-One portrait, three renderings, all from the same two images: the
-photograph and a depth map baked from it.
-
-**Stipple** (the default). `stipple.js` reads `portrait-300.webp` for
-luminance and `portrait-depth.webp` for depth, detail and the silhouette,
-then places points on a jittered 260×325 grid with a fixed seed. Dark and
-structured areas get more and larger points, near surfaces press harder, and
-the shoulders fade into the paper. It is drawn once as a single Canvas 2D
-path, redrawn only on resize or a theme change, and the point count in the
-caption is written by the script. In dark mode the same dots print in cream:
-a paper negative.
-
-**Photograph.** The `<img>` is already in the figure; the control, hover on a
-fine pointer, or press-and-hold on touch fades it in over the dots. It is
-also what you get without JavaScript.
-
-**Depth cloud.** `depth-cloud.js` is imported the first time the button is
-pressed, so nothing WebGL runs before that. A 320×400 lattice of 128 000
-candidate points reads the depth map on the GPU; points are culled where the
-face is smooth and kept where it has structure, and the script counts the
-kept points on the CPU for the caption. One reveal sweep, then the loop
-stops. Pointer movement draws single frames; Rescan replays the sweep.
-
-The depth map, `portrait-depth.webp` (300×375, lossless), carries four things
-in one image:
-
-| channel | what it holds |
-|---------|---------------|
-| R | depth: a per-row distance transform plus a high-pass of the shading |
-| G | facial detail, from a band-passed edge response with the silhouette suppressed |
-| B | distance from the silhouette |
-| A | the portrait mask |
-
-The G channel is the part I'd point at in an interview. A uniform grid spends
-as many points on a flat cheek as on an eyelid, which is why early versions
-gave me a face you couldn't read. Baking edge detail into the image lets both
-renderers put small dense points where the face has structure and drop most of
-them where it doesn't. The detail channel is baked per photograph: a new face
-against the old map looks wrong.
-
-## Rebuilding assets
+## Rebuilding
 
 ```bash
-pip install pillow numpy scipy       # plus rembg[cpu] if the portrait source changes
-python3 tools/build-assets.py        # portrait-*.webp, portrait-depth.webp, work/*-{360,480,…}.webp
-node tools/render-images.js          # favicon-32.png, apple-touch-icon.png, og-image.png
-python3 tools/build-cv.py            # cv/index.html and sv/cv/index.html from assets/data/cv.json
-node tools/build-cv-pdf.js           # assets/cv/*.pdf from the CV pages
-python3 tools/stamp.py               # the numbers in the pages
+python3 tools/build-cv.py     # CV pages from assets/data/cv.json
+tools/build-images.sh         # screenshots, icons, profile picture, link preview
+python3 tools/art/sprites.py  # the MetalVisualKit tile
+python3 tools/stamp.py        # build date, request count and page weight
 ```
 
-`build-assets.py` cuts the studio shot out of its backdrop (cached in
-`tools/source/`, so `rembg` is only needed when the source changes), crops it
-to 4:5, feathers the shoulders, writes the three portrait sizes and the depth
-map, and resizes the two app captures to the widths the `<img srcset>` lists.
+`build-images.sh` needs `sips`, `cwebp`, `ffmpeg` and Chrome. It reads the screenshots straight from the Subtl, DeviceMonitor, MetalVisualKit and Giggle Dash checkouts. It expects them next to this repository, or you can pass the folder that holds them. The link preview is the cover I made for LinkedIn, scaled and cut to 1200 by 630 and saved as a JPEG. The cover is composed outside this repository and kept in `Media/`, which Git ignores, so without it the script leaves the committed picture alone.
 
-`render-images.js` and `build-cv-pdf.js` need Node with Playwright and its
-Chromium on `NODE_PATH`; `build-cv-pdf.js` also runs poppler's `pdfinfo` to
-check that each PDF is one A4 page. The icons are rendered from `favicon.svg`; the OG
-image from `tools/og.html`, which loads the site's own fonts and draws the
-stipple with the same `stipple.js` the page uses.
-
-`stamp.py` (stdlib only) rewrites every `<span data-stamp="…">` in the pages
-before a commit: the build date, the number of `func test` in a local
-MetalVisualKit checkout together with the short hash it was counted at
-(`--mvk` points at the checkout; by default it is looked for next to this
-repository), and the request count and weight of a phone's first view of
-`index.html`, measured from the files on disk. It
-only ever replaces the text inside those spans, and running it twice changes
-nothing.
+The city and the mascot have no build step: `assets/js/city.js` and `assets/js/smed3d.js` draw them in the browser. Where WebGL 2 is missing, Bit is one still picture, `assets/art/mascot-still.webp`, and it loads only then. The city's own still, `assets/art/malmo-still.webp`, is the clear night at 22:00 captured from the city with the page hidden, so the words keep their contrast on it; it shows until the city's first frame fades in over it, and stays where WebGL is missing. The four section marks in `assets/art/` (Experience, Skills, About and CV) are drawn as app icons and stored at 60, 120, 180 and 240 pixels. They head the sections of the CV page and stand in the CV's index, cut to the same squircle as the icons of the apps. Their drawing script is not in this repository yet.
 
 ## Decisions I'd defend
 
-- **Content on cards, navigation on glass.** Projects, the at-a-glance numbers
-  and the skills sheet sit on cards with soft corners; only the masthead and
-  the phone tab bar are translucent, because they are the only things that
-  float over content. That is the rule Apple gives for Liquid Glass in
-  iOS 26, and it keeps the page calm.
-- **It should feel like the platform it is about.** Buttons are capsules,
-  EN/SV and Fig. 0's renderings are segmented controls drawn the way iOS
-  draws them, the phone navigation is a floating tab bar with icons, and the
-  logo is an app icon: a continuous-corner tile with an A whose crossbar is a
-  red rule running past the letter.
-- **Figures say what they are.** Real captures are labelled as captures, the
-  two unfinished projects are drawn as architecture diagrams instead of mock
-  screens, and the diagrams are real text in real boxes so they reflow on a
-  phone instead of shrinking to unreadable.
-- **Numbers are counted, not typed.** The test count carries the commit hash
-  it was counted at, and the footer's request count and page weight are
-  measured from disk by `tools/stamp.py`. If a number goes stale, the stamp
-  moves it.
-- **Motion only where it means something.** The stipple draws itself once;
-  text blocks fade in as they scroll into view; cards lift on hover; between
-  pages a project's figure morphs into its case study (cross-document view
-  transitions, Chrome 126+ and Safari 18.2+, a plain navigation elsewhere).
-  The depth cloud runs only when asked for and stops after one sweep.
-  `prefers-reduced-motion` turns all of it off.
-- **Light and dark from the system, with a toggle.** `color-scheme: light dark`,
-  the dark tokens under `prefers-color-scheme`, and an inline script that
-  applies a stored choice before first paint so nothing flashes. In dark the
-  logo tile inverts so it never disappears into the page.
-- **Contrast is measured, not eyeballed.** With the shipped tokens, body ink
-  is 16.7:1 on the page and 18.5:1 on cards, secondary text 8.4:1, captions
-  and labels 5.2:1 (5.8:1 on cards) in light and 5.8:1 in dark. The accent
-  carries text only in the large cover line (4.8:1 light, 7.8:1 dark); links
-  use the darker `--accent-ink` (5.4:1 light, 8.4:1 dark); status chips are
-  5.4:1 or better. Everything that is text clears WCAG AA in both themes.
-- **Nothing third-party.** No CDN, no analytics, no Google Fonts. The four
-  font files are vendored. The footer's "n requests · n KB" line is the
-  measured first view of the home page, stamped at build time.
+- **The scene is the interface.** The portfolio is a home screen, and the city fills it. On it stand my name, one line about me with a small picture, the sun and one row of apps, written straight on the sky and the water with no card under them. Home, Work, CV and Contact are pages you swipe between. The four apps open in place from their icons and keep their real addresses, the line about me opens About, and everything is still a plain link. Nothing is painted behind the words and the picture is not darkened for them. The page tells the city where its words end at the top and where the apps begin at the foot, and the city says which ink each of those zones needs: cream where the picture behind is deep, navy where it is bright, as on a clear noon. The words change ink in one soft move when the light does. Each ink keeps a contrast of 4.5:1 against the darkest or brightest picture the city lets stand behind it.
+- **The sun is the clock.** In the sky left of the tower stands the sun, where the sun over Malmö stands on its way from sunrise to sunset. The city draws it there, a small white disc in a soft bloom that warms and widens as it sinks, with its light on the water. By night the moon makes the same crossing in its real phase. The page only says where they stand, and keeps a handle there. Take hold of the sun, or focus it and use the arrow keys, and its path comes out as a hairline with a tick at sunrise, noon and sunset; it follows the finger and runs the city's day and its weather, and let go, it springs back to now. Add `?hour=16` to the address to start at another hour.
+- **The time and the weather are written on the sky.** The almanac has no frame and nothing behind it, only three lines. A small line in spaced capitals says what it shows: Malmö now, or how many hours ahead while the sun is held. Then Malmö's time, set light in the system face with even figures, as a lock screen sets it. Then one line with the hour's symbol, temperature and weather in a word. It has a colour of its own, never the name's: lamplight gold on a dark sky, deep ultramarine on a bright one. The symbols are drawn in one stroke, as tall as the figures beside them. On a phone the almanac stands under the line about me; on a computer it stands apart on the sky's open side, under the header's capsule. Numbers change without moving anything around them, and nothing moves for a reader who asks for less motion. While the sun is held the almanac shows that hour and its forecast, up to a day ahead, and the city draws its clouds, rain, snow and fog. The weather is SMHI's forecast for Malmö. `?wx=clear`, `cloudy`, `overcast`, `rain`, `snow`, `fog` or `thunder` shows a state without asking SMHI, and with `?hour=` nothing is asked unless `?wx=live` is given too.
+- **One layout that follows the space it gets.** The grids answer to the width of their container, so the same CV is one column in a phone-sized window and two in a wide one. A short window, or a phone on its side, turns the bottom bar into a rail down the side.
+- **A real 3D Malmö, drawn in pixels.** The wallpaper is a small WebGL scene rendered at low resolution. One art pixel is always a whole number of screen pixels. It has the Turning Torso with its steel spine and the Öresund Bridge with its harp cables. Around them are Västra Hamnen with its boardwalk, Ribersborgs Kallbadhus, a skyline and the Lillgrund wind turbines. A train and cars cross the bridge, and boats and gulls move. A flag flies at the pier head, cyclists pass on the promenade, and windows light up through the evening. Where there is time for it, the city is drawn at twice the picture's resolution. Each art pixel is then the mean of what it covers. That softens every outline against the sky and keeps the pixel grid. The picture is composed as an illustration in layers: the pier, the quay and the tower, the skyline and the far shore each stand a step further into the air. Shade is a soft second tone, windows keep some of their wall's colour, clouds and reflections have clean edges, and every hour has one palette, with shade leaning to the sky's colour and light to the sun's. Nothing is dithered. Cloud shadows drift over it by day, and lamps have a faint halo at night. Swiping moves a camera through it. The shapes follow photos and published dimensions, but the distances are compressed to fit a phone and the sun's direction is composed for the light. The sun's height and the sky follow the real time of day in Malmö.
+- **The pages are one space.** What a page holds lies at different depths. On the way between two pages the far layers lag and the near ones run ahead, shrink and fade. Everything turns a little toward where it is going. The camera in the city rises and pulls back on the same trip. All of it is a function of how far the pages have scrolled, so it follows a finger exactly. The pointer, or a phone that reports its tilt without asking, leans the camera a few metres and drifts the glass against the city. An open project pushes the home screen back: smaller and fainter, never blurred. With Reduce Motion on, pages fade in and nothing travels.
+- **Bit lives in the interface.** The mascot is Bit, a small retro computer on two legs with a pixel screen for a face. He stands on the glass bar, drawn live in 3D. The city's sun lights him, so his light and shadow follow the time of day. He runs to the tab you tap, jumps when you scroll hard and falls asleep if you leave the page alone. Tap him and he trips, tumbles and comes up dizzy. Drag him and he hangs from your finger until you let go. He answers the site as well: he types when the Work page arrives, thinks over the CV and starts when the sun is dragged into night. He waits for a page to land before he walks to its tab. On a first visit he boots up, says his name and dances. Home and Contact keep a lane for him above the bar. On the other pages the first screen is text from edge to edge, so there he visits for a few seconds and then leaves. When a project is open, or a page has scrolled half a screen, he shrinks away and comes back when his lane is free. The bar's glass can shrink and take a press without moving him, because only the glass inside the bar scales.
+- **The whole name is readable.** My name stands on one line from 360 pixels wide, on two below that, at 38 pixels on a phone and 60 to 72 on a computer, so the city keeps most of the window. Where a letter meets the Turning Torso, the city repaints the tower's own pixels on a second canvas above the text, so the overlap reads as depth and no letter is hidden.
+- **One glass, nearly clear.** The bar, the language and theme control and the titles of the other pages are one material. It shows the city almost untouched in the middle and bends it in a band along the rim, with a slight colour split. Inside the glass the city is read out of focus, from smaller copies of the picture, so the glass looks clean while the city stays pixel art. The bend follows the same squircle the browser clips each shape to. The rim is one hairline for every shape, brightest at the top left and the bottom right. That light turns with the pointer, the page and the scroll. A press turns it to the far side. A single small shader draws every shape, and it rests when nothing has moved. Where WebGL is missing, the same shapes fall back to a light blur. There is one glass per place: a shape is drawn by the shader or by the blur, never both, with one rim and one shadow, and nothing that lies on glass is glass itself. The bar's selection is a brighter tint, not a second pane.
+- **The tint keeps the text readable.** Glass on the city carries white text, which needs a contrast of 4.5:1. The shader works that out for every pixel. What is already dark enough passes through untouched. What is brighter is held just under the level the text needs, and its colour is scaled, not mixed with grey. A sunset stays a sunset behind the glass, and at night the glass is almost clear.
+- **A small set of shapes.** Cards are squircles: paper, glass, a project, an app tile, a screenshot in its frame. Every control is a capsule, 36, 44 or 52 pixels tall. The arc is the sun's path over the home screen, and it comes back in three places only. It is the rule under a page title, with a dot where the sun stands in Malmö's day. It is the rise behind a project's screens. It divides the parts of a case study. A dot is a state, such as the green one in the header. An app's icon is one layer: the picture cut to the squircle, one shadow and one hairline of light, with no plate behind it. It turns a few degrees toward the pointer, or with a tilted phone. The list is at the top of `assets/css/style.css`.
+- **One header.** On the left the mark, in one colour, with a line of status over a line of platforms and one small green dot that does not move. On the right, language and theme share one glass capsule in two segments. On the home screen at rest the left group stands on the sky with no glass under it, in line with my name. On any other page, or once a page has scrolled, it becomes a glass capsule, which then folds down to the mark.
+- **One line about me.** Under the name there is a small picture of me, a cutout standing in a tile of the sky's colours with a crisp side under it, so my whole head rises above the tile. Beside it are my role and one short line. The longer text lives in About, which the line opens. I had the portrait in a glass card of its own before. It was a good picture and one card too many.
+- **A bar of my own.** The bottom bar is a rounded rectangle, not a copy of the iOS capsule. Its selection is a drop of brighter tint, with no rim or glass of its own, that lies inside the bar with the same 6 pixel gap on every side, and its corner is the bar's less that gap, so the two outlines run parallel. It goes to a tab on a spring with a little overshoot. Its tail follows, so the shape stretches on the way and runs together where it lands. You can drag it. Against either end it squashes and never reaches the bar's rim, and a throw carries it to the tab it would reach. In a short window the same bar stands as a rail.
+- **Everything that moves is a spring.** Tabs, the window that projects open in, the rows of screens and the sun are stepped by one exact spring function, so a new touch can take any of them over mid-way. There are four springs in all: a quick one with a little overshoot for a control that answers a touch, one for a window on its way, one with no bounce that carries the pages to a tab in about half a second, and a calm one for what trails or returns. The spring that moves the pages tells the layers, the city's camera and the sun where it is in the same frame, and nothing else starts until 300 milliseconds after it has landed. A project opens out of its tile or card and goes back into it. Drag the window down by its top bar, or by the page when it is at its top, and the throw decides whether it leaves. Back, Esc and the browser's swipe-back close it too. With Reduce Motion on, everything jumps to its end state.
+- **Projects are a deck.** On the Work page each project is a card in its own hue with its screens first. The cards stick as you scroll, so the next one slides over the last. Colours are OKLCH ramps on one hue per project, which keeps light and dark themes in step.
+- **A CV made for a phone.** The CV has an index that follows you, a rail through jobs and schools, and skills as chips under iOS, Android and Java. The chips are cut from the sentences in `cv.json`. The sentences themselves stay in the page for print and for screen readers.
+- **Real screens only.** Every image of an app is a capture of it running in the iOS Simulator. Screens are shown bare with rounded corners, because Apple's rules on device frames allow only its own bezels. The Subtl case study has one image built with those.
+- **Light and dark from the system, with a toggle.** A small inline script applies a stored choice before first paint, so nothing flashes.
+- **Numbers are measured.** The footer's request count and page weight are read from the files on disk by `tools/stamp.py`. Its list is what a phone at three pixels to the point fetches for the first view, and it stops at 450 000 bytes. It also prints what comes after the page has loaded, the sun's art and the weather, on lines of their own.
+- **The first picture needs three files.** The stylesheets, the display face and the still picture of the city are asked for first; the face and the still are preloaded. The city is asked for once that picture is on the screen, and the glass and the mascot are fetched beside it and started after it, the mascot when the page is idle. The marks of the CV's sections and the pixel face are not fetched until a page that shows them is opened. The weather comes after the page has loaded, and the city's clouds, rain, snow and water half a second after its first frames. Until the display face is in, its stand-in is Arial Bold at the same width and height, so a late swap moves nothing. Canvases stop when hidden, off screen or under a window. Links to my other pages are prefetched when a pointer rests on them, where the browser has speculation rules. No page has an unload handler, so the back and forward cache can keep it. GitHub Pages sets its own cache headers, ten minutes when I last looked, so the files keep plain names and nothing counts on a long cache; on a host where headers can be set, the files under `assets/` should get a hash in their names and a year.
+- **One call to someone else, for the weather.** There is no CDN, no analytics and no Google Fonts. The one request that leaves this site goes to SMHI, Sweden's weather service, for Malmö's forecast. It is made after the page has loaded and asks for the forecast's address only. The browser adds its usual headers, among them the Origin, which names this site, but it sends no Referer and no cookie. The answer is kept for half an hour in the tab. If SMHI is slow or away, the almanac keeps to the clock and the sun. The weather is SMHI's open data under CC BY 4.0, and I draw it in my own symbols.
+- **Type and space.** Three typefaces are served from this repository. Bricolage Grotesque sets my name and the headings. Pixelify Sans sets small labels on the pages after the first, and is fetched with the first of them. Inter sets body text where the device has no system font of its own, so Apple devices never fetch it. The type scale has eight steps: 11, 13, 15 and 17 pixels for text and four fluid sizes for display. Only my name on the home screen is outside it, because it is fitted to the width it gets. Tracking tightens as the type grows, leading comes in steps of 4 pixels, and running text keeps to about 65 characters a line. Spacing is in steps of 4 pixels too, controls are 36, 44 or 52 pixels high, and a shape inside another takes the outer corner less the gap between them. The icons are my own, one stroked family on a 24 pixel grid.
 
 ## Contact
 
@@ -174,6 +90,4 @@ anton@smedberg.eu · [LinkedIn](https://www.linkedin.com/in/anton-smedberg-a9aa6
 
 ## Licence
 
-Code under MIT (`LICENSE`). The photograph and the CVs are mine — please
-don't reuse those. The fonts are under the SIL Open Font License; see
-[`assets/fonts/LICENSE.md`](assets/fonts/LICENSE.md).
+Code under MIT (`LICENSE`). The photograph, the CVs and the project screenshots are mine, so please don't reuse those. Bricolage Grotesque, Inter and Pixelify Sans are under the SIL Open Font License; see [`assets/fonts/LICENSE.md`](assets/fonts/LICENSE.md). The icons are drawn for this site and fall under the MIT licence with the code.

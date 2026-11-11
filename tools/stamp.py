@@ -7,72 +7,72 @@ else in a file is touched, pages that do not exist yet are skipped, and a
 second run with the same inputs changes nothing.
 
   build     today's ISO date (--date overrides)
-  tests     number of `func test` in a local MetalVisualKit checkout
-  hash      that checkout's short HEAD, so the count is tied to a revision
   requests  requests of index.html's first view on a phone (FIRST_VIEW)
   weight    their size on disk, in KB (1 000 bytes, as DevTools counts)
 
+The first view may weigh at most BUDGET bytes; past it the script stops
+before writing anything. What the home page fetches after its load event is
+printed on lines of its own, on disk and gzipped as GitHub Pages sends it.
+
 Run from anywhere:
-  python3 tools/stamp.py [--date YYYY-MM-DD] [--mvk /path/to/MetalVisualKit]
+  python3 tools/stamp.py [--date YYYY-MM-DD]
 Stdlib only.
 """
 
 import argparse
 import datetime
 import glob
+import gzip
 import os
 import re
-import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-PAGES = ["index.html", "sv/index.html", "work/*.html", "cv/index.html", "sv/cv/index.html"]
+PAGES = ["index.html", "sv/index.html", "work/*.html", "cv/index.html", "sv/cv/index.html", "404.html"]
 
-# What a first view of index.html fetches on a phone: the page, its
-# stylesheet, the two modules, the four fonts, the two images the stipple
-# samples, the photograph (a 2x or 3x screen picks the 840 px file), the two
-# project captures (lazy, but within the browser's lazy-load distance, so
-# they load before any scroll; a 3x screen picks the 480 px files) and the
-# favicon. The depth cloud, which loads only when asked for, is not here.
+# What the home page fetched on load in Chrome at 390 px wide and 3x, read from
+# the Resource Timing list, plus the page and the favicon. The screenshots on
+# the Work page are not in it: that page renders them only once it is swiped
+# to (content-visibility in home.css). case-study.css and cv.css style what an
+# app window shows, and main.js fetches them with the first window. Pixelify
+# Sans sets labels on the other pages only, and main.js lets it in with the
+# first of them. The mascot is drawn by smed3d.js, which is fetched beside the
+# city and is counted; its still picture loads only where WebGL 2 is missing.
+# Re-measure after changing the layout.
 FIRST_VIEW = [
     "index.html",
-    "assets/css/style.css",
-    "assets/js/main.js",
-    "assets/js/stipple.js",
-    "assets/fonts/instrument-serif-400.woff2",
-    "assets/fonts/instrument-sans-wght.woff2",
-    "assets/fonts/instrument-serif-400-italic.woff2",
-    "assets/fonts/plex-mono-400.woff2",
-    "assets/img/portrait-300.webp",
-    "assets/img/portrait-depth.webp",
-    "assets/img/portrait.webp",
-    "work/metalvisualkit-480.webp",
-    "work/devicemonitor-480.webp",
     "assets/img/favicon.svg",
+    "assets/fonts/bricolage-grotesque-wght.woff2",
+    "assets/css/style.css",
+    "assets/css/home.css",
+    "assets/js/main.js",
+    "assets/js/smed3d.js",
+    "assets/js/city.js",
+    "assets/js/glass.js",
+    "assets/art/malmo-still.webp",
+    "assets/art/icon-metalvisualkit.png",
+    "assets/img/icons.svg",
+    "assets/img/me-cut-168.webp",
+    "work/img/icon-subtl-180.webp",
+    "work/img/icon-giggledash-180.webp",
+    "work/img/icon-devicemonitor-180.webp",
+]
+
+BUDGET = 450_000
+
+# Fetched once the home page has loaded: the weather with its symbols and
+# stylesheet (main.js), and the city's clouds, rain, snow and water (city.js,
+# half a second after its first frame).
+AFTER_LOAD = [
+    "assets/js/weather.js",
+    "assets/js/sky.js",
+    "assets/css/sky.css",
+    "assets/js/city-sky.js",
+    "assets/js/smed3d-fine.js",
 ]
 
 STAMP = re.compile(r'(<span\b[^>]*\bdata-stamp="([a-z]+)"[^>]*>)([^<]*)(</span>)')
-
-
-def git(args, cwd):
-    try:
-        return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as err:
-        print(f"! git {' '.join(args)} in {cwd}: {err}", file=sys.stderr)
-        return None
-
-
-def count_tests(mvk):
-    """Occurrences of `func test` in the checkout's Swift files."""
-    n = 0
-    for dirpath, dirnames, filenames in os.walk(mvk):
-        dirnames[:] = [d for d in dirnames if d not in (".git", ".build")]
-        for name in filenames:
-            if name.endswith(".swift"):
-                with open(os.path.join(dirpath, name), encoding="utf-8", errors="replace") as f:
-                    n += len(re.findall(r"\bfunc test", f.read()))
-    return n
 
 
 def first_view():
@@ -89,20 +89,18 @@ def first_view():
 def values(args):
     out = {"build": args.date}
 
-    if os.path.isdir(args.mvk):
-        head = git(["rev-parse", "--short", "HEAD"], args.mvk)
-        if head:
-            out["hash"] = head
-            out["tests"] = str(count_tests(args.mvk))
-    else:
-        print(f"! no MetalVisualKit checkout at {args.mvk}: tests and hash left as they are", file=sys.stderr)
-
     rows = first_view()
     width = max(len(rel) for rel, _ in rows)
     for rel, size in rows:
         print(f"  {rel:<{width}}  {size:>7,} B")
     total = sum(size for _, size in rows)
     print(f"  {'first view':<{width}}  {total:>7,} B  {len(rows)} requests")
+    for rel in AFTER_LOAD:
+        with open(os.path.join(ROOT, rel), "rb") as f:
+            data = f.read()
+        print(f"  after load: {rel:<{width - 12}}  {len(data):>7,} B  {len(gzip.compress(data, 9)):>6,} B gzipped")
+    if total > BUDGET:
+        sys.exit(f"! first view is {total:,} B, over the budget of {BUDGET:,} B: nothing written")
     out["requests"] = str(len(rows))
     out["weight"] = f"{round(total / 1000)} KB"
     return out
@@ -137,7 +135,6 @@ def stamp(path, vals):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--date", default=datetime.date.today().isoformat(), help="build date, ISO (default: today)")
-    parser.add_argument("--mvk", default=os.path.join(os.path.dirname(ROOT), "metalvisualkit"), help="local MetalVisualKit checkout (default: next to this repository)")
     args = parser.parse_args()
 
     vals = values(args)

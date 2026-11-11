@@ -1,14 +1,14 @@
-# Fonts
+# Font licences
 
-All typefaces on this site are self-hosted and licensed under the
-SIL Open Font License 1.1. The licence text, with the three copyright
-notices, is in `OFL.txt` beside the font files.
+`inter-wght.woff2` is the Latin subset of the variable Inter, by Rasmus Andersson
+and the Inter Project Authors. See [`OFL-Inter.txt`](OFL-Inter.txt).
 
-| file | family | copyright |
-|---|---|---|
-| `instrument-serif-400.woff2`, `instrument-serif-400-italic.woff2` | Instrument Serif | Copyright 2022 The Instrument Serif Project Authors (https://github.com/Instrument/instrument-serif) |
-| `instrument-sans-wght.woff2` | Instrument Sans (variable, wght 400–700) | Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans) |
-| `plex-mono-400.woff2` | IBM Plex Mono | Copyright © 2017 IBM Corp. with Reserved Font Name "Plex" |
+`pixelify-sans-wght.woff2` is the Latin subset of the variable Pixelify Sans, by
+the Pixelify Sans Project Authors. See [`OFL-Pixelify-Sans.txt`](OFL-Pixelify-Sans.txt).
 
-The files are the Latin subsets served by Google Fonts, vendored here so the
-site makes no third-party requests.
+`bricolage-grotesque-wght.woff2` is the Latin subset of the variable Bricolage
+Grotesque (weight axis, 200 to 800), by Mathieu Triay and the Bricolage Grotesque
+Project Authors. See [`OFL-Bricolage-Grotesque.txt`](OFL-Bricolage-Grotesque.txt).
+
+All three are licensed under the SIL Open Font License 1.1 and served from this
+site rather than from a CDN.

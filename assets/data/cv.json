@@ -1,9 +1,5 @@
 {
-  "_readme": "Single source for the CV. tools/build-cv.py renders cv/index.html and sv/cv/index.html from it; tools/build-cv-pdf.js prints the A4 PDFs from those pages. {tests} and {hash} are replaced by the stamped values below. Digit groups (49 000) get a non-breaking space at build time.",
-  "stamps": {
-    "tests": "71",
-    "hash": "94ab1f5"
-  },
+  "_readme": "Single source for the CV pages. tools/build-cv.py renders cv/index.html and sv/cv/index.html from it. The text follows the iOS CVs in assets/cv/, which are copied from the CV package and not generated here.",
   "person": {
     "name": "Anton Smedberg",
     "email": "anton@smedberg.eu",
@@ -18,225 +14,371 @@
         "url": "https://antonsmedberg.github.io/"
       },
       {
-        "label": "github.com/antonsmedberg",
-        "url": "https://github.com/antonsmedberg"
-      },
-      {
         "label": "linkedin.com/in/anton-smedberg-a9aa6121b",
         "url": "https://www.linkedin.com/in/anton-smedberg-a9aa6121b/"
+      },
+      {
+        "label": "github.com/antonsmedberg",
+        "url": "https://github.com/antonsmedberg"
       }
     ]
   },
   "en": {
-    "title": "iOS Developer · Swift 6 · SwiftUI · Swift Concurrency",
-    "availability": "Open to iOS and mobile roles in Malmö, Lund and Copenhagen · on-site, hybrid or remote",
-    "profile": "iOS developer building native apps in Swift 6 and SwiftUI. Five months on the Mobile Apps team at Axis Communications in Lund, shipping live-video controls and async/await migrations into an established production codebase with code review, QA and Datadog/OpenTelemetry instrumentation. Since then I have built my own iOS projects end to end: an open-source Metal and SwiftUI package with {tests} tests, DocC and CI, a SwiftData app under strict concurrency, and an on-device captioning app built on SpeechAnalyzer and AVFoundation.",
-    "facts": [
-      {
-        "label": "Production",
-        "value": "Axis Communications, 5 months"
-      },
-      {
-        "label": "Open source",
-        "value": "MetalVisualKit, {tests} tests, CI"
-      },
-      {
-        "label": "Rendering",
-        "value": "49 000 points/frame"
-      }
-    ],
+    "title": "iOS & Android Developer",
+    "keywords": "Swift · SwiftUI · UIKit · Swift Concurrency · XCTest · CI/CD · Kotlin · Jetpack Compose",
+    "availability": "Open to iOS and mobile roles in Skåne, Copenhagen or remote",
+    "profile": "I am an iOS developer with a focus on UI/UX, something my mentor at Axis Communications singled out. For nearly five months in the iOS team there, I built live video controls and fixed bugs in a production app. I am now finishing my own app, Subtl, for the App Store. It creates captions with AI that runs right on the phone, and I am the only developer.",
     "experience": [
       {
-        "role": "Independent iOS development",
-        "org": "Own products and open source",
-        "place": "Malmö",
-        "period": "Jun 2026 – present",
-        "bullets": [
-          "Native iOS apps in Swift 6 and SwiftUI: architecture, implementation, testing, instrumentation and release preparation.",
-          "On-device speech and video pipelines with AVFoundation; GPU work with Metal and ARKit. MetalVisualKit maintained with {tests} tests, an example app and CI."
-        ]
-      },
-      {
-        "role": "iOS Developer Intern (LIA), Mobile Apps",
+        "role": "iOS Developer Intern (LIA placement)",
         "org": "Axis Communications",
-        "place": "Lund",
-        "period": "Jan – May 2026",
+        "place": "Lund, Sweden",
+        "period": "Jan 2026–May 2026",
         "bullets": [
-          "Shipped Swift and SwiftUI features and fixes in an established production iOS app: live-video controls for microphone, speaker and PTZ, and an interactive SwiftUI Canvas interface.",
-          "Migrated selected async flows to async/await under strict Swift Concurrency; instrumented a multi-step workflow with Datadog and OpenTelemetry so failures could be traced.",
-          "Took work from investigation through pull request, code review, testing and QA alongside iOS and Android developers, using Jira."
-        ]
+          "Built live video controls for microphone, speaker and PTZ (pan-tilt-zoom) in an iOS app that connects to cloud services and IoT devices, so users can listen, talk and control the camera from their phone.",
+          "Migrated selected asynchronous flows to async/await with strict concurrency checking, and created an interactive interface with SwiftUI Canvas.",
+          "Added Datadog and OpenTelemetry tracing to a multi-step flow, so the team can see where errors occur.",
+          "Delivered bug fixes, new components and Datadog analytics through pull requests that were reviewed and merged, in an agile team of iOS and Android developers."
+        ],
+        "tech": "Swift, SwiftUI, UIKit, async/await, Datadog, OpenTelemetry, Git, Jira",
+        "note": "My manager at Axis wrote in his letter: “We give him our best recommendation.” More recommendations on LinkedIn."
       },
       {
-        "role": "Android Developer Intern",
+        "role": "Android Developer Intern (LIA placement)",
         "org": "Weavy",
-        "place": "Malmö",
-        "period": "Apr – Nov 2023",
+        "place": "Malmö, Sweden",
+        "period": "Apr 2023–Nov 2023",
         "bullets": [
-          "Built an Android chat app in Kotlin and Jetpack Compose with authentication, REST API integration and a responsive UI, from product specifications with code review and regular releases."
-        ]
+          "Built an Android chat app in Kotlin and Jetpack Compose on top of Weavy’s REST API, with MVVM (ViewModel and StateFlow), Hilt, Retrofit and token-based authentication with the token in DataStore."
+        ],
+        "tech": "Kotlin, Jetpack Compose, Coroutines, Hilt, Retrofit, DataStore, Git"
       }
     ],
     "projects": [
       {
-        "name": "MetalVisualKit",
-        "status": "Open source",
-        "url": "https://github.com/antonsmedberg/MetalVisualKit",
-        "stack": "Swift 6 · Metal · SwiftUI · ARKit · SPM · DocC · GitHub Actions",
-        "summary": "MIT-licensed Swift package of GPU-backed SwiftUI views: a compute-shader particle loader (about 1 400 particles) and an ARKit LiDAR point-cloud renderer (about 49 000 points per frame) that samples camera colour per point. Swift 6, iOS 17+, {tests} tests, example app, DocC and CI on every push."
+        "name": "Subtl",
+        "status": "Independent app, preparing for App Store release",
+        "period": "Jul 2026–Present",
+        "url": "/work/subtl.html",
+        "bullets": [
+          "The app creates captions with AI speech recognition in English and Swedish and translates them locally, with no account, no uploads and no data collection.",
+          "Transcription runs in an actor under Swift 6, export burns captions into the video or writes SRT and WebVTT, and the five caption styles look the same in preview and export.",
+          "Built Ask Subtl on Apple’s Foundation Models. The assistant searches clips and transcripts through tool calling and proposes changes that the user must confirm.",
+          "Connected the app to Siri, Shortcuts and Spotlight via App Intents, added a Live Activity for background exports and built layouts for the foldable iPhone Duo. The app is in English and Swedish.",
+          "Wrote automated unit and UI tests for the flow from import to export, including dark mode and large text, and set up CI in GitHub Actions with static analysis and a release build."
+        ],
+        "tech": "Swift 6, SwiftUI, SpeechAnalyzer, Foundation Models, App Intents"
       },
       {
         "name": "DeviceMonitor",
-        "status": "Public repo",
-        "url": "https://github.com/antonsmedberg/DeviceMonitor",
-        "stack": "Swift 6 · SwiftUI · SwiftData · XCTest · XCUITest · GitHub Actions",
-        "summary": "Degree project: a network-device dashboard with status history, filtering and search. Service, storage and view-model layers behind protocols, actor-safe SwiftData persistence under Swift 6 strict concurrency, 6 unit tests in GitHub Actions and 2 UI tests. iOS 26.2+."
+        "status": "Grit Academy final project (Distinction), developed into my own app",
+        "period": "May 2026–Present",
+        "url": "/work/devicemonitor.html",
+        "bullets": [
+          "A network monitor for iPhone and iPad that finds the devices on the local Wi-Fi network with TCP, ICMP and UDP probes and Bonjour, and charts latency, jitter and outages over time.",
+          "The monitoring engine runs in an actor and writes to SwiftData every 500 ms, with a versioned schema migration. Views only read immutable snapshots, never the database.",
+          "Apple Intelligence (Foundation Models) explains each device on the network without sending data to the cloud. Names and services from the network go in as fenced data to guard against prompt injection."
+        ],
+        "tech": "SwiftUI, SwiftData, Foundation Models, Swift Charts, Metal"
       },
       {
-        "name": "Subtl",
-        "status": "In development",
-        "url": "https://antonsmedberg.github.io/subtl/",
-        "stack": "Swift 6 · SpeechAnalyzer · AVFoundation · Core Animation · StoreKit 2",
-        "summary": "Captioning for short-form video with transcription on the device, so nothing leaves the phone. One caption-style model drives both the live preview and the AVFoundation export, so the exported file matches what was edited. Actor-isolated transcription engine; in development, with the support site and privacy policy published."
+        "name": "MetalVisualKit",
+        "status": "Open source, MIT licence",
+        "period": "Aug 2026",
+        "url": "/work/metalvisualkit.html",
+        "bullets": [
+          "Swift package that unprojects LiDAR depth data into about 49,000 3D points on the GPU and animates 1,400 particles in a compute shader. It has unit tests in XCTest, a demo app, CI and DocC."
+        ],
+        "tech": "Metal, ARKit, Swift Package Manager, XCTest, DocC"
       }
     ],
     "education": [
       {
-        "name": "Java Developer — Backend & Web Development, YH",
+        "name": "Java Developer",
         "org": "Grit Academy",
         "place": "Malmö",
-        "period": "Aug 2024 – May 2026",
-        "detail": "Java, Spring Boot, JPA, SQL, REST APIs and web development. Final internship (LIA) at Axis Communications."
+        "period": "Aug 2024–May 2026",
+        "detail": "YH diploma, 400 YH credits. Distinction in 15 of 16 courses, including Test-Driven Development in Java and IT Security for Java Developers. Both of the programme’s LIA periods were at Axis."
       },
       {
-        "name": "iPhone & Android Application Development, YH",
+        "name": "iPhone and Android Programmer",
         "org": "Malmö Yrkeshögskola",
         "place": "Malmö",
-        "period": "Sep 2022 – Dec 2023",
-        "detail": "Swift/iOS, Kotlin/Android, mobile development and UX, with coursework in on-device ML, Python for AI, testing and digital accessibility."
+        "period": "Sep 2022–Nov 2023",
+        "detail": "YH diploma, 280 YH credits. Swift and Kotlin for iOS and Android, Distinction for the LIA and final project."
+      }
+    ],
+    "courses": [
+      {
+        "name": "UX, Digital Accessibility & AI",
+        "org": "Malmö Yrkeshögskola",
+        "meta": "80 YH credits, Distinction",
+        "period": "Sep 2024–Jan 2025",
+        "detail": "Modules in UX and digital accessibility, SEO for digital accessibility and UX, and AI in practical work."
+      },
+      {
+        "name": "Python Programming for AI Development",
+        "org": "IT-Högskolan",
+        "meta": "30 YH credits, Distinction",
+        "period": "Sep 2024–Jan 2025"
+      },
+      {
+        "name": "Software Testing",
+        "org": "Medieinstitutet",
+        "meta": "30 YH credits, Distinction",
+        "period": "Apr 2024–Jun 2024"
+      },
+      {
+        "name": "On-Device Machine Learning for Apple & Android",
+        "org": "Malmö Yrkeshögskola",
+        "meta": "70 YH credits",
+        "period": "Sep 2023–Jan 2024"
       }
     ],
     "skills": [
       {
         "group": "iOS",
-        "items": "Swift 6, SwiftUI, UIKit, Swift Concurrency (async/await, actors), Combine, SwiftData, AVFoundation, Metal/MetalKit, ARKit, RealityKit, Core ML, StoreKit 2, MVVM, Swift Package Manager, accessibility"
+        "items": "Swift 6, SwiftUI, UIKit, Swift Concurrency, SwiftData, Core Data, AVFoundation, Combine and App Intents (from my internship and own apps). Basic Objective-C."
       },
       {
-        "group": "Quality & delivery",
-        "items": "Xcode, XCTest, XCUITest, unit and UI testing, Instruments, Git, GitHub Actions, CI, pull requests, code review, debugging, QA, Jira, TestFlight, Datadog, OpenTelemetry"
+        "group": "Testing",
+        "items": "Automated tests with Swift Testing, XCTest and XCUITest, GitHub Actions and TestFlight"
       },
       {
-        "group": "Beyond iOS",
-        "items": "Kotlin, Jetpack Compose, Java, Spring Boot, REST APIs, GraphQL, SQL, JPA"
+        "group": "Architecture",
+        "items": "MVVM, dependency injection, Swift packages (including a design system), REST APIs"
+      },
+      {
+        "group": "Performance & debugging",
+        "items": "Instruments, signposts, Thread Sanitizer, os.Logger, Datadog and OpenTelemetry"
+      },
+      {
+        "group": "Graphics & AI",
+        "items": "Metal, ARKit, Core ML, SpeechAnalyzer and Foundation Models"
+      },
+      {
+        "group": "Accessibility",
+        "items": "VoiceOver, Dynamic Type, WCAG and UX design"
+      },
+      {
+        "group": "Tools",
+        "items": "Xcode, App Store Connect, Git, GitHub, Jira and Figma"
+      },
+      {
+        "group": "Android",
+        "items": "Kotlin, Coroutines, Flow, Jetpack Compose and Hilt (from my internship and studies)"
+      },
+      {
+        "group": "Backend",
+        "items": "Java, Spring Boot, JPA and SQL (from my YH programme)"
+      },
+      {
+        "group": "AI tools",
+        "items": "Claude Code, GitHub Copilot and OpenAI Codex. In Subtl I give Claude Code my own rules and review every change before I commit it."
+      },
+      {
+        "group": "Languages",
+        "items": "Swedish (native) and English (professional)"
       }
     ],
-    "languages": "Swedish (native) · English (professional working proficiency)",
-    "references": "Written recommendation from an Engineering Manager at Axis available on request; recommendations from my manager and mentor are on LinkedIn."
+    "other_experience": [
+      {
+        "role": "Online Shop Owner",
+        "org": "Self-employed",
+        "period": "Mar 2020–Sep 2021"
+      },
+      {
+        "role": "Recruitment Researcher",
+        "org": "RC Professional Search AB, Malmö",
+        "period": "Jan 2018–Aug 2019"
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Judo at elite level",
+        "detail": "Competed in the Swedish Championships and internationally when I was younger."
+      }
+    ]
   },
   "sv": {
-    "title": "iOS-utvecklare · Swift 6 · SwiftUI · Swift Concurrency",
-    "availability": "Öppen för iOS- och mobilroller i Malmö, Lund och Köpenhamn · på plats, hybrid eller distans",
-    "profile": "iOS-utvecklare som bygger native appar i Swift 6 och SwiftUI. Fem månader i Mobile Apps-teamet på Axis Communications i Lund, där jag levererade livevideokontroller och async/await-migreringar i en etablerad produktkodbas med kodgranskning, QA och instrumentering i Datadog/OpenTelemetry. Sedan dess bygger jag egna iOS-projekt från början till slut: ett open source-paket för Metal och SwiftUI med {tests} tester, DocC och CI, en SwiftData-app under strikt concurrency och en app för textning på enheten byggd på SpeechAnalyzer och AVFoundation.",
-    "facts": [
-      {
-        "label": "Produktion",
-        "value": "Axis Communications, 5 månader"
-      },
-      {
-        "label": "Öppen källkod",
-        "value": "MetalVisualKit, {tests} tester, CI"
-      },
-      {
-        "label": "Rendering",
-        "value": "49 000 punkter/bildruta"
-      }
-    ],
+    "title": "iOS- och Androidutvecklare",
+    "keywords": "Swift · SwiftUI · UIKit · Swift Concurrency · XCTest · CI/CD · Kotlin · Jetpack Compose",
+    "availability": "Öppen för roller inom iOS och mobil i Skåne, Köpenhamn eller på distans",
+    "profile": "Jag är iOS-utvecklare med fokus på UI/UX, något som min mentor på Axis Communications särskilt lyfte fram. Under nästan fem månader i iOS-teamet där byggde jag livevideoreglage och rättade buggar i en app i produktion. Nu gör jag klart min egen app Subtl inför App Store. Den skapar undertexter med AI direkt i telefonen, och jag är ensam utvecklare.",
     "experience": [
       {
-        "role": "Egen iOS-utveckling",
-        "org": "Egna produkter och open source",
-        "place": "Malmö",
-        "period": "jun 2026 – pågående",
-        "bullets": [
-          "Native iOS-appar i Swift 6 och SwiftUI: arkitektur, implementation, testning, instrumentering och releaseförberedelser.",
-          "Tal- och videoflöden på enheten med AVFoundation; GPU-arbete med Metal och ARKit. MetalVisualKit underhålls med {tests} tester, demoapp och CI."
-        ]
-      },
-      {
-        "role": "iOS-utvecklare, LIA, Mobile Apps",
+        "role": "iOS-utvecklare, LIA-praktik",
         "org": "Axis Communications",
         "place": "Lund",
-        "period": "jan – maj 2026",
+        "period": "jan 2026–maj 2026",
         "bullets": [
-          "Levererade funktioner och rättningar i Swift och SwiftUI i en etablerad iOS-app i produktion: livevideokontroller för mikrofon, högtalare och PTZ samt ett interaktivt SwiftUI Canvas-gränssnitt.",
-          "Migrerade utvalda asynkrona flöden till async/await under strikt Swift Concurrency; instrumenterade ett flerstegsflöde med Datadog och OpenTelemetry för spårbarhet vid fel.",
-          "Tog uppgifter från analys till pull request, kodgranskning, testning och QA tillsammans med iOS- och Android-utvecklare, med Jira."
-        ]
+          "Byggde livevideoreglage för mikrofon, högtalare och PTZ (pan, tilt och zoom) i en iOS-app som ansluter till molntjänster och IoT-enheter, så att användaren kan lyssna, prata och styra kameran från telefonen.",
+          "Migrerade utvalda asynkrona flöden till async/await med strikt concurrency-kontroll och tog fram ett interaktivt gränssnitt med SwiftUI Canvas.",
+          "Lade till spårning med Datadog och OpenTelemetry i ett flöde med flera steg, så att teamet kan se i vilket av stegen felen uppstår.",
+          "Levererade buggrättningar, nya komponenter och Datadog-analys via pull requests som granskades och slogs ihop, i ett agilt team med iOS- och Androidutvecklare."
+        ],
+        "tech": "Swift, SwiftUI, UIKit, async/await, Datadog, OpenTelemetry, Git, Jira",
+        "note": "Min chef på Axis skriver i sitt brev: ”We give him our best recommendation.” Fler rekommendationer finns på LinkedIn."
       },
       {
-        "role": "Androidutvecklare, praktik",
+        "role": "Androidutvecklare, LIA-praktik",
         "org": "Weavy",
         "place": "Malmö",
-        "period": "apr – nov 2023",
+        "period": "april 2023–nov 2023",
         "bullets": [
-          "Byggde en Android-chattapp i Kotlin och Jetpack Compose med autentisering, REST-integrationer och responsivt gränssnitt, utifrån produktspecifikationer med kodgranskning och regelbundna releaser."
-        ]
+          "Byggde en chattapp för Android i Kotlin och Jetpack Compose mot Weavys REST-API, med MVVM (ViewModel och StateFlow), Hilt, Retrofit och tokenbaserad autentisering som sparar token i DataStore."
+        ],
+        "tech": "Kotlin, Jetpack Compose, Coroutines, Hilt, Retrofit, DataStore, Git"
       }
     ],
     "projects": [
       {
-        "name": "MetalVisualKit",
-        "status": "Öppen källkod",
-        "url": "https://github.com/antonsmedberg/MetalVisualKit",
-        "stack": "Swift 6 · Metal · SwiftUI · ARKit · SPM · DocC · GitHub Actions",
-        "summary": "MIT-licensierat Swift-paket med GPU-drivna SwiftUI-vyer: en partikelindikator i compute shader (cirka 1 400 partiklar) och en ARKit/LiDAR-renderare för punktmoln (cirka 49 000 punkter per bildruta) som samplar kamerafärg per punkt. Swift 6, iOS 17+, {tests} tester, demoapp, DocC och CI vid varje push."
+        "name": "Subtl",
+        "status": "Egen app, inför release i App Store",
+        "period": "juli 2026–pågående",
+        "url": "/work/subtl.html",
+        "bullets": [
+          "Appen skapar undertexter med AI-taligenkänning på svenska och engelska och översätter dem lokalt, utan konto, uppladdning eller datainsamling.",
+          "Transkriberingen körs i en actor under Swift 6, exporten bränner in texten eller skriver SRT och WebVTT, och de fem undertextstilarna ser likadana ut i förhandsvisning och export.",
+          "Byggde Ask Subtl på Apples Foundation Models. Assistenten söker i klipp och transkript via tool calling och föreslår ändringar som användaren måste bekräfta.",
+          "Kopplade appen till Siri, Genvägar och Spotlight via App Intents, lade till en Live Activity för exporter i bakgrunden och byggde layouter för den vikbara iPhone Duo. Appen finns på svenska och engelska.",
+          "Skrev automatiserade enhets- och UI-tester för flödet från import till export, även i mörkt läge och med stor text, och satte upp CI i GitHub Actions med statisk analys och releasebygge."
+        ],
+        "tech": "Swift 6, SwiftUI, SpeechAnalyzer, Foundation Models, App Intents"
       },
       {
         "name": "DeviceMonitor",
-        "status": "Publikt repo",
-        "url": "https://github.com/antonsmedberg/DeviceMonitor",
-        "stack": "Swift 6 · SwiftUI · SwiftData · XCTest · XCUITest · GitHub Actions",
-        "summary": "Examensarbete: en översikt över nätverksenheter med statushistorik, filtrering och sökning. Tjänste-, lagrings- och vymodellager bakom protokoll, actor-säker SwiftData-persistens under strikt Swift 6-concurrency, 6 enhetstester i GitHub Actions och 2 UI-tester. iOS 26.2+."
+        "status": "Examensarbete på Grit Academy (VG), vidareutvecklat till egen app",
+        "period": "maj 2026–pågående",
+        "url": "/work/devicemonitor.html",
+        "bullets": [
+          "Nätverksmonitor för iPhone och iPad som hittar enheterna på wifi-nätet med TCP-, ICMP- och UDP-prober och Bonjour, och visar latens, jitter och avbrott över tid.",
+          "Övervakningsmotorn körs i en actor och skriver till SwiftData var 500:e ms, med versionerad schemamigrering. Vyerna läser bara oföränderliga ögonblicksbilder, inte databasen.",
+          "Appen förklarar varje enhet på nätet med Apple Intelligence (Foundation Models), utan att skicka data till molnet. Namn och tjänster från nätverket skickas in som avgränsad data, till skydd mot promptinjektion."
+        ],
+        "tech": "SwiftUI, SwiftData, Foundation Models, Swift Charts, Metal"
       },
       {
-        "name": "Subtl",
-        "status": "Under utveckling",
-        "url": "https://antonsmedberg.github.io/subtl/",
-        "stack": "Swift 6 · SpeechAnalyzer · AVFoundation · Core Animation · StoreKit 2",
-        "summary": "Textning av kortvideo med transkribering på enheten, så att inget lämnar telefonen. En gemensam stilmodell styr både förhandsvisning och AVFoundation-export, så att filen matchar det som redigerats. Actor-isolerad transkriptionsmotor; under utveckling, supportsida och integritetspolicy publicerade."
+        "name": "MetalVisualKit",
+        "status": "Öppen källkod, MIT-licens",
+        "period": "aug 2026",
+        "url": "/work/metalvisualkit.html",
+        "bullets": [
+          "Swift-paket som omvandlar LiDAR-djupdata till cirka 49 000 3D-punkter på GPU:n och animerar 1 400 partiklar i en compute-shader. Paketet har enhetstester i XCTest, en demoapp, CI och DocC."
+        ],
+        "tech": "Metal, ARKit, Swift Package Manager, XCTest, DocC"
       }
     ],
     "education": [
       {
-        "name": "Javautvecklare — backend- och webbutveckling, YH",
+        "name": "Javautvecklare",
         "org": "Grit Academy",
         "place": "Malmö",
-        "period": "aug 2024 – maj 2026",
-        "detail": "Java, Spring Boot, JPA, SQL, REST-API:er och webbutveckling. Avslutande LIA på Axis Communications."
+        "period": "aug 2024–maj 2026",
+        "detail": "Yrkeshögskoleexamen, 400 YH-poäng. VG i 15 av 16 kurser, bland annat IT-säkerhet för Javautvecklare och Testdriven utveckling i Java. Båda LIA-perioderna var på Axis Communications."
       },
       {
-        "name": "Programmerare iPhone och Android, YH",
+        "name": "Programmerare iPhone och Android",
         "org": "Malmö Yrkeshögskola",
         "place": "Malmö",
-        "period": "sep 2022 – dec 2023",
-        "detail": "Swift/iOS, Kotlin/Android, mobilapputveckling och UX, samt kurser i on-device-ML, Python för AI, testning och digital tillgänglighet."
+        "period": "sep 2022–nov 2023",
+        "detail": "Yrkeshögskoleexamen, 280 YH-poäng. Swift och Kotlin för iOS och Android, VG på LIA och examensarbete."
+      }
+    ],
+    "courses": [
+      {
+        "name": "UX, digital tillgänglighet och AI",
+        "org": "Malmö Yrkeshögskola",
+        "meta": "80 YH-poäng, VG",
+        "period": "sep 2024–jan 2025",
+        "detail": "Delkurserna UX och digital tillgänglighet, SEO för digital tillgänglighet och UX samt AI i det praktiska arbetet."
+      },
+      {
+        "name": "Pythonprogrammering för AI-utveckling",
+        "org": "IT-Högskolan",
+        "meta": "30 YH-poäng, VG",
+        "period": "sep 2024–jan 2025"
+      },
+      {
+        "name": "Mjukvarutestning",
+        "org": "Medieinstitutet",
+        "meta": "30 YH-poäng, VG",
+        "period": "april 2024–juni 2024"
+      },
+      {
+        "name": "Maskininlärning on-device för Apple och Android",
+        "org": "Malmö Yrkeshögskola",
+        "meta": "70 YH-poäng",
+        "period": "sep 2023–jan 2024"
       }
     ],
     "skills": [
       {
         "group": "iOS",
-        "items": "Swift 6, SwiftUI, UIKit, Swift Concurrency (async/await, actors), Combine, SwiftData, AVFoundation, Metal/MetalKit, ARKit, RealityKit, Core ML, StoreKit 2, MVVM, Swift Package Manager, tillgänglighet"
+        "items": "Swift 6, SwiftUI, UIKit, Swift Concurrency, SwiftData, Core Data, AVFoundation, Combine och App Intents (goda kunskaper från LIA och egna appar). Grundläggande Objective-C."
       },
       {
-        "group": "Kvalitet & leverans",
-        "items": "Xcode, XCTest, XCUITest, enhets- och UI-testning, Instruments, Git, GitHub Actions, CI, pull requests, kodgranskning, felsökning, QA, Jira, TestFlight, Datadog, OpenTelemetry"
+        "group": "Test",
+        "items": "Automatiserade tester med Swift Testing, XCTest och XCUITest, GitHub Actions och TestFlight"
       },
       {
-        "group": "Utanför iOS",
-        "items": "Kotlin, Jetpack Compose, Java, Spring Boot, REST-API:er, GraphQL, SQL, JPA"
+        "group": "Arkitektur",
+        "items": "MVVM, dependency injection, Swift-paket (bland annat ett designsystem), REST-API:er"
+      },
+      {
+        "group": "Prestanda och felsökning",
+        "items": "Instruments, signposts, Thread Sanitizer, os.Logger, Datadog och OpenTelemetry"
+      },
+      {
+        "group": "Grafik och AI",
+        "items": "Metal, ARKit, Core ML, SpeechAnalyzer och Foundation Models"
+      },
+      {
+        "group": "Tillgänglighet",
+        "items": "VoiceOver, Dynamic Type, WCAG och UX-design"
+      },
+      {
+        "group": "Verktyg",
+        "items": "Xcode, App Store Connect, Git, GitHub, Jira och Figma"
+      },
+      {
+        "group": "Android",
+        "items": "Kotlin, Coroutines, Flow, Jetpack Compose och Hilt (goda kunskaper från LIA och studier)"
+      },
+      {
+        "group": "Backend",
+        "items": "Java, Spring Boot, JPA och SQL (goda kunskaper från YH-utbildningen)"
+      },
+      {
+        "group": "AI-verktyg",
+        "items": "Claude Code, GitHub Copilot och OpenAI Codex. I Subtl styr jag Claude Code med egna regler och granskar varje ändring innan jag checkar in den."
+      },
+      {
+        "group": "Språk",
+        "items": "Svenska (modersmål) och engelska (professionell nivå)"
+      },
+      {
+        "group": "Körkort",
+        "items": "B"
       }
     ],
-    "languages": "Svenska (modersmål) · Engelska (professionell nivå)",
-    "references": "Rekommendationsbrev från Engineering Manager på Axis finns på begäran; rekommendationer från chef och mentor finns på LinkedIn."
+    "other_experience": [
+      {
+        "role": "Egenföretagare, e-handel",
+        "org": "Egen webbutik",
+        "period": "mars 2020–sep 2021"
+      },
+      {
+        "role": "Researcher, rekrytering",
+        "org": "RC Professional Search AB, Malmö",
+        "period": "jan 2018–aug 2019"
+      }
+    ],
+    "achievements": [
+      {
+        "name": "Judo på elitnivå",
+        "detail": "Tävlade i SM och internationellt som yngre."
+      }
+    ]
   }
 }

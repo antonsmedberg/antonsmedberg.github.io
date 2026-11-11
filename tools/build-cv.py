@@ -4,9 +4,9 @@ Renders the CV pages from one data file.
 
   assets/data/cv.json  ->  cv/index.html (English) and sv/cv/index.html (Swedish)
 
-tools/build-cv-pdf.js then prints the two A4 PDFs in assets/cv/ from these
-pages, so the web pages and the PDFs cannot disagree. The HTML template lives
-in this file; the CV content lives only in cv.json. Stdlib only.
+The PDFs in assets/cv/ are the finished iOS CVs, copied in as they are; keep
+cv.json in step with them. The HTML template lives in this file; the CV content
+lives only in cv.json. Stdlib only.
 
 Run from anywhere:  python3 tools/build-cv.py
 """
@@ -33,33 +33,35 @@ PAGES = {
         "other_lang": "sv",
         "home": "/",
         "job_title": "iOS Developer",
-        "og_alt": "Anton Smedberg, iOS developer in Malmö, next to a stippled ink portrait.",
+        "og_alt": "Anton Smedberg, junior developer in iOS, Android and Java. His name beside a pixel-art Turning Torso at dusk, with the mascot Bit waving.",
         "pdf": "/assets/cv/Anton-Smedberg-CV.pdf",
         "locale": "en_GB",
         "in_language": "en-GB",
-        "title": "Anton Smedberg — CV",
-        "description": "CV of Anton Smedberg, iOS developer in Malmö: Swift 6, SwiftUI, Metal, AVFoundation and ARKit, with five months of production iOS work at Axis Communications in Lund. One page, also as a PDF.",
+        "title": "CV, Anton Smedberg",
+        "description": "CV of Anton Smedberg, iOS developer in Malmö with a focus on UI and UX: internships at Axis Communications and Weavy, and my own apps in Swift and SwiftUI. Also as a PDF.",
         "skip": "Skip to content",
-        "brand": "Anton Smedberg — home",
-        "nav_label": "Sections",
-        "nav": [("Work", "/#work"), ("Experience", "/#experience"), ("Skills", "/#skills"), ("About", "/#about"), ("Contact", "/#contact")],
-        "lang_switch": '<span aria-current="page">EN</span><span aria-hidden="true">/</span><a href="/sv/cv/" hreflang="sv" lang="sv" aria-label="Svenska">SV</a>',
+        "brand": "Anton Smedberg, home",
+        "status": "Open to junior roles",
+        "lang_label": "SV", "lang_name": "Svenska",
         "theme": "Theme: follows the system. Switch to light",
-        "kicker": "Curriculum vitae",
         "download": "Download PDF",
+        "pdf_other": "/assets/cv/Anton-Smedberg-CV-SV.pdf",
+        "download_other": "PDF in Swedish",
         "print": "Print",
-        "switch": "Svenska",
-        "headings": {
-            "profile": "Profile", "facts": "Key facts", "experience": "Experience",
-            "projects": "Projects", "education": "Education", "skills": "Skills",
-            "languages": "Languages & references", "spoken": "Languages", "references": "References",
-        },
+        "index": "Sections of the CV",
+        "index_items": [("profile", "Summary"), ("experience", "Experience"), ("projects", "Projects"), ("education", "Education"), ("skills", "Skills")],
+        "tools": "Language and theme",
+        # Skill groups in cv.json by track; a group named nowhere joins the last track.
+        "tracks": [("iOS", ["iOS", "Testing", "Architecture", "Performance & debugging", "Graphics & AI", "Accessibility"]), ("Android", ["Android"]), ("Java and backend", ["Backend"]), ("Tools and languages", [])],
+        "headings": {"profile": "Summary", "experience": "Experience", "projects": "Projects", "education": "Education", "courses": "Courses (Higher Vocational Education)", "skills": "Skills", "other": "Other experience", "achievements": "Other achievements"},
+        "tech": "Tech",
         "updated": "Updated",
-        "colophon": "Set in Instrument Serif, Instrument Sans and IBM Plex Mono, all self-hosted. This page and the PDF are generated from one data file, assets/data/cv.json, by tools/build-cv.py, so they cannot disagree.",
+        "colophon": "Set in Bricolage Grotesque, the system font and Inter, with Pixelify Sans for the small labels, served from this site. This page is generated from assets/data/cv.json by tools/build-cv.py.",
         "pdf_label": "CV (PDF)",
         "source": "Source",
-        "folio_label": "Sections (bottom)",
-        "folio": [("Work", "/#work"), ("Experience", "/#experience"), ("Skills", "/#skills"), ("CV", "/cv/"), ("Contact", "/#contact")],
+        "smed_label": "Bit, the mascot. Tap to say hi.", "smed_hello": "Hej. This is my CV.", "smed_lines": ["Hej. I am Bit.", "Still booting.", "Oops. Did you see that.", "Beep.", "I run on coffee and Swift."],
+        "tab_label": "Sections",
+        "tabs": [("Home", "/", "t-home"), ("Work", "/#work", "t-work"), ("CV", "/cv/", "t-cv"), ("Contact", "/#contact", "t-mail")],
     },
     "sv": {
         "path": "sv/cv/index.html",
@@ -68,35 +70,49 @@ PAGES = {
         "other_lang": "en",
         "home": "/sv/",
         "job_title": "iOS-utvecklare",
-        "og_alt": "Anton Smedberg, iOS-utvecklare i Malmö, bredvid ett punktat bläckporträtt.",
+        "og_alt": "Anton Smedberg, juniorutvecklare inom iOS, Android och Java. Namnet står bredvid Turning Torso i pixelgrafik i skymningen, och maskoten Bit vinkar.",
         "pdf": "/assets/cv/Anton-Smedberg-CV-SV.pdf",
         "locale": "sv_SE",
         "in_language": "sv-SE",
-        "title": "Anton Smedberg — CV (svenska)",
-        "description": "CV för Anton Smedberg, iOS-utvecklare i Malmö: Swift 6, SwiftUI, Metal, AVFoundation och ARKit, med fem månader iOS i produktion på Axis Communications i Lund. En sida, även som PDF.",
+        "title": "CV, Anton Smedberg (svenska)",
+        "description": "CV för Anton Smedberg, iOS-utvecklare i Malmö med fokus på UI och UX: LIA på Axis Communications och Weavy och egna appar i Swift och SwiftUI. Även som PDF.",
         "skip": "Hoppa till innehåll",
-        "brand": "Anton Smedberg — startsida",
-        "nav_label": "Avsnitt",
-        "nav": [("Arbete", "/sv/#work"), ("Erfarenhet", "/sv/#experience"), ("Kompetens", "/sv/#skills"), ("Om", "/sv/#about"), ("Kontakt", "/sv/#contact")],
-        "lang_switch": '<span aria-current="page">SV</span><span aria-hidden="true">/</span><a href="/cv/" hreflang="en" lang="en" aria-label="English">EN</a>',
+        "brand": "Anton Smedberg, startsida",
+        "status": "Söker juniorroll",
+        "lang_label": "EN", "lang_name": "English",
         "theme": "Tema: följer systemet. Byt till ljust",
-        "kicker": "Meritförteckning",
         "download": "Ladda ner PDF",
+        "pdf_other": "/assets/cv/Anton-Smedberg-CV.pdf",
+        "download_other": "PDF på engelska",
         "print": "Skriv ut",
-        "switch": "English",
-        "headings": {
-            "profile": "Profil", "facts": "Nyckelfakta", "experience": "Erfarenhet",
-            "projects": "Projekt", "education": "Utbildning", "skills": "Kompetens",
-            "languages": "Språk & referenser", "spoken": "Språk", "references": "Referenser",
-        },
+        "index": "CV:ts avsnitt",
+        "index_items": [("profile", "Profil"), ("experience", "Erfarenhet"), ("projects", "Projekt"), ("education", "Utbildning"), ("skills", "Kompetenser")],
+        "tools": "Språk och tema",
+        "tracks": [("iOS", ["iOS", "Test", "Arkitektur", "Prestanda och felsökning", "Grafik och AI", "Tillgänglighet"]), ("Android", ["Android"]), ("Java och backend", ["Backend"]), ("Verktyg och språk", [])],
+        "headings": {"profile": "Profil", "experience": "Arbetslivserfarenhet", "projects": "Projekt", "education": "Utbildning", "courses": "Kurser (yrkeshögskola)", "skills": "Kompetenser", "other": "Övrig arbetslivserfarenhet", "achievements": "Övriga meriter"},
+        "tech": "Teknik",
         "updated": "Uppdaterad",
-        "colophon": "Satt i Instrument Serif, Instrument Sans och IBM Plex Mono, alla självhostade. Sidan och PDF:en genereras från samma datafil, assets/data/cv.json, av tools/build-cv.py, så de kan inte skilja sig åt.",
+        "colophon": "Satt i Bricolage Grotesque, systemets typsnitt och Inter, med Pixelify Sans för de små etiketterna, som serveras från den här webbplatsen. Sidan genereras från assets/data/cv.json av tools/build-cv.py.",
         "pdf_label": "CV (PDF)",
         "source": "Källkod",
-        "folio_label": "Avsnitt (nederst)",
-        "folio": [("Arbete", "/sv/#work"), ("Erfarenhet", "/sv/#experience"), ("Kompetens", "/sv/#skills"), ("CV", "/sv/cv/"), ("Kontakt", "/sv/#contact")],
+        "smed_label": "Bit, maskoten. Tryck för att säga hej.", "smed_hello": "Hej. Det här är mitt CV.", "smed_lines": ["Hej. Jag heter Bit.", "Startar fortfarande.", "Hoppsan. Såg du det.", "Pip.", "Jag går på kaffe och Swift."],
+        "tab_label": "Avsnitt",
+        "tabs": [("Hem", "/sv/", "t-home"), ("Projekt", "/sv/#work", "t-work"), ("CV", "/sv/cv/", "t-cv"), ("Kontakt", "/sv/#contact", "t-mail")],
     },
 }
+
+SPRITE = "/assets/img/icons.svg"
+MARK = '<svg class="mark" aria-hidden="true"><use href="/assets/img/icons.svg#i-mark"/></svg>'
+
+# The sections that have a mark of their own in the index: the same pictures that head them on the home page.
+SECTION_MARKS = {"profile": "cv", "experience": "experience", "skills": "skills"}
+
+
+def section_mark(key):
+    if key not in SECTION_MARKS:
+        return ""
+    name = SECTION_MARKS[key]
+    return '<img class="sec" src="/assets/art/tile-%s-60.webp" srcset="/assets/art/tile-%s-60.webp 60w, /assets/art/tile-%s-120.webp 120w" sizes="20px" width="60" height="60" alt="" decoding="async">' % (name, name, name)
 
 PAGE = Template("""<!DOCTYPE html>
 <html lang="$lang" class="no-js">
@@ -108,8 +124,8 @@ PAGE = Template("""<!DOCTYPE html>
 <meta name="author" content="Anton Smedberg">
 <meta name="robots" content="index,follow">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f2ed">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#100f0d">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f5f7">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0d11">
 <link rel="canonical" href="$site$url">
 <link rel="alternate" hreflang="en" href="$site/cv/">
 <link rel="alternate" hreflang="sv" href="$site/sv/cv/">
@@ -118,11 +134,12 @@ PAGE = Template("""<!DOCTYPE html>
 <link rel="icon" href="/assets/img/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <meta property="og:type" content="profile">
-<meta property="og:site_name" content="Anton Smedberg — $job_title">
+<meta property="og:site_name" content="Anton Smedberg">
 <meta property="og:title" content="$title">
 <meta property="og:description" content="$description">
 <meta property="og:url" content="$site$url">
-<meta property="og:image" content="$site/assets/img/og-image.png">
+<meta property="og:image" content="$site/assets/img/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="$og_alt">
@@ -130,47 +147,24 @@ PAGE = Template("""<!DOCTYPE html>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="$title">
 <meta name="twitter:description" content="$description">
-<meta name="twitter:image" content="$site/assets/img/og-image.png">
-<link rel="preload" href="/assets/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/instrument-sans-wght.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="twitter:image" content="$site/assets/img/og-image.jpg">
 <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="stylesheet" href="/assets/css/style.css">
 <link rel="stylesheet" href="/assets/css/cv.css">
+<script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/assets/*"}}]},"eagerness":"moderate"}]}</script>
 <script type="application/ld+json">
 $jsonld
 </script>
 </head>
 <body>
+<div class="screen">
 <a class="skip-link" href="#main">$skip</a>
-<svg width="0" height="0" aria-hidden="true" focusable="false" class="visually-hidden">
-  <symbol id="mark" viewBox="0 0 32 32"><path d="M32.00 16.00 31.99 21.37 31.95 23.09 31.88 24.32 31.78 25.32 31.65 26.16 31.50 26.90 31.32 27.55 31.11 28.13 30.86 28.65 30.59 29.12 30.27 29.54 29.93 29.93 29.54 30.27 29.12 30.59 28.65 30.86 28.13 31.11 27.55 31.32 26.90 31.50 26.16 31.65 25.32 31.78 24.32 31.88 23.09 31.95 21.37 31.99 16.00 32.00 10.63 31.99 8.91 31.95 7.68 31.88 6.68 31.78 5.84 31.65 5.10 31.50 4.45 31.32 3.87 31.11 3.35 30.86 2.88 30.59 2.46 30.27 2.07 29.93 1.73 29.54 1.41 29.12 1.14 28.65 0.89 28.13 0.68 27.55 0.50 26.90 0.35 26.16 0.22 25.32 0.12 24.32 0.05 23.09 0.01 21.37 0.00 16.00 0.01 10.63 0.05 8.91 0.12 7.68 0.22 6.68 0.35 5.84 0.50 5.10 0.68 4.45 0.89 3.87 1.14 3.35 1.41 2.88 1.73 2.46 2.07 2.07 2.46 1.73 2.88 1.41 3.35 1.14 3.87 0.89 4.45 0.68 5.10 0.50 5.84 0.35 6.68 0.22 7.68 0.12 8.91 0.05 10.63 0.01 16.00 0.00 21.37 0.01 23.09 0.05 24.32 0.12 25.32 0.22 26.16 0.35 26.90 0.50 27.55 0.68 28.13 0.89 28.65 1.14 29.12 1.41 29.54 1.73 29.93 2.07 30.27 2.46 30.59 2.88 30.86 3.35 31.11 3.87 31.32 4.45 31.50 5.10 31.65 5.84 31.78 6.68 31.88 7.68 31.95 8.91 31.99 10.63Z" style="fill:var(--mark-tile,#15120f)"/><path d="M8.8 27.2 16 9.4l7.2 17.8" fill="none" style="stroke:var(--mark-glyph,#f6f1e8)" stroke-width="3.6" stroke-miterlimit="8"/><path d="M5 21.4h22" style="stroke:var(--mark-rule,#c33a1c)" stroke-width="2.6"/></symbol>
-  <symbol id="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M9 7h8v8"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/></symbol>
-  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6"/><path d="m11.5 6-6 6 6 6"/></symbol>
-  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7.5 8 5.5 8-5.5"/></symbol>
-  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2.5"/><path d="M15.5 8.5V6A2 2 0 0 0 13.5 4H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5"/></symbol>
-  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h6.8l4.7 4.7V19a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z"/><path d="M13.5 3.8V8.5h4.7"/><path d="M8.8 12.5h6.4M8.8 16h6.4"/></symbol>
-  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8"/></symbol>
-  <symbol id="i-case" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7" width="17" height="12.5" rx="2.5"/><path d="M9 7V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8V7"/><path d="M3.5 12.5h17"/></symbol>
-  <symbol id="i-tools" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5h9M17 7.5h3M4 16.5h3M11 16.5h9"/><circle cx="15" cy="7.5" r="2"/><circle cx="9" cy="16.5" r="2"/></symbol>
-  <symbol id="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
-  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></symbol>
-  <symbol id="i-github" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .7C5.65.7.5 5.85.5 12.2c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.14c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.05 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.22c.98 0 1.96.13 2.88.39 2.19-1.49 3.15-1.18 3.15-1.18.63 1.58.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.27 5.69.42.36.78 1.06.78 2.14v3.16c0 .3.21.66.79.55A11.51 11.51 0 0 0 23.5 12.2C23.5 5.85 18.35.7 12 .7z"/></symbol>
-  <symbol id="i-linkedin" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM2.9 21.5h4.16V9.5H2.9v12zM9.5 9.5h3.99v1.64h.06c.56-1.05 1.92-2.16 3.95-2.16 4.22 0 5 2.78 5 6.4v6.12h-4.16v-5.43c0-1.29-.02-2.96-1.8-2.96-1.8 0-2.08 1.4-2.08 2.86v5.53H9.5v-12z"/></symbol>
-</svg>
-
 <header class="masthead">
   <div class="shell masthead__inner">
-    <a class="brand" href="$home" aria-label="$brand"><svg aria-hidden="true"><use href="#mark"/></svg><span>Anton Smedberg</span></a>
-    <nav class="nav" aria-label="$nav_label">
-      $nav
-    </nav>
-    <div class="tools">
-      <span class="lang">$lang_switch</span>
-      <button class="theme" type="button" data-theme-toggle aria-label="$theme"><svg class="i-auto" aria-hidden="true"><use href="#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
-      <a class="btn btn--sm" href="$url" aria-current="page"><svg aria-hidden="true"><use href="#i-doc"/></svg>CV</a>
+    <a class="brand glass" href="$home" aria-label="$brand">$mark<span class="island__text"><b>Anton Smedberg</b><small>$status<i class="island__dot" aria-hidden="true"></i></small></span></a>
+    <div class="tools glass" role="group" aria-label="$tools">
+      <a class="tool tool--lang" href="$other" hreflang="$other_lang" lang="$other_lang" aria-label="$lang_name"><svg aria-hidden="true"><use href="$sprite#i-globe"/></svg>$lang_label</a>
+      <button class="tool theme" type="button" data-theme-toggle aria-label="$theme"><svg class="i-auto" aria-hidden="true"><use href="$sprite#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="$sprite#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="$sprite#i-moon"/></svg></button>
     </div>
   </div>
 </header>
@@ -178,85 +172,90 @@ $jsonld
 <main id="main" tabindex="-1">
 <article class="cv shell" aria-labelledby="cv-name">
   <header class="cv__head">
-    <p class="label cv__kicker">$kicker</p>
     <h1 class="cv__name" id="cv-name">$name</h1>
-    <p class="role cv__role">$role</p>
+    <p class="cv__role">$role</p>
+    <p class="cv__keys">$keywords</p>
     $contact
-    <p class="cv__contact">$availability</p>
+    <p class="avail cv__avail"><i aria-hidden="true"></i><span>$availability</span></p>
     <div class="actions">
-      <a class="btn" href="$pdf" download>$download <svg aria-hidden="true"><use href="#i-down"/></svg></a>
-      <button class="btn btn--ghost" type="button" data-print>$print</button>
-      <a class="text-link" href="$other" hreflang="$other_lang" lang="$other_lang">$switch <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <a class="btn" href="$pdf" download><svg class="icon" aria-hidden="true"><use href="$sprite#i-download"/></svg>$download</a>
+      <a class="btn btn--quiet" href="$pdf_other" download hreflang="$other_lang"><svg class="icon" aria-hidden="true"><use href="$sprite#i-download"/></svg>$download_other</a>
+      <button class="btn btn--quiet" type="button" data-print>$print</button>
     </div>
   </header>
 
-  <section class="cv__section" aria-labelledby="cv-profile">
-    <h2 class="label" id="cv-profile">$h_profile</h2>
-    <div class="cv__text"><p>$profile</p></div>
+  <nav class="cv__index glass" aria-label="$index">$index_links</nav>
+
+  <div class="cv__cols">
+  <div class="cv__main">
+  <section class="cv__section panel" data-sec="profile" aria-labelledby="cv-profile">
+    <h2 id="cv-profile">$h_profile</h2>
+    <p class="cv__profile">$profile</p>
   </section>
 
-  <dl class="cv__facts" aria-label="$h_facts">
-    $facts
-  </dl>
-
-  <section class="cv__section" aria-labelledby="cv-experience">
-    <h2 class="label" id="cv-experience">$h_experience</h2>
-    <ol class="cv__rows">
-      $experience
-    </ol>
+  <section class="cv__section panel" data-sec="experience" aria-labelledby="cv-experience">
+    <h2 id="cv-experience">$h_experience</h2>
+    <div class="cv__timeline">
+    $experience
+    </div>
   </section>
 
-  <section class="cv__section" aria-labelledby="cv-projects">
-    <h2 class="label" id="cv-projects">$h_projects</h2>
-    <ul class="cv__rows">
-      $projects
-    </ul>
+  <section class="cv__section panel" data-sec="projects" aria-labelledby="cv-projects">
+    <h2 id="cv-projects">$h_projects</h2>
+    $projects
   </section>
 
-  <section class="cv__section" aria-labelledby="cv-education">
-    <h2 class="label" id="cv-education">$h_education</h2>
-    <ol class="cv__rows">
-      $education
-    </ol>
+  </div>
+  <div class="cv__side">
+  <section class="cv__section panel" data-sec="education" aria-labelledby="cv-education">
+    <h2 id="cv-education">$h_education</h2>
+    <div class="cv__timeline">
+    $education
+    </div>
   </section>
 
-  <section class="cv__section" aria-labelledby="cv-skills">
-    <h2 class="label" id="cv-skills">$h_skills</h2>
-    <ul class="cv__rows">
-      $skills
-    </ul>
+  <section class="cv__section panel" data-sec="courses" aria-labelledby="cv-courses">
+    <h2 id="cv-courses">$h_courses</h2>
+    $courses
   </section>
 
-  <section class="cv__section" aria-labelledby="cv-languages">
-    <h2 class="label" id="cv-languages">$h_languages</h2>
-    <ul class="cv__rows">
-      <li class="cv__row"><p class="cv__key">$h_spoken</p><div><p>$languages</p></div></li>
-      <li class="cv__row"><p class="cv__key">$h_references</p><div><p>$references</p></div></li>
-    </ul>
+  <section class="cv__section panel" data-sec="skills" aria-labelledby="cv-skills">
+    <h2 id="cv-skills">$h_skills</h2>
+    $skills
   </section>
 
-  <p class="label cv__meta">$updated <span data-stamp="build">$build</span></p>
+  <section class="cv__section panel" data-sec="other" aria-labelledby="cv-other">
+    <h2 id="cv-other">$h_other</h2>
+    $other_experience
+  </section>
+
+  <section class="cv__section panel" data-sec="achievements" aria-labelledby="cv-achievements">
+    <h2 id="cv-achievements">$h_achievements</h2>
+    $achievements
+  </section>
+  </div>
+  </div>
 </article>
 </main>
 
-<footer class="footer">
+<footer class="footer panel">
   <div class="shell footer__inner">
-    <div>
-      <a class="brand" href="$home" aria-label="$brand"><svg aria-hidden="true"><use href="#mark"/></svg><span>Anton Smedberg</span></a>
-      <p class="colophon">$colophon</p>
-    </div>
+    <p class="colophon">$colophon $updated <span data-stamp="build">$build</span>.</p>
     <div class="footer__links">
       <a href="mailto:$email">$email</a>
       <a href="$pdf">$pdf_label</a>
       <a href="$source">$source_label</a>
-      <a href="$other" hreflang="$other_lang" lang="$other_lang">$switch</a>
-      <span>© <span data-year>$year</span> Anton Smedberg · Malmö</span>
+      <a href="$other" hreflang="$other_lang" lang="$other_lang">$lang_name</a>
     </div>
   </div>
 </footer>
-
-<nav class="folio" aria-label="$folio_label">
-  $folio
+</div>
+<nav class="tabbar" aria-label="$tab_label">
+  <div class="tabbar__body glass">
+    <span class="tabbar__lens" aria-hidden="true"></span>
+    $tabs
+  </div>
+  <button class="smed" type="button" aria-label="$smed_label" data-hello="$smed_hello" data-lines="$smed_lines"><span class="smed__say" aria-hidden="true"></span></button>
 </nav>
 
 <script type="module" src="/assets/js/main.js"></script>
@@ -265,107 +264,129 @@ $jsonld
 </html>
 """)
 
-DIGIT_GROUP = re.compile(r"(?<=\d)[  ](?=\d{3}(?!\d))")
+# Spaces a line must not break at: inside a number, between a number and its
+# unit, and between a name and its version.
+GLUE = re.compile(r"(?<=\d) (?=\d{3}(?!\d))|(?<=\d) (?=YH\b)|(?<=\bSwift) (?=\d)|(?<=\biOS) (?=\d)")
 
 
-def text(value, stamps):
-    """Escape content text, glue digit groups, expand {tests}/{hash} stamps."""
-    out = html.escape(value, quote=False)
-    out = DIGIT_GROUP.sub("&#160;", out)
-    for key, stamp in stamps.items():
-        out = out.replace("{%s}" % key, '<span data-stamp="%s">%s</span>' % (key, html.escape(stamp)))
-    return out
+def text(value):
+    """Escape content text and glue what belongs together."""
+    return GLUE.sub("&#160;", html.escape(value, quote=False))
 
 
 def attr(value):
     return html.escape(value, quote=True)
 
 
-def links(items):
-    return "".join('<a href="%s">%s</a>' % (attr(href), html.escape(label)) for label, href in items)
-
-
-FOLIO_ICONS = ["i-grid", "i-case", "i-tools", "i-doc", "i-mail"]
-
-
-def folio_links(items, current):
+def tab_links(items, current):
     return "".join(
-        '<a href="%s"%s><svg aria-hidden="true"><use href="#%s"/></svg><span>%s</span></a>'
-        % (attr(href), ' aria-current="page"' if href == current else "", FOLIO_ICONS[i % 5], html.escape(label))
-        for i, (label, href) in enumerate(items)
-    )
-
-
-def links_current(items, current):
-    return "".join(
-        '<a href="%s"%s>%s</a>' % (attr(href), ' aria-current="page"' if href == current else "", html.escape(label))
-        for label, href in items
+        '<a href="%s"%s><i><svg class="o" aria-hidden="true"><use href="%s#%s"/></svg><svg class="f" aria-hidden="true"><use href="%s#%s-f"/></svg></i><span>%s</span></a>'
+        % (attr(href), ' aria-current="page"' if href == current else "", SPRITE, icon, SPRITE, icon, html.escape(label))
+        for label, href, icon in items
     )
 
 
 def contact(person, lang):
-    """Two mono lines: e-mail, phone and city; then the links."""
     phone_href = "tel:" + re.sub(r"[^\d+]", "", person["phone"])
-    lines = [
-        [
-            '<a href="mailto:%s">%s</a>' % (attr(person["email"]), html.escape(person["email"])),
-            '<a href="%s">%s</a>' % (phone_href, html.escape(person["phone"])),
-            html.escape(person["location"][lang]),
-        ],
-        ['<a href="%s">%s</a>' % (attr(link["url"]), html.escape(link["label"])) for link in person["links"]],
-    ]
-    return "\n    ".join('<p class="cv__contact">%s</p>' % "".join("<span>%s</span>" % p for p in parts) for parts in lines)
+    parts = [
+        "<span>%s</span>" % html.escape(person["location"][lang]),
+        '<a href="%s">%s</a>' % (phone_href, html.escape(person["phone"])),
+        '<a href="mailto:%s">%s</a>' % (attr(person["email"]), html.escape(person["email"])),
+    ] + ['<a href="%s">%s</a>' % (attr(link["url"]), html.escape(link["label"])) for link in person["links"]]
+    return '<p class="cv__contact">%s</p>' % "".join(parts)
 
 
-def row(margin, body, margin_class="when label"):
-    return '<li class="cv__row"><p class="%s">%s</p><div>%s</div></li>' % (margin_class, margin, body)
+def bullets(items):
+    return "<ul>%s</ul>" % "".join("<li>%s</li>" % text(b) for b in items)
 
 
-def experience(entries, stamps):
+def experience(entries, tech):
     out = []
     for e in entries:
-        body = "<h3>%s</h3><p class=\"org cv__org\"><b>%s</b> · %s</p><ul>%s</ul>" % (
-            text(e["role"], stamps),
-            text(e["org"], stamps),
-            text(e["place"], stamps),
-            "".join("<li>%s</li>" % text(b, stamps) for b in e["bullets"]),
+        note = '<p class="cv__note">%s</p>' % text(e["note"]) if e.get("note") else ""
+        out.append(
+            '<div class="cv__item"><h3>%s</h3><p class="cv__meta">%s, %s</p><p class="cv__when">%s</p>%s<p class="cv__tech">%s: %s</p>%s</div>'
+            % (text(e["role"]), text(e["org"]), text(e["place"]), text(e["period"]), bullets(e["bullets"]), tech, text(e["tech"]), note)
         )
-        out.append(row(text(e["period"], stamps), body))
-    return "\n      ".join(out)
+    return "\n    ".join(out)
 
 
-def projects(entries, stamps):
-    out = []
-    for p in entries:
-        body = '<h3><a href="%s">%s</a></h3><p class="cv__stack">%s</p><p class="cv__p">%s</p>' % (
-            attr(p["url"]), text(p["name"], stamps), text(p["stack"], stamps), text(p["summary"], stamps)
-        )
-        out.append(row(text(p["status"], stamps), body))
-    return "\n      ".join(out)
-
-
-def education(entries, stamps):
-    out = []
-    for e in entries:
-        body = '<h3>%s</h3><p class="org cv__org"><b>%s</b> · %s</p><p class="cv__p">%s</p>' % (
-            text(e["name"], stamps), text(e["org"], stamps), text(e["place"], stamps), text(e["detail"], stamps)
-        )
-        out.append(row(text(e["period"], stamps), body))
-    return "\n      ".join(out)
-
-
-def skills(groups, stamps):
-    # Group names carry product names (iOS), so they are not uppercase labels.
-    return "\n      ".join(
-        row(text(g["group"], stamps), "<p>%s</p>" % text(g["items"], stamps), margin_class="cv__key") for g in groups
+def projects(entries, tech):
+    return "\n    ".join(
+        '<div class="cv__item"><h3><a href="%s">%s</a></h3><p class="cv__meta">%s</p><p class="cv__when">%s</p>%s<p class="cv__tech">%s: %s</p></div>'
+        % (attr(p["url"]), text(p["name"]), text(p["status"]), text(p["period"]), bullets(p["bullets"]), tech, text(p["tech"]))
+        for p in entries
     )
 
 
-def facts(items, stamps):
-    # Joined without whitespace: in print the cells run inline, separated by middots.
-    return "".join(
-        '<div><dt class="label">%s</dt><dd class="proof__value">%s</dd></div>' % (text(f["label"], stamps), text(f["value"], stamps))
-        for f in items
+def education(entries):
+    return "\n    ".join(
+        '<div class="cv__item"><h3>%s</h3><p class="cv__meta">%s, %s</p><p class="cv__when">%s</p><p class="cv__p">%s</p></div>'
+        % (text(e["name"]), text(e["org"]), text(e["place"]), text(e["period"]), text(e["detail"]))
+        for e in entries
+    )
+
+
+def courses(entries):
+    out = []
+    for c in entries:
+        detail = '<p class="cv__p">%s</p>' % text(c["detail"]) if c.get("detail") else ""
+        out.append(
+            '<div class="cv__item"><h3>%s</h3><p class="cv__meta">%s, %s</p><p class="cv__when">%s</p>%s</div>'
+            % (text(c["name"]), text(c["org"]), text(c["meta"]), text(c["period"]), detail)
+        )
+    return "\n    ".join(out)
+
+
+LIST_END = re.compile(r" (?:and|och) (?=[^,]+$)")
+OUTSIDE_PARENS = re.compile(r", (?![^(]*\))")
+
+
+def chips(items):
+    """A plain list of short names becomes chips; a trailing remark stays a sentence.
+    Returns None when the text is not such a list, so it is shown as written."""
+    head, dot, tail = items.partition(". ")
+    remark = tail
+    # One aside, at the end, is about the whole list; several belong to their names.
+    aside = re.search(r" (\([^)]*\))$", head)
+    if aside and head.count("(") == 1:
+        head, remark = head[: aside.start()], (aside.group(1) + dot + tail).strip()
+    names = OUTSIDE_PARENS.split(LIST_END.sub(", ", head))
+    if len(names) < 2 or any(len(re.sub(r"\([^)]*\)", "", n).split()) > 3 for n in names):
+        return None
+    note = '<p class="cv__chipnote">%s</p>' % text(remark) if remark else ""
+    return '<ul class="chips" aria-hidden="true">%s</ul>%s' % ("".join("<li>%s</li>" % text(n) for n in names), note)
+
+
+def skills(groups, tracks):
+    """Skill groups under their track. The sentence from cv.json is always in the
+    page, for print and screen readers; where it reads as a list, chips show it."""
+    named = {name for _, names in tracks for name in names}
+    out = []
+    for title, names in tracks:
+        rows = []
+        for g in groups:
+            if g["group"] not in (names or [x["group"] for x in groups if x["group"] not in named]):
+                continue
+            shown = chips(g["items"])
+            cls = ' class="cv__listed"' if shown else ""
+            rows.append("<div%s><dt>%s</dt><dd><span>%s</span>%s</dd></div>" % (cls, text(g["group"]), text(g["items"]), shown or ""))
+        if rows:
+            out.append('<div class="cv__track"><h3>%s</h3><dl class="cv__skills">%s</dl></div>' % (html.escape(title), "".join(rows)))
+    return "\n    ".join(out)
+
+
+def other_experience(entries):
+    return "\n    ".join(
+        '<div class="cv__item"><h3>%s</h3><p class="cv__meta">%s</p><p class="cv__when">%s</p></div>'
+        % (text(e["role"]), text(e["org"]), text(e["period"]))
+        for e in entries
+    )
+
+
+def achievements(entries):
+    return "\n    ".join(
+        '<div class="cv__item"><h3>%s</h3><p class="cv__p">%s</p></div>' % (text(a["name"]), text(a["detail"])) for a in entries
     )
 
 
@@ -406,11 +427,12 @@ def render(lang, data, build):
     page = PAGES[lang]
     person = data["person"]
     content = data[lang]
-    stamps = data["stamps"]
     h = page["headings"]
     ctx = {
         "lang": lang,
         "site": SITE,
+        "sprite": SPRITE,
+        "mark": MARK,
         "url": page["url"],
         "other": page["other"],
         "other_lang": page["other_lang"],
@@ -420,39 +442,33 @@ def render(lang, data, build):
         "title": attr(page["title"]),
         "description": attr(page["description"]),
         "jsonld": jsonld(person, page, build),
-        "job_title": attr(page["job_title"]),
         "og_alt": attr(page["og_alt"]),
         "skip": html.escape(page["skip"]),
         "brand": attr(page["brand"]),
-        "nav_label": attr(page["nav_label"]),
-        "nav": links(page["nav"]),
-        "lang_switch": page["lang_switch"],
+        "status": attr(page["status"]),
+        "lang_label": page["lang_label"],
+        "lang_name": page["lang_name"],
         "theme": attr(page["theme"]),
-        "kicker": html.escape(page["kicker"]),
         "name": html.escape(person["name"]),
-        "role": text(content["title"], stamps),
+        "role": text(content["title"]),
+        "keywords": text(content["keywords"]),
         "contact": contact(person, lang),
-        "availability": text(content["availability"], stamps),
+        "availability": text(content["availability"]),
         "download": html.escape(page["download"]),
         "print": html.escape(page["print"]),
-        "switch": html.escape(page["switch"]),
-        "h_profile": html.escape(h["profile"]),
-        "h_facts": attr(h["facts"]),
-        "h_experience": html.escape(h["experience"]),
-        "h_projects": html.escape(h["projects"]),
-        "h_education": html.escape(h["education"]),
-        "h_skills": html.escape(h["skills"]),
-        "h_languages": html.escape(h["languages"]),
-        "h_spoken": html.escape(h["spoken"]),
-        "h_references": html.escape(h["references"]),
-        "profile": text(content["profile"], stamps),
-        "facts": facts(content["facts"], stamps),
-        "experience": experience(content["experience"], stamps),
-        "projects": projects(content["projects"], stamps),
-        "education": education(content["education"], stamps),
-        "skills": skills(content["skills"], stamps),
-        "languages": text(content["languages"], stamps),
-        "references": text(content["references"], stamps),
+        "profile": text(content["profile"]),
+        "experience": experience(content["experience"], page["tech"]),
+        "projects": projects(content["projects"], page["tech"]),
+        "education": education(content["education"]),
+        "courses": courses(content["courses"]),
+        "skills": skills(content["skills"], page["tracks"]),
+        "index": attr(page["index"]),
+        "index_links": "".join('<a href="#cv-%s" data-to="%s">%s%s</a>' % (key, key, section_mark(key), html.escape(label)) for key, label in page["index_items"]),
+        "tools": attr(page["tools"]),
+        "pdf_other": page["pdf_other"],
+        "download_other": html.escape(page["download_other"]),
+        "other_experience": other_experience(content["other_experience"]),
+        "achievements": achievements(content["achievements"]),
         "updated": html.escape(page["updated"]),
         "build": build,
         "colophon": html.escape(page["colophon"]),
@@ -460,10 +476,14 @@ def render(lang, data, build):
         "pdf_label": html.escape(page["pdf_label"]),
         "source": SOURCE,
         "source_label": html.escape(page["source"]),
-        "year": build[:4],
-        "folio_label": attr(page["folio_label"]),
-        "folio": folio_links(page["folio"], page["url"]),
+        "smed_label": attr(page["smed_label"]),
+        "smed_hello": attr(page["smed_hello"]),
+        "smed_lines": attr(json.dumps(page["smed_lines"], ensure_ascii=False)),
+        "tab_label": attr(page["tab_label"]),
+        "tabs": tab_links(page["tabs"], page["url"]),
     }
+    for key, value in h.items():
+        ctx["h_" + key] = html.escape(value)
     return PAGE.substitute(ctx)
 
 

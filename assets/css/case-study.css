@@ -1,106 +1,102 @@
-/* Case studies and the 404 — layered on style.css, same tokens, nothing redefined.
-   Breadcrumb → head → figure → article | specifications → prev/next ring → 404. */
+/* Case studies and the 404. Layers on style.css and redefines no token. A
+   case study is also what a project's window shows, so it leads with the
+   screens and the facts and keeps the story below. */
 
-.breadcrumb { border-bottom: 1px solid var(--rule); font: 400 var(--t-caption) / 1.4 var(--font-mono); }
+/* A row of screens: it snaps, and main.js lets a mouse drag and throw it. */
+.stage { margin: 8px; border-radius: var(--r-md); background: light-dark(oklch(0.93 0.035 var(--h)), oklch(0.2 0.04 var(--h))); }
+.shots {
+  display: flex; gap: 16px; padding: 16px;
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory; scroll-padding-inline: 16px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.shots::-webkit-scrollbar { display: none; }
+.shots:focus-visible { outline-offset: -4px; }
+.shots { transition: translate 0.5s var(--spring); }
+.shots.is-held { scroll-snap-type: none; cursor: grabbing; transition: none; }
+.shots.is-held img { pointer-events: none; }
 
-.breadcrumb a { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 2.75rem; color: var(--ink-2); transition: color 0.2s; }
+.shot { flex: 0 0 auto; width: 66%; max-width: 17rem; scroll-snap-align: center; }
+.shot img { -webkit-user-drag: none; user-select: none; }
+.shots--wide .shot { width: 90%; max-width: 38rem; }
+.shots--solo { justify-content: center; }
 
-.breadcrumb svg,
-.case-aside a svg { display: inline; width: 0.85em; height: 0.85em; }
+.case { padding-block: 16px 0; }
 
-.case { padding-block: clamp(2rem, 5vw, 4rem) var(--section-y); }
+.back { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--ink-2); font-size: var(--fs-sub); font-weight: 500; }
+.back svg { width: 18px; height: 18px; }
 
-.case-head { display: grid; gap: 1rem; max-width: 66ch; }
+.case-head { margin-top: 12px; }
+/* The longest name, DeviceMonitor, must fit beside its icon on a small
+   phone, so the narrowest screens set the title a step down. */
+.case-head h1 { font-size: var(--fs-2xl); font-weight: 780; letter-spacing: var(--tr-3xl); line-height: 0.98; }
+@container (max-width: 359px) { .case-head h1 { font-size: var(--fs-xl); } }
+.case-head .project__top > div { min-width: 0; }
+.case-head .project__icon { width: 60px; height: 60px; }
+.case-head .deck { margin-top: 16px; max-width: 30em; color: var(--ink-2); font-size: var(--fs-lg); letter-spacing: var(--tr-md); line-height: var(--lh-body); }
+.case-facts { display: grid; gap: 12px 28px; margin-top: 20px; max-width: 44rem; }
+.case-facts dd { margin-top: 4px; font-weight: 600; line-height: var(--lh-md); }
+.case-head .actions { margin-top: 20px; }
 
-.case-head__num { display: flex; align-items: center; gap: 0.75rem; }
+.case .stage { margin: 24px calc(-1 * max(var(--gutter), env(safe-area-inset-left))) 0; border-radius: 0; }
+.case .shots { padding-block: 24px 28px; padding-inline: max(var(--gutter), env(safe-area-inset-left)); scroll-padding-inline: var(--gutter); }
 
-.case-head h1,
-.nf h1 { font-family: var(--font-display); font-size: var(--t-h2); font-weight: 400; line-height: 1.04; letter-spacing: -0.02em; }
+.case-wide { margin-top: 12px; }
+.case-wide img { width: 100%; max-width: 32rem; margin-inline: auto; border-radius: var(--r-md); }
+.case-wide--ipad img { box-shadow: var(--shadow); }
+.case-wide figcaption { max-width: 32rem; margin: 8px auto 0; color: var(--ink-3); font-size: var(--fs-note); letter-spacing: var(--tr-sm); line-height: var(--lh-sm); }
 
-.case-head .deck,
-.nf__copy { max-width: 56ch; color: var(--ink-2); font-size: var(--t-lede); line-height: 1.5; }
+.case-grid { display: grid; gap: 32px; margin-top: 36px; }
 
-.case-fig { margin-top: clamp(1.75rem, 4vw, 3rem); }
+/* The story: one column of 60 to 70 characters, each part under a heading
+   that stands a clear step above the text and well clear of the part before. */
+.case-body { max-width: var(--measure); min-width: 0; }
+.case-body h2 { margin-top: 40px; font-size: var(--fs-xl); letter-spacing: var(--tr-xl); line-height: 1.1; }
+.case-body h2:first-child { margin-top: 0; }
+.case-body h2:not(:first-child)::before { margin-bottom: 24px; }
+.case-body p { margin-top: 12px; color: var(--ink-2); }
+.case-body a { color: var(--accent); font-weight: 500; }
+.case-body code { font: 0.92em ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink); overflow-wrap: anywhere; }
 
-.case-fig .device { width: min(18rem, 60vw); }
+.pull { margin-top: 16px; padding: 16px; border-radius: var(--r-sm); background: var(--accent-soft); }
+.case-body .pull p { margin: 0; color: var(--ink); font-family: var(--font-display); font-size: var(--fs-lg); font-weight: 640; letter-spacing: var(--tr-lg); line-height: var(--lh-md); text-wrap: balance; }
 
-.case-fig figcaption { margin-top: 0.6rem; }
+.limits { display: grid; gap: 12px; margin-top: 12px; color: var(--ink-2); }
+.limits b { color: var(--ink); font-weight: 600; }
 
-.case-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2.5rem, 5vw, 4rem); margin-top: clamp(2rem, 5vw, 3.5rem); }
+.case-aside { padding: 20px 20px 8px; }
+.case-aside h2 { font-size: var(--fs-lg); letter-spacing: var(--tr-lg); }
+.case-aside dl { margin-top: 8px; }
+.case-aside dl > div { padding-block: 12px; border-top: 1px solid var(--line); }
+.case-aside dt { color: var(--ink-3); font-size: var(--fs-note); letter-spacing: var(--tr-sm); line-height: var(--lh-sm); }
+.case-aside dd { font-size: var(--fs-sub); font-weight: 500; line-height: var(--lh-md); }
+.case-aside a { color: var(--accent); }
 
-.case-body { max-width: 66ch; }
+.case-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 40px; }
+.case-nav a { display: grid; gap: 4px; padding: 16px; border-radius: var(--r-md); transition: transform 0.4s var(--press); }
+.case-nav a:active { transform: scale(0.97); }
+.case-nav a:last-child { justify-items: end; text-align: end; }
+.case-nav span { color: var(--ink-3); font-size: var(--fs-note); }
+.case-nav b { display: inline-flex; align-items: center; gap: 6px; font-weight: 640; letter-spacing: -0.012em; }
+.case-nav svg { width: 18px; height: 18px; flex: none; }
 
-.case-body h2 { margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-family: var(--font-display); font-size: var(--t-h3); font-weight: 400; line-height: 1.1; }
+.nf { padding-block: 72px 0; }
+.nf h1 { margin-top: 8px; font-size: var(--fs-3xl); font-weight: 780; letter-spacing: var(--tr-3xl); line-height: 0.98; }
+.nf .deck { margin-top: 16px; max-width: 30em; color: var(--ink-2); font-size: var(--fs-lg); letter-spacing: var(--tr-md); line-height: var(--lh-body); }
+.nf .actions { margin-top: 24px; }
 
-.case-body h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
-
-.case-body p { margin-top: 0.9rem; color: var(--ink-2); }
-
-.case-body .pull { margin-block: 1.5rem; }
-
-.case-body .pull p { margin-top: 0; color: var(--ink); }
-
-.case-body code { font: 0.9em var(--font-mono); color: var(--ink); }
-
-.case-aside h2 { margin-bottom: 0.6rem; }
-
-.case-aside dl { border-top: 1px solid var(--rule-strong); }
-
-.case-aside div { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0.75rem; padding-block: 0.65rem; border-bottom: 1px solid var(--rule); }
-
-.case-aside dt { padding-top: 0.2em; }
-
-.case-aside dd { font: 400 var(--t-caption) / 1.5 var(--font-mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-
-.case-aside a { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 0.3em; transition: text-decoration-color 0.2s; }
-
-.case-nav { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: var(--section-y); border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); }
-
-.case-nav a { display: grid; gap: 0.5rem; padding-block: 1.25rem; border-bottom: 1px solid var(--rule); }
-
-.case-nav a:last-child { border-bottom: 0; }
-
-.case-nav__title { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-display); font-size: var(--t-h3); line-height: 1.1; transition: color 0.2s; }
-
-.case-nav__title svg { width: 0.6em; height: 0.6em; flex: none; }
-
-.nf { display: grid; gap: 2.5rem; padding-block: clamp(2rem, 5vw, 4rem) var(--section-y); }
-
-.nf h1, .nf__copy { margin-top: 1rem; }
-
-.nf .actions { margin-top: 1.5rem; }
-
-.fig--404 { width: 100%; max-width: 22rem; }
-
-.ghost {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  border: 1.5px dashed var(--rule-strong);
-  border-radius: var(--r-md);
-  color: var(--ink-3);
-  font: italic 400 clamp(4.5rem, 16vw, 7rem) / 1 var(--font-display);
-  letter-spacing: -0.02em;
+@container (min-width: 620px) {
+  .case-facts { grid-template-columns: auto minmax(0, 1fr); }
+  .case .stage { margin-inline: 0; border-radius: var(--r-lg); }
+  .case .shot { max-width: 19rem; }
 }
 
-@media (min-width: 760px) { .ghost { aspect-ratio: 4 / 5; } }
-
-@media (hover: hover) {
-  .breadcrumb a:hover,
-  .case-nav a:hover .case-nav__title { color: var(--accent-ink); }
-  .case-aside a:hover { text-decoration-color: var(--accent); }
-}
-
-@media (min-width: 760px) {
-  .case-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .case-nav a { border-bottom: 0; }
-  .case-nav a:first-child { padding-inline-end: 1.5rem; border-inline-end: 1px solid var(--rule); }
-  .case-nav a:last-child { padding-inline-start: 1.5rem; justify-items: end; text-align: end; }
-  .nf { grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem); align-items: center; }
-}
-
-@media (min-width: 1024px) {
-  .case-grid { grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem); }
-  .case-aside { position: sticky; top: calc(var(--masthead-h) + 1.5rem); align-self: start; }
+/* Room for two columns: the story on the left, the facts pinned beside it. */
+@container (min-width: 880px) {
+  .case { padding-top: 28px; }
+  .case-head .project__icon { width: 76px; height: 76px; }
+  .case-grid { grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem); gap: 48px; align-items: start; margin-top: 48px; }
+  .case-aside { position: sticky; top: calc(var(--head-h) + 16px); }
+  .case-wide img, .case-wide figcaption { max-width: 38rem; }
+  .nf { padding-top: 16vh; }
 }

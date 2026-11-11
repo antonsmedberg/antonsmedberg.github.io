@@ -1,22 +1,110 @@
-// main.js — progressive enhancement only.
-// Everything on the page reads and navigates without this file. It adds the
-// theme toggle, the scroll spy, the reveal of text blocks, Fig. 0 (the
-// stipple, the photograph on request, and the depth cloud loaded on request)
-// and the copy-address button.
+// Progressive enhancement only. Everything reads and navigates without this
+// file. It adds the theme toggle, reveal, the swiped pages, the glass bar, the
+// window that apps open in, the 3D city, the sun that is its clock, and the mascot.
+// Everything that moves is a spring, so a new touch can take it over mid-way.
 
 const root = document.documentElement;
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const reduceGlass = matchMedia('(prefers-reduced-transparency: reduce), (prefers-contrast: more)');
+// Short windows and phones on their side: the bar stands as a rail down the
+// side. The same query switches the layout in style.css.
+const rail = matchMedia('(max-height: 540px) and (min-width: 600px)');
+// Tablets and computers: an open window is a sheet with the home screen round
+// it. Anywhere else it covers the home screen whole.
+const sheet = matchMedia('(min-width: 720px) and (min-height: 541px)');
+const screenEl = document.querySelector('.screen');
+const pager = document.querySelector('.pager');
+const pages = pager ? [...pager.querySelectorAll(':scope > .pg')] : [];
+// The pager's width is read once per resize, never in a scroll handler.
+let pagerWidth = pager ? pager.clientWidth : 0;
+if (pager) addEventListener('resize', () => { pagerWidth = pager.clientWidth; });
+const pageAt = () => (pager ? pager.scrollLeft / Math.max(1, pagerWidth) : 0);
+const pageIndex = () => Math.round(pageAt());
+const scrollTop = () => (pager ? pages[pageIndex()].scrollTop : scrollY);
+const lang = root.lang === 'sv' ? 'sv' : 'en';
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
 root.classList.remove('no-js');
 
 /* -------------------------------------------------------------------------
-   Theme: Auto → Light → Dark → Auto. The inline <head> script applied the
+   Springs. `springStep` is the exact step of a damped spring over dt, so the
+   curve is the same at any frame rate (f in Hz, zeta 1 = no bounce). `animate`
+   runs step functions once a frame until they return false.
+   ------------------------------------------------------------------------- */
+
+function springStep(s, goal, f, zeta, dt) {
+  const w = 2 * Math.PI * f;
+  const x = s.x - goal;
+  const e = Math.exp(-zeta * w * dt);
+  if (zeta < 1) {
+    const a = w * Math.sqrt(1 - zeta * zeta);
+    const c = Math.cos(a * dt);
+    const sn = Math.sin(a * dt);
+    const k = (zeta * w) / a;
+    s.x = goal + e * ((c + k * sn) * x + (sn / a) * s.v);
+    s.v = e * (((-w * w * sn) / a) * x + (c - k * sn) * s.v);
+  } else {
+    s.x = goal + e * ((1 + w * dt) * x + dt * s.v);
+    s.v = e * (-w * w * dt * x + (1 - w * dt) * s.v);
+  }
+  return s;
+}
+
+// One family of springs for everything that moves: frequency in Hz, damping.
+// `quick` is a control answering a touch, with a little overshoot; `move` is
+// a window or a sheet travelling; `page` carries the pager to a tab in about
+// half a second with no bounce; `calm` is what trails or returns. The
+// stylesheet's --spring and --press are `quick` and a press written out as
+// curves.
+const SPRINGS = { quick: [3.6, 0.72], move: [2.6, 0.9], page: [1.9, 1], calm: [1.8, 1] };
+const spring = (s, goal, kind, dt) => springStep(s, goal, SPRINGS[kind][0], SPRINGS[kind][1], dt);
+
+const steppers = new Set();
+let stepFrame = 0;
+let stepAt = 0;
+function animate(fn) {
+  steppers.add(fn);
+  if (!stepFrame) {
+    stepAt = performance.now();
+    stepFrame = requestAnimationFrame(function run(now) {
+      const dt = Math.min(0.034, Math.max(0.001, (now - stepAt) / 1000));
+      stepAt = now;
+      for (const step of [...steppers]) if (step(dt) === false) steppers.delete(step);
+      stepFrame = steppers.size ? requestAnimationFrame(run) : 0;
+    });
+  }
+  return () => steppers.delete(fn);
+}
+
+// A finger's speed at release: the slope over its last 100 ms, in px/s.
+function tracker() {
+  let samples = [];
+  return {
+    add(t, x, y = 0) {
+      samples.push([t, x, y]);
+      while (samples.length > 2 && t - samples[0][0] > 100) samples.shift();
+    },
+    speed(now) {
+      const [t0, x0, y0] = samples[0] || [0, 0, 0];
+      const [t1, x1, y1] = samples[samples.length - 1] || [0, 0, 0];
+      samples = [];
+      // A finger that rested before lifting throws nothing.
+      if (t1 - t0 < 8 || now - t1 > 60) return [0, 0];
+      return [((x1 - x0) / (t1 - t0)) * 1000, ((y1 - y0) / (t1 - t0)) * 1000];
+    },
+  };
+}
+
+// Past an edge a drag keeps moving, less and less: travel `over` shows as this.
+const rubber = (over, size) => (0.55 * over * size) / (size + 0.55 * over);
+
+/* -------------------------------------------------------------------------
+   Theme: auto, light, dark, auto. The inline <head> script applied the
    stored choice before first paint; this wires the button.
    ------------------------------------------------------------------------- */
 
 const themeButton = document.querySelector('[data-theme-toggle]');
 const themeMetas = [...document.querySelectorAll('meta[name="theme-color"]')];
-const lang = root.lang === 'sv' ? 'sv' : 'en';
 
 const themeLabels = {
   en: {
@@ -41,10 +129,9 @@ function syncTheme() {
   if (themeButton) {
     themeButton.setAttribute('aria-label', themeLabels[lang][state]);
   }
-  // Browser chrome follows the paper colour that is actually in effect.
-  const paper = getComputedStyle(root).getPropertyValue('--paper').trim();
+  // Browser chrome follows the page colour that is actually in effect.
+  const paper = getComputedStyle(document.body).backgroundColor;
   themeMetas.forEach((meta) => { meta.content = paper; });
-  document.dispatchEvent(new CustomEvent('themechange', { detail: { state, paper } }));
 }
 
 if (themeButton) {
@@ -64,50 +151,30 @@ if (themeButton) {
 syncTheme();
 
 /* -------------------------------------------------------------------------
-   Scroll spy — one observer over the sections, both navigation sets.
-   When no section is in the band (the hero, the footer) nothing is current;
-   at the end of the page the last section is, since it may never reach the
-   band.
+   The sky's colours as CSS custom properties. The home screen reads them
+   from the city; the other pages borrow what it last showed.
    ------------------------------------------------------------------------- */
 
-const navLinks = [...document.querySelectorAll('.nav a[href^="#"], .folio a[href^="#"]')];
-const sections = [...new Set(navLinks.map((a) => document.getElementById(a.hash.slice(1))).filter(Boolean))];
+const SKIES = ['night', 'dawn', 'day', 'dusk'];
+const TINTS = { top: '--sky-top', horizon: '--sky-horizon', accent: '--sky-accent' };
+const HEX = /^#[0-9a-f]{6}$/i;
 
-if (sections.length && 'IntersectionObserver' in window) {
-  const visible = new Map();
-  const last = sections[sections.length - 1];
-  const mark = () => {
-    let current = null;
-    let best = -1;
-    for (const [section, ratio] of visible) {
-      if (ratio > best) { best = ratio; current = section; }
-    }
-    const atEnd = innerHeight + scrollY >= root.scrollHeight - 2;
-    if (atEnd && last.getBoundingClientRect().top < innerHeight) current = last;
-    for (const link of navLinks) {
-      if (current && link.hash === `#${current.id}`) link.setAttribute('aria-current', 'location');
-      else link.removeAttribute('aria-current');
-    }
-  };
-  const spy = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) visible.set(entry.target, entry.intersectionRatio);
-        else visible.delete(entry.target);
-      }
-      mark();
-    },
-    { rootMargin: '-35% 0px -55% 0px', threshold: [0, 0.1, 0.5] }
-  );
-  sections.forEach((section) => spy.observe(section));
-  let spyFrame = 0;
-  addEventListener('scroll', () => {
-    if (!spyFrame) spyFrame = requestAnimationFrame(() => { spyFrame = 0; mark(); });
-  }, { passive: true });
+function paintSky(sky, tint) {
+  if (SKIES.includes(sky)) root.dataset.sky = sky;
+  for (const [key, prop] of Object.entries(TINTS)) {
+    if (tint && HEX.test(tint[key])) root.style.setProperty(prop, tint[key]);
+  }
+}
+
+if (!document.querySelector('canvas.wall')) {
+  try {
+    const kept = JSON.parse(sessionStorage.getItem('sky'));
+    if (kept) paintSky(kept.sky, kept.tint);
+  } catch (e) { /* no storage or an old value: the stylesheet's sky stands */ }
 }
 
 /* -------------------------------------------------------------------------
-   Reveal — text blocks only. The class that hides them is added here, after
+   Reveal: text blocks only. The class that hides them is added here, after
    the observer exists, so a script failure can never hide content.
    ------------------------------------------------------------------------- */
 
@@ -124,169 +191,11 @@ if (revealables.length && !reduceMotion.matches && 'IntersectionObserver' in win
     },
     { rootMargin: '0px 0px -8% 0px', threshold: 0.05 }
   );
-  const fold = innerHeight;
   root.classList.add('io');
   for (const el of revealables) {
-    if (el.getBoundingClientRect().top < fold) el.classList.add('is-visible');
+    if (el.getBoundingClientRect().top < innerHeight) el.classList.add('is-visible');
     else observer.observe(el);
   }
-}
-
-/* -------------------------------------------------------------------------
-   Fig. 0 — one portrait, three renderings from the same depth map.
-   ------------------------------------------------------------------------- */
-
-const fig = document.querySelector('[data-portrait]');
-
-if (fig) {
-  const canvas = fig.querySelector('[data-stipple]');
-  const photo = fig.querySelector('[data-photo]');
-  const cloudBox = fig.querySelector('[data-cloud]');
-  const countEl = fig.querySelector('[data-count]');
-  const captions = {
-    stipple: fig.querySelector('[data-caption-stipple]'),
-    photo: fig.querySelector('[data-caption-photo]'),
-    cloud: fig.querySelector('[data-caption-cloud]'),
-  };
-  const buttons = [...fig.querySelectorAll('[data-mode-btn]')];
-  const cloudButton = buttons.find((b) => b.dataset.modeBtn === 'cloud');
-  const lostNote = fig.querySelector('[data-cloud-lost]');
-  const stoppedNote = fig.querySelector('[data-cloud-stopped]');
-  const photoURL = fig.dataset.sampler;
-  const depthURL = fig.dataset.depth;
-
-  let stipple = null;
-  let dots = null;
-  let cloud = null;
-  let cloudLoading = null;
-
-  const ink = () => getComputedStyle(root).getPropertyValue('--ink').trim();
-
-  const paint = (progress = 1) => {
-    if (!dots || !stipple.fitCanvas(canvas)) return;
-    stipple.paintDots(canvas, dots, ink(), progress);
-  };
-
-  const groupDigits = (n) => n.toLocaleString('en-GB').replace(/,/g, ' ');
-
-  const setMode = (mode) => {
-    fig.dataset.mode = mode;
-    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modeBtn === mode)));
-    for (const [key, el] of Object.entries(captions)) {
-      if (el) el.hidden = key !== mode;
-    }
-    if (mode === 'cloud') {
-      if (stoppedNote) stoppedNote.hidden = true;
-      showCloud();
-    } else if (cloud) cloud.pause();
-  };
-
-  // a) The stipple: computed once, drawn top to bottom over 1.1 s. The
-  //    module is imported here, so pages without Fig. 0 never fetch it; the
-  //    home pages modulepreload it.
-  import('./stipple.js')
-    .then((module) => {
-      stipple = module;
-      return stipple.sample(photoURL, depthURL);
-    })
-    .then((data) => {
-      dots = stipple.computeDots(data);
-      if (countEl) countEl.textContent = groupDigits(dots.length / 3);
-      if (fig.dataset.mode === 'loading') fig.dataset.mode = 'stipple';
-      if (reduceMotion.matches) {
-        paint(1);
-        return;
-      }
-      const started = performance.now();
-      const step = (now) => {
-        const t = Math.min(1, (now - started) / 1100);
-        paint(1 - Math.pow(1 - t, 3));
-        if (t < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    })
-    .catch(() => {
-      // Without the sampler images there is no stipple and no cloud: the
-      // photograph stays, unless the reader has already chosen it.
-      buttons.forEach((b) => { b.disabled = true; });
-      if (fig.dataset.mode === 'loading' || fig.dataset.mode === 'stipple') setMode('photo');
-    });
-
-  let resizeTimer = 0;
-  addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => paint(1), 120);
-  });
-  document.addEventListener('themechange', () => paint(1));
-
-  // b) The photograph: a persistent state via the control, a temporary peek
-  //    on hover (fine pointers) and press-and-hold (touch).
-  buttons.forEach((b) => b.addEventListener('click', () => setMode(b.dataset.modeBtn)));
-
-  const plate = fig.querySelector('.plate');
-  if (plate && photo) {
-    let held = false;
-    const peek = (on) => {
-      if (on) fig.dataset.peek = '';
-      else delete fig.dataset.peek;
-    };
-    // The rendering control floats on the plate; pointing at it never peeks.
-    const onControl = (e) => Boolean(e.target.closest && e.target.closest('.seg, .rescan'));
-    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      plate.addEventListener('pointermove', (e) => {
-        if (e.pointerType !== 'mouse') return;
-        peek(fig.dataset.mode === 'stipple' && !onControl(e));
-      }, { passive: true });
-      plate.addEventListener('pointerleave', () => peek(false));
-    }
-    plate.addEventListener('pointerdown', (e) => {
-      if (e.pointerType === 'mouse' || fig.dataset.mode !== 'stipple' || onControl(e)) return;
-      held = true;
-      peek(true);
-    });
-    const release = () => { if (held) { held = false; peek(false); } };
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => plate.addEventListener(type, release));
-    plate.addEventListener('contextmenu', (e) => { if (held) e.preventDefault(); });
-  }
-
-  // c) The depth cloud: raw WebGL, imported the first time it is asked for.
-  function showCloud() {
-    if (cloud) { cloud.resume(); return; }
-    if (cloudLoading) return;
-    cloudLoading = import('./depth-cloud.js')
-      .then((module) => {
-        if (fig.dataset.mode !== 'cloud') return;
-        cloud = module.mount(cloudBox, {
-          depthURL,
-          photoURL,
-          reduceMotion: reduceMotion.matches,
-          onCount: (kept, total) => {
-            fig.querySelectorAll('[data-kept]').forEach((el) => { el.textContent = groupDigits(kept); });
-            fig.querySelectorAll('[data-total]').forEach((el) => { el.textContent = groupDigits(total); });
-          },
-          // The GPU context went away (iOS does this to background tabs).
-          // A lost context cannot be reused, so the next request mounts on
-          // a fresh canvas.
-          onLost: () => {
-            const stopped = cloud;
-            cloud = null;
-            stopped?.destroy();
-            cloudBox.querySelector('canvas')?.replaceWith(document.createElement('canvas'));
-            if (fig.dataset.mode === 'cloud') setMode('stipple');
-            if (stoppedNote) stoppedNote.hidden = false;
-          },
-        });
-        if (!cloud) {
-          setMode('stipple');
-          cloudButton?.setAttribute('disabled', '');
-          if (lostNote) lostNote.hidden = false;
-        }
-      })
-      .catch(() => setMode('stipple'))
-      .finally(() => { cloudLoading = null; });
-  }
-
-  fig.querySelector('[data-rescan]')?.addEventListener('click', () => cloud?.rescan());
 }
 
 /* -------------------------------------------------------------------------
@@ -309,3 +218,1501 @@ document.querySelectorAll('[data-copy]').forEach((button) => {
 document.querySelectorAll('[data-year]').forEach((el) => {
   el.textContent = String(new Date().getFullYear());
 });
+
+/* -------------------------------------------------------------------------
+   The name is sized so its longest line runs the width it is given, whatever
+   face it ends up set in. The stylesheet caps it and has a size without this.
+   ------------------------------------------------------------------------- */
+
+const nameEl = document.querySelector('.name');
+let fitName = () => {};
+if (nameEl) {
+  const line = nameEl.firstElementChild;
+  let queued = 0;
+  const fit = () => {
+    queued = 0;
+    nameEl.style.removeProperty('--name-fit');
+    const size = parseFloat(getComputedStyle(nameEl).fontSize);
+    const width = line.getBoundingClientRect().width;
+    if (width > 0) nameEl.style.setProperty('--name-fit', `${((size * nameEl.clientWidth) / width).toFixed(2)}px`);
+  };
+  fitName = () => { if (!queued) queued = requestAnimationFrame(fit); };
+  fit();
+  document.fonts?.ready.then(fit);
+  addEventListener('resize', fitName);
+}
+
+/* -------------------------------------------------------------------------
+   The name arrives once per visit: each letter rises into place on a spring,
+   one after the other, and then the heading is plain text again. The letters
+   keep the places the kerned word gave them, so nothing shifts at the end.
+   ------------------------------------------------------------------------- */
+
+if (nameEl && !reduceMotion.matches) {
+  let seen = true;
+  try {
+    seen = Boolean(sessionStorage.getItem('named'));
+    sessionStorage.setItem('named', '1');
+  } catch (e) { /* no storage: the name simply stands */ }
+  if (!seen) {
+    const line = nameEl.firstElementChild;
+    const plain = [...line.childNodes];
+    const range = document.createRange();
+    const letters = [];
+    for (const node of plain.filter((n) => n.nodeType === Node.TEXT_NODE)) {
+      const word = [...node.textContent].map((ch, i) => {
+        range.setStart(node, i);
+        range.setEnd(node, i + 1);
+        const el = document.createElement('span');
+        el.textContent = ch;
+        el.style.opacity = '0';
+        return { el, left: range.getBoundingClientRect().left, s: { x: 1, v: 0 } };
+      });
+      node.replaceWith(...word.map((l) => l.el));
+      letters.push(word);
+    }
+    for (const word of letters) {
+      const off = word.map((l) => l.left - l.el.getBoundingClientRect().left);
+      word.forEach((l, i) => { l.el.style.marginLeft = `${(off[i] - (off[i - 1] || 0)).toFixed(2)}px`; });
+    }
+    nameEl.setAttribute('aria-label', plain.map((n) => n.textContent).filter(Boolean).join(' '));
+    const all = letters.flat();
+    let t = 0;
+    animate((dt) => {
+      t += dt;
+      let busy = false;
+      all.forEach((l, i) => {
+        if (t >= i * 0.03) spring(l.s, 0, 'quick', dt);
+        l.el.style.transform = `translateY(${(l.s.x * 0.5).toFixed(3)}em)`;
+        l.el.style.opacity = clamp(1 - l.s.x * 1.4, 0, 1).toFixed(3);
+        busy ||= Math.abs(l.s.x) > 0.004 || Math.abs(l.s.v) > 0.05;
+      });
+      if (busy && t < 0.86) return true;
+      line.replaceChildren(...plain);
+      nameEl.removeAttribute('aria-label');
+      return false;
+    });
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Pages. A tab, a link or a throw of the bar's selection sends the pager to
+   a page on a spring; a touch on the pager takes it back at once.
+   ------------------------------------------------------------------------- */
+
+const bar = document.querySelector('.tabbar');
+let smed = null;
+let appOpen = false;
+let city = null;
+let sun = null;
+let wx = null;
+let stopPage = null;
+const smedEl = bar && bar.querySelector('.smed');
+let awayTimer = 0;
+let visitTimer = 0;
+let visitOver = false;
+let actedAt = -Infinity;
+
+// The mascot's lane is only clear on a page's first screen. Under an open
+// window, or once the page has scrolled half a screen, it would stand on what
+// is being read, so it shrinks away and comes back when the lane is free.
+function parkMascot() {
+  if (!smedEl) return;
+  // A page change can call this mid-bounce, when the pager is past its ends.
+  const y = pager ? pages[clamp(pageIndex(), 0, pages.length - 1)].scrollTop : scrollY;
+  const on = appOpen || visitOver || y > innerHeight / 2;
+  if (on === smedEl.classList.contains('is-parked')) return;
+  clearTimeout(awayTimer);
+  if (on) awayTimer = setTimeout(() => smedEl.classList.add('is-away'), 320);
+  else {
+    // Back in the layout first, so the way in is animated too.
+    smedEl.classList.remove('is-away');
+    smedEl.getBoundingClientRect();
+  }
+  smedEl.classList.toggle('is-parked', on);
+}
+
+// The header folds down to the mark and the dot once the page under it has
+// scrolled, and opens again at the top. Folded, it has no room for what the
+// status pill shows when open.
+const masthead = document.querySelector('.masthead');
+const island = document.querySelector('.island details');
+function condense() {
+  if (!masthead) return;
+  const i = pager ? clamp(pageIndex(), 0, pages.length - 1) : -1;
+  const y = pager ? pages[i].scrollTop : scrollY;
+  // On the home page at rest the status stands on the sky itself; anywhere else it needs its glass.
+  masthead.classList.toggle('is-bare', i === 0 && y <= 40 && !island?.open);
+  if (y > 40 === masthead.classList.contains('is-condensed')) return;
+  masthead.classList.toggle('is-condensed', y > 40);
+  if (y > 40 && island) island.open = false;
+}
+island?.addEventListener('toggle', condense);
+
+// Home and Contact keep that lane. Everywhere else the first screen is text
+// to its edges, so there he only visits: long enough to react, then he leaves
+// the page to be read.
+function visitPage() {
+  clearTimeout(visitTimer);
+  visitOver = false;
+  const laned = pager && ['home', 'contact'].includes(pages[clamp(pageIndex(), 0, pages.length - 1)].id);
+  if (!laned) visitTimer = setTimeout(() => { visitOver = true; parkMascot(); }, 8000);
+  parkMascot();
+}
+
+// He answers what happens on the site, lightly: one act every few seconds at
+// most. An act asked for mid-run waits in the figure until he stands still.
+function cueMascot(name) {
+  const now = performance.now();
+  if (!smed || now - actedAt < 5000) return false;
+  actedAt = now;
+  smed.play(name);
+  return true;
+}
+
+// The page a tab or a throw has sent the pager to, while it is on its way.
+let pageGoal = null;
+
+function settlePager() {
+  if (stopPage) stopPage();
+  stopPage = null;
+  pageGoal = null;
+  pager.classList.remove('is-scrub');
+}
+
+// What follows the pager: the bar's selection, the layers' travel and the city's camera.
+// A spring calls it in the frame it moves the pager; a finger's scroll calls it from the scroll event.
+let follow = () => {};
+
+function goToPage(i, speed = 0) {
+  const to = i * pagerWidth;
+  if (stopPage) stopPage();
+  if (reduceMotion.matches) {
+    settlePager();
+    // No travel: the page is swapped and fades in.
+    if (Math.abs(pager.scrollLeft - to) > 1) pager.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+    pager.scrollLeft = to;
+    return;
+  }
+  if (!speed && Math.abs(pager.scrollLeft - to) < 1) { settlePager(); return; }
+  const s = { x: pager.scrollLeft, v: speed };
+  pager.classList.add('is-scrub');
+  pageGoal = i;
+  stopPage = animate((dt) => {
+    spring(s, to, 'page', dt);
+    const there = Math.abs(s.x - to) < 0.5 && Math.abs(s.v) < 10;
+    pager.scrollLeft = there ? to : s.x;
+    if (there) {
+      stopPage = null;
+      pageGoal = null;
+      pager.classList.remove('is-scrub');
+    }
+    follow(pager.scrollLeft / Math.max(1, pagerWidth), false);
+    return !there;
+  });
+}
+
+/* -------------------------------------------------------------------------
+   Travel. The pages are one space seen from a moving camera: what a page holds
+   lies at different depths, so on the way between two pages the far layers
+   lag, the near ones run ahead, shrink and fade, and everything turns a little
+   toward where it is going. It is a pure function of how far the pager has
+   scrolled, so it follows a finger exactly and settles with the page's spring.
+   ------------------------------------------------------------------------- */
+
+// Per page, back to front: the first layer lies nearest the city.
+const strata = pages.map((page) => {
+  const els = [...page.querySelectorAll(':scope > .shell > *, :scope > .footer')].flatMap((el) => (el.matches('.projects, .cv-side') ? [...el.children] : [el]));
+  return els.map((el, k) => ({ el, z: els.length > 1 ? k / (els.length - 1) : 0.5 }));
+});
+const travelled = pages.map(() => 0);
+
+function travel(p) {
+  if (reduceMotion.matches) return;
+  pages.forEach((page, i) => {
+    const off = i - p;
+    // A page that is out of sight, or at rest, carries no transform at all.
+    const d = Math.abs(off) >= 1 || Math.abs(off) < 0.002 ? 0 : off;
+    if (d === travelled[i]) return;
+    travelled[i] = d;
+    const a = Math.abs(d);
+    for (const { el, z } of strata[i]) {
+      if (!d) { el.style.transform = ''; el.style.opacity = ''; continue; }
+      // Zero at both ends of the trip, so a layer neither starts nor lands with a step.
+      const x = d * (1 - a) * pagerWidth * (z - 0.4) * 0.5;
+      el.style.transform = `perspective(900px) translate3d(${x.toFixed(1)}px, 0, 0) rotateY(${(-d * (5 + 5 * z)).toFixed(2)}deg) scale(${(1 - a * (0.03 + 0.07 * z)).toFixed(4)})`;
+      el.style.opacity = (1 - a * (0.2 + 0.5 * z)).toFixed(3);
+    }
+  });
+}
+
+// The deck of projects: where each card sticks while the next slides over it.
+const deck = [...document.querySelectorAll('.pg .project')];
+if (deck.length) {
+  const page = deck[0].closest('.pg');
+  const stack = () => {
+    const style = getComputedStyle(page);
+    // Sticky offsets count from the page's padding, which already clears the top bar.
+    const room = page.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) + 16;
+    deck.forEach((card, i) => card.style.setProperty('--stick', `${Math.round(Math.min(i * 10, room - card.offsetHeight))}px`));
+  };
+  const sized = new ResizeObserver(stack);
+  deck.forEach((card) => sized.observe(card));
+  addEventListener('resize', stack);
+  stack();
+}
+
+function pageOfHash(hash) {
+  const el = hash.length > 1 ? document.getElementById(hash.slice(1)) : null;
+  return el ? pages.indexOf(el.closest('.pg')) : -1;
+}
+
+/* -------------------------------------------------------------------------
+   The bar. Its selection is a drop of brighter tint that lies inside the bar
+   with the same gap all round. The head goes to the chosen tab on a spring
+   with a little overshoot, or stays under a finger; the tail follows, so the
+   drop stretches on the way and runs together where it lands. Against either
+   end it squashes: it never reaches the bar's rim. It lies along the bottom
+   or stands as a rail.
+   ------------------------------------------------------------------------- */
+
+if (bar) {
+  const body = bar.querySelector('.tabbar__body');
+  const tabs = [...bar.querySelectorAll('a')];
+  // The bar's own size, measured when it can change and not while it moves.
+  // The gap is the stylesheet's.
+  let long = 0;
+  let inset = 0;
+  const measure = () => {
+    inset = parseFloat(getComputedStyle(body).paddingLeft);
+    long = (rail.matches ? body.clientHeight : body.clientWidth) - 2 * inset;
+  };
+  measure();
+  addEventListener('resize', measure);
+  rail.addEventListener('change', measure);
+  const length = () => long;
+  const step = () => long / tabs.length;
+  // Distance along the bar from its first tab, for a pointer.
+  const along = (e) => {
+    const box = body.getBoundingClientRect();
+    return (rail.matches ? e.clientY - box.top : e.clientX - box.left) - inset;
+  };
+  const head = { x: 0, v: 0 };
+  const tail = { x: 0, v: 0 };
+  // How far a drag has pulled the selection past an end.
+  const over = { x: 0, v: 0 };
+  let aim = 0;
+  let held = false;
+  let running = false;
+
+  // A drop that starts at x: what of it fits between the bar's ends. Past
+  // an end it is shorter, never further out.
+  const fit = (x, len) => {
+    const from = clamp(x, 0, long - len / 2);
+    return [from, clamp(x + len, len / 2, long) - from];
+  };
+  // The head drop. Pulled past an end by a finger it squashes against the wall.
+  const front = () => {
+    const size = step();
+    const len = size * (1 - Math.min(0.3, Math.abs(over.x) / size));
+    return fit(over.x > 0 ? head.x + size - len : head.x, len);
+  };
+  const draw = () => {
+    const size = step();
+    const [at, len] = front();
+    const [back, backLen] = fit(tail.x, size);
+    const from = Math.min(at, back);
+    const stretch = (Math.max(at + len, back + backLen) - from) / size;
+    bar.style.setProperty('--lx', rail.matches ? '0px' : `${from.toFixed(2)}px`);
+    bar.style.setProperty('--ly', rail.matches ? `${from.toFixed(2)}px` : '0px');
+    bar.style.setProperty('--lsx', rail.matches ? '1' : stretch.toFixed(4));
+    bar.style.setProperty('--lsy', rail.matches ? stretch.toFixed(4) : '1');
+    tabs.forEach((a, k) => a.style.setProperty('--near', clamp(1 - Math.abs(head.x - k * size) / size, 0, 1).toFixed(3)));
+    // The page gives with a drag past the end, as its own edge would.
+    if (pager) pager.style.translate = Math.abs(over.x) > 0.2 ? `${((-over.x / size) * pagerWidth * 0.3).toFixed(1)}px 0` : '';
+  };
+  const run = () => {
+    if (running) return;
+    running = true;
+    animate((dt) => {
+      if (!held) {
+        spring(over, 0, 'quick', dt);
+        spring(head, aim, 'quick', dt);
+      }
+      spring(tail, head.x, 'move', dt);
+      draw();
+      const near = (s, to, d) => Math.abs(s.x - to) < d && Math.abs(s.v) < 4;
+      const still = !held && near(over, 0, 0.2) && near(head, aim, 0.2) && near(tail, head.x, 0.2);
+      if (still) { over.x = 0; head.x = aim; tail.x = aim; head.v = 0; tail.v = 0; draw(); running = false; }
+      return !still;
+    });
+  };
+  // Send the selection to x. Under a finger and on arrival it is there at
+  // once; otherwise the springs carry it.
+  const place = (x, jump) => {
+    aim = x;
+    if (jump || reduceMotion.matches) { head.x = x; tail.x = x; head.v = 0; tail.v = 0; draw(); } else {
+      if (held) { head.x = x; head.v = 0; }
+      run();
+    }
+    bar.classList.add('has-lens');
+  };
+  const syncLens = () => {
+    if (pager) return;
+    const i = tabs.findIndex((a) => a.hasAttribute('aria-current'));
+    if (i >= 0) place(i * step(), true);
+    else bar.classList.remove('has-lens');
+  };
+  syncLens();
+  addEventListener('resize', syncLens);
+
+  if (pager) {
+    const first = pageOfHash(location.hash);
+    if (first > 0) pager.scrollLeft = first * pagerWidth;
+    let current = -1;
+    // What waits for the trip to end: the mascot's walk to the new tab, what
+    // he does on that page, and the pixel face the other pages set their
+    // labels in. While the pager travels, and for 300 ms after it and the
+    // finger have come to rest, nothing else starts.
+    const pageActs = { work: 'type', cv: 'think', contact: 'love' };
+    let pending = null;
+    let fingers = false;
+    let restTimer = 0;
+    const rested = () => {
+      clearTimeout(restTimer);
+      restTimer = setTimeout(() => {
+        if (held || fingers || stopPage) return;
+        if (current > 0) document.body.classList.add('px');
+        smed?.goTo(current);
+        if (pending) cueMascot(pending);
+        pending = null;
+      }, 300);
+    };
+    follow = (p, jump) => {
+      // Sent to a tab, the selection goes straight there and the page follows.
+      place((pageGoal ?? p) * step(), jump);
+      travel(p);
+      city?.setProgress(p);
+      const i = clamp(Math.round(p), 0, tabs.length - 1);
+      if (i !== current) {
+        current = i;
+        tabs.forEach((a, k) => (k === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
+        pending = pageActs[pages[i].id] || null;
+        visitPage();
+        condense();
+        history.replaceState(history.state, '', i === 0 ? location.pathname + location.search : `#${pages[i].id}`);
+      }
+      rested();
+    };
+    follow(pageAt(), true);
+    // A spring that is carrying the pager has already said where it is, in the same frame.
+    pager.addEventListener('scroll', () => { if (!stopPage) follow(pageAt(), false); }, { passive: true });
+    pager.addEventListener('touchstart', () => { fingers = true; }, { passive: true });
+    for (const type of ['touchend', 'touchcancel']) pager.addEventListener(type, (e) => { fingers = e.touches.length > 0; rested(); }, { passive: true });
+    addEventListener('resize', () => { settlePager(); pager.scrollLeft = current * pagerWidth; follow(current, true); });
+    // A finger or a wheel on the pages takes over from a spring in flight.
+    for (const type of ['touchstart', 'wheel']) pager.addEventListener(type, () => { if (stopPage) settlePager(); }, { passive: true });
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a || a.dataset.sheet || a.dataset.to || e.metaKey || e.ctrlKey) return;
+      const i = pageOfHash(a.hash);
+      if (i < 0) return;
+      e.preventDefault();
+      goToPage(i);
+    });
+  }
+
+  let start = null;
+  let dragged = false;
+  const finger = tracker();
+  const release = () => {
+    held = false;
+    bar.classList.remove('is-pressed');
+    run();
+  };
+  bar.addEventListener('dragstart', (e) => e.preventDefault());
+  bar.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.smed') || e.button) return;
+    start = { at: along(e), grab: along(e) - head.x, id: e.pointerId, inside: along(e) >= head.x && along(e) <= head.x + step() };
+    dragged = false;
+    bar.classList.add('is-pressed');
+  });
+  bar.addEventListener('pointermove', (e) => {
+    if (!start || e.pointerId !== start.id) return;
+    if (!dragged && Math.abs(along(e) - start.at) > 8) {
+      dragged = true;
+      held = true;
+      if (stopPage) stopPage();
+      // A drag that starts on the selection carries it; elsewhere it jumps under the finger.
+      if (!start.inside) start.grab = step() / 2;
+      bar.classList.add('has-lens');
+      bar.setPointerCapture(e.pointerId);
+    }
+    if (!dragged) return;
+    finger.add(e.timeStamp, along(e));
+    const max = length() - step();
+    pageGoal = null;
+    const want = along(e) - start.grab;
+    const inside = clamp(want, 0, max);
+    over.x = Math.sign(want - inside) * rubber(Math.abs(want - inside), step());
+    over.v = 0;
+    if (pager) {
+      pager.classList.add('is-scrub');
+      pager.scrollLeft = (inside / step()) * pagerWidth;
+    } else place(inside, false);
+    run();
+  });
+  const finish = (e) => {
+    if (!start) return;
+    start = null;
+    if (!dragged) { release(); return; }
+    const [speed] = finger.speed(e.timeStamp);
+    // Where the throw would carry it, then the nearest tab.
+    const i = clamp(Math.round((head.x + speed * 0.099) / step()), 0, tabs.length - 1);
+    release();
+    // The throw goes on in the selection.
+    head.v = speed;
+    if (pager) goToPage(i, (speed / step()) * pagerWidth);
+    else { smed?.goTo(i); place(i * step(), false); tabs[i].click(); }
+  };
+  bar.addEventListener('pointerup', finish);
+  bar.addEventListener('pointercancel', () => { start = null; release(); if (pager) goToPage(pageIndex()); else syncLens(); });
+  bar.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    if (dragged && e.isTrusted) { e.preventDefault(); dragged = false; return; }
+    if (pager) return;
+    const i = tabs.indexOf(a);
+    place(i * step(), false);
+    smed?.goTo(i);
+  });
+
+  let lastY = scrollTop();
+  let ticking = false;
+  const onVertical = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const y = scrollTop();
+      bar.classList.toggle('is-small', y > 140 && y > lastY);
+      if (Math.abs(y - lastY) > 90) smed?.hop();
+      lastY = y;
+      parkMascot();
+      condense();
+    });
+  };
+  (pager ? pages : [window]).forEach((s) => s.addEventListener('scroll', onVertical, { passive: true }));
+}
+
+/* -------------------------------------------------------------------------
+   The sun is the clock. It stands in the sky left of the tower where the sun
+   over Malmö stands on its way from sunrise to sunset, and the moon makes the
+   same crossing by night. Take hold of it, or focus it and use the arrow
+   keys, and it runs the city's day; let go and it springs back to now. It
+   needs no city to draw: over the still picture it is the same sun.
+   ------------------------------------------------------------------------- */
+
+const malmoTime = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', hour: '2-digit', minute: '2-digit' });
+const malmoDate = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Stockholm', month: 'numeric', day: 'numeric', timeZoneName: 'shortOffset' });
+const clockText = (minutes) => `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(Math.floor(minutes % 60)).padStart(2, '0')}`;
+const minutesOf = (text) => Number(text.slice(0, 2)) * 60 + Number(text.slice(3, 5));
+// `?hour=N` starts the page at another hour on Malmö's clock.
+const preview = new URLSearchParams(location.search).get('hour');
+const asked = preview === null ? null : Number(preview);
+const malmoNow = () => (asked === null ? minutesOf(malmoTime.format(new Date())) : asked * 60);
+// How far Malmö's day has run, for the dot on the arc under the page titles.
+root.style.setProperty('--day', (minutesOf(malmoTime.format(new Date())) / 1440).toFixed(3));
+let dialHeld = false;
+// Set once the city is up: it paints its sky's colours into the stylesheet.
+let showSky = () => {};
+
+// Today's sun over Malmö, by the same sums the city lights itself with: the hours it rises, stands
+// highest and sets, and its height at any hour as the sine of its elevation, so 0 is the horizon.
+function sunPath(date) {
+  const part = Object.fromEntries(malmoDate.formatToParts(date).map((p) => [p.type, p.value]));
+  const offset = parseInt(part.timeZoneName.replace('GMT', ''), 10) || 0;
+  const doy = (Date.UTC(date.getUTCFullYear(), part.month - 1, part.day) - Date.UTC(date.getUTCFullYear(), 0, 1)) / 86400000 + 1;
+  const lat = (55.6 * Math.PI) / 180;
+  // Declination and the equation of time by Spencer's series: sunrise and sunset to a few minutes.
+  const g = ((2 * Math.PI) / 365) * (doy - 1);
+  const wave = (c1, s1, c2, s2) => c1 * Math.cos(g) + s1 * Math.sin(g) + c2 * Math.cos(2 * g) + s2 * Math.sin(2 * g);
+  const tilt = 0.006918 + wave(-0.399912, 0.070257, -0.006758, 0.000907) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+  // Noon by the sun: Malmö lies 13 degrees east, the clock's meridian 15 for each hour of its offset.
+  const noon = 12 + offset - 13 / 15 - (3.82 * (0.000075 + wave(0.001868, -0.032077, -0.014615, -0.040849)));
+  // Sunrise and sunset are when the disc's top meets the horizon: its centre 0.833 degrees below it.
+  const half = (Math.acos(clamp((-0.01454 - Math.sin(lat) * Math.sin(tilt)) / (Math.cos(lat) * Math.cos(tilt)), -1, 1)) * 12) / Math.PI;
+  return { rise: noon - half, noon, set: noon + half, height: (hour) => Math.sin(lat) * Math.sin(tilt) + Math.cos(lat) * Math.cos(tilt) * Math.cos(((hour - noon) * Math.PI) / 12) };
+}
+
+function mountSun(el, sky) {
+  const DAY = 1440;
+  const path = sunPath(new Date());
+  const rise = path.rise * 60;
+  const set = path.set * 60;
+  const noon = path.noon * 60;
+  const high = path.height(path.noon);
+  const deep = -path.height(path.noon + 12);
+  const dark = DAY - (set - rise);
+  const wrap = (m) => ((m % DAY) + DAY) % DAY;
+  // The minute nearest `ref` that reads `m` on the clock, so a spring takes the short way round.
+  const near = (m, ref) => ref + wrap(m - ref + DAY / 2) - DAY / 2;
+  // Where a minute lies on the crossing: `t` is how far across, by day from sunrise to sunset and by
+  // night from sunset to sunrise, and `up` how high, as a share of the sun's highest today or, for
+  // the moon, of how deep the sun then stands under the horizon.
+  const spot = (m) => {
+    const day = m >= rise && m <= set;
+    const h = path.height(m / 60);
+    return { day, t: day ? (m - rise) / (set - rise) : wrap(m - set) / dark, up: Math.max(0, day ? h / high : -h / deep) };
+  };
+  // Day and night end to end, 0 to 2: how far along a minute lies, and the minute at a place.
+  const along = (m) => { const s = spot(wrap(m)); return s.day ? s.t : 1 + s.t; };
+  const minuteAt = (a) => { const u = ((a % 2) + 2) % 2; return u <= 1 ? rise + u * (set - rise) : set + (u - 1) * dark; };
+  // What the handle says beside the time: the sun's next set or rise. Swedish weather pages write "sol ned"
+  // and "sol upp".
+  const words = { en: ['Sunset', 'Sunrise'], sv: ['Sol ned', 'Sol upp'] }[lang];
+  const stateAt = (m) => (m >= rise && m < set ? `${words[0]} ${clockText(set)}` : `${words[1]} ${clockText(rise)}`);
+  // The stylesheet's sky for a minute, for when there is no city to say.
+  const skyAt = (m) => (m < rise - 48 || m > set + 48 ? 'night' : m < rise + 60 ? 'dawn' : m > set - 60 ? 'dusk' : 'day');
+
+  // The path the handle shows while held. The city draws the sun and the moon where the handle stands.
+  sky.innerHTML = '<svg class="sky__arc"><path/><path/><path/></svg>';
+  const [base, dayArc, nightArc] = sky.firstChild.children;
+  const hand = el.querySelector('.sun__hand');
+  const clock = document.querySelector('[data-clock]');
+  const alm = el.previousElementSibling;
+  const eye = alm.firstElementChild;
+  const here = eye.textContent;
+
+  let shown = malmoNow();
+  let want = shown;
+  let held = false;
+  let grab = null;
+  let moving = null;
+  let said = -1;
+  const dial = { x: shown, v: 0 };
+
+  // The room the crossing has, read when it can change and never during a drag: where it starts in
+  // the window, how far across it runs, the line it rises from and how high it goes.
+  let box = null;
+  const gauge = () => {
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    if (!w || !h) return false;
+    // The room the sun takes: `--orb` across, its disc and close glow 11 and its bloom 24 units of 80.
+    const orb = parseFloat(getComputedStyle(el).getPropertyValue('--orb'));
+    const disc = (orb * 11) / 80;
+    // The crossing rises from the tower's foot, where the room reaches it; the city sets a low sun behind
+    // its roofs.
+    const ground = parseFloat(screenEl.style.getPropertyValue('--tower-b')) - el.offsetTop - disc / 2;
+    // At its highest the sun keeps its bloom in its room, clear of the almanac. In a room lower than that
+    // it crosses flat along the room's foot, above the icons and as far from the words as it can.
+    const low = h < orb;
+    const clear = (orb * 24) / 80 + 2;
+    const foot = low ? h - disc - 2 : Math.max(clear, Math.min(h - disc - 4, ground || Infinity));
+    const lift = low ? 0 : Math.min(foot - clear, w * 0.5);
+    // `in` is where the crossing starts inside the box, `x` and `y` where that is in the window.
+    const r = hand.offsetWidth / 2;
+    const above = Math.max(0, el.getBoundingClientRect().top - Math.max(...[alm, alm.previousElementSibling].map((e) => e.getBoundingClientRect().bottom)));
+    box = { in: disc + 4, x: el.offsetLeft + disc + 4, y: el.offsetTop, span: w - 2 * disc - 8, foot, lift, lo: r - above, hi: h - r };
+    const at = (t, up) => `${(box.x + t * box.span).toFixed(1)} ${(box.y + foot - up * lift).toFixed(1)}`;
+    const run = (from, to) => `M${Array.from({ length: 49 }, (_, i) => { const s = spot(wrap(from + ((to - from) * i) / 48)); return at(i / 48, s.up); }).join('L')}`;
+    // The line of the horizon with a tick at each end and under the highest point, then the two crossings.
+    const tick = (t) => `M${at(t, 0)}v6`;
+    base.setAttribute('d', `M${at(0, 0)}L${at(1, 0)}${tick(0)}${tick(0.5)}${tick(1)}`);
+    dayArc.setAttribute('d', run(rise, set));
+    nightArc.setAttribute('d', run(set, rise + DAY));
+    return true;
+  };
+  // The handle rests on the disc the city drew, else on the page's spot, kept between the words above
+  // the room and the room's foot, off the icons.
+  let spotAt = [0, 0];
+  let drawn = null;
+  let placed = [NaN, NaN];
+  const place = () => {
+    if (!box) return;
+    const [x, at] = drawn ? [drawn.x - box.x + box.in, drawn.y - box.y] : spotAt;
+    const y = box.lo > box.hi ? (box.lo + box.hi) / 2 : Math.max(box.lo, Math.min(at, box.hi));
+    if (Math.abs(x - placed[0]) <= 0.5 && Math.abs(y - placed[1]) <= 0.5) return;
+    placed = [x, y];
+    hand.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+  };
+  const draw = (again) => {
+    if (again === true) said = -1;
+    if (!box) return;
+    const m = wrap(shown);
+    const s = spot(m);
+    const x = s.t * box.span;
+    const y = box.foot - s.up * box.lift;
+    spotAt = [box.in + x, y];
+    place();
+    // The city draws the sun or the moon here, with its glow and its light on the water. By night it also
+    // hears where the sun went down or will come up: the glow of dusk and of dawn belongs there.
+    city?.setSun?.(box.x + x, box.y + y, s.day);
+    if (!s.day) city?.setSun?.(box.x + (s.t < 0.5 ? box.span : 0), box.y + box.foot, true);
+    const wasNight = sky.classList.contains('is-night');
+    sky.classList.toggle('is-night', !s.day);
+    sky.classList.toggle('is-held', held);
+    el.classList.toggle('is-held', Boolean(grab));
+    alm.classList.toggle('is-held', held);
+    if (held && !wasNight && !s.day) cueMascot('surprise');
+    if (Math.floor(m) === said) return;
+    said = Math.floor(m);
+    clock.textContent = clockText(m);
+    // A new minute at rest comes in softly; under a finger it is there at once.
+    if (!dialHeld && !reduceMotion.matches) clock.animate([{ opacity: 0.35 }, {}], 240);
+    hand.setAttribute('aria-valuenow', String(said));
+    hand.setAttribute('aria-valuetext', `${clockText(m)}, ${stateAt(m)}`);
+    // The forecast for the minute shown, from now to a day ahead, and above the clock how far ahead that is.
+    const ahead = Math.round(wrap(m - minutesOf(malmoTime.format(new Date())) + 30) - 30);
+    const hours = Math.round((wrap(m - malmoNow() + 30) - 30) / 60);
+    eye.textContent = hours < 1 ? here : eye.dataset.ahead.replace('#', hours);
+    wx?.show(Date.now() + ahead * 60000);
+    if (!city) paintSky(skyAt(m));
+  };
+  // Hand the hour to the city while the sun is held, and give it back to the real clock after.
+  const show = () => {
+    dialHeld = held || Boolean(moving);
+    city?.setHour(dialHeld ? wrap(shown) / 60 : asked);
+    showSky();
+    draw();
+  };
+  // The sun follows what is asked of it on a spring: quick under a finger, calm on the way back to
+  // the real time.
+  const run = () => {
+    if (moving) return;
+    moving = animate((dt) => {
+      const before = dial.x;
+      const goal = held ? want : near(malmoNow(), dial.x);
+      spring(dial, goal, held ? 'quick' : 'calm', dt);
+      // A tick at sunrise, noon and sunset: a phone that can, taps as the finger passes one.
+      for (const mark of [rise, noon, set]) {
+        const at = near(mark, before);
+        if ((at - before) * (at - dial.x) < 0 && grab && navigator.userActivation?.hasBeenActive) navigator.vibrate?.(6);
+      }
+      const still = Math.abs(dial.x - goal) < 0.5 && Math.abs(dial.v) < 6;
+      if (still) { moving = null; dial.x = goal; dial.v = 0; }
+      shown = dial.x;
+      show();
+      return !still;
+    });
+  };
+  const hold = (minutes) => {
+    held = true;
+    want = minutes;
+    if (!reduceMotion.matches) { run(); return; }
+    dial.x = want;
+    shown = want;
+    show();
+  };
+  const release = () => {
+    if (!held) return;
+    held = false;
+    grab = null;
+    if (!reduceMotion.matches) { run(); return; }
+    shown = malmoNow();
+    dial.x = shown;
+    show();
+  };
+
+  hand.setAttribute('role', 'slider');
+  hand.setAttribute('tabindex', '0');
+  hand.setAttribute('aria-label', hand.dataset.dial);
+  hand.setAttribute('aria-valuemin', '0');
+  hand.setAttribute('aria-valuemax', String(DAY - 1));
+  el.dataset.live = '';
+  new ResizeObserver(() => { if (gauge()) draw(); }).observe(el);
+  addEventListener('resize', () => { if (gauge()) draw(); });
+  setInterval(() => { if (!dialHeld) { shown = malmoNow(); dial.x = shown; draw(); } }, 20000);
+
+  // The body goes as far across as the finger does. Past sunset the moon comes up where the sun did.
+  hand.addEventListener('pointerdown', (e) => {
+    if (e.button || !gauge()) return;
+    hand.setPointerCapture(e.pointerId);
+    grab = { x: e.clientX, from: along(dial.x), id: e.pointerId };
+    hold(dial.x);
+  });
+  hand.addEventListener('pointermove', (e) => {
+    if (!grab || e.pointerId !== grab.id) return;
+    hold(near(minuteAt(grab.from + (e.clientX - grab.x) / box.span), want));
+  });
+  const drop = () => { if (grab) release(); };
+  hand.addEventListener('pointerup', drop);
+  hand.addEventListener('pointercancel', drop);
+  hand.addEventListener('keydown', (e) => {
+    const turn = { ArrowRight: 15, ArrowUp: 15, ArrowLeft: -15, ArrowDown: -15, PageUp: 60, PageDown: -60 }[e.key];
+    if (turn) hold(Math.round((held ? want : shown) / 15) * 15 + turn);
+    else if (e.key === 'Home') hold(0);
+    else if (e.key === 'End') hold(DAY - 1);
+    else if (e.key === 'Escape') release();
+    else return;
+    e.preventDefault();
+  });
+  hand.addEventListener('blur', release);
+
+  return {
+    // Draw again: the city or the weather has just come.
+    draw: () => draw(true),
+    follow: (disc) => { drawn = disc || null; place(); },
+    // Whether the sun is up at a moment, for the forecast's symbols.
+    dayAt: (ms) => path.height(minutesOf(malmoTime.format(new Date(ms))) / 60) > 0,
+  };
+}
+
+{
+  const el = document.querySelector('.sun');
+  const sky = document.querySelector('.sky');
+  if (el && sky) {
+    sun = mountSun(el, sky);
+    // The weather comes once the page has loaded, so it never holds up the first picture. Without it the
+    // almanac keeps to the clock and the sun.
+    const alm = document.querySelector('.alm');
+    const start = () => {
+      const css = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: '/assets/css/sky.css' });
+      document.head.append(css);
+      Promise.all([import('./weather.js'), new Promise((done) => { css.onload = css.onerror = done; })]).then(([{ mountWeather }]) => {
+        wx = mountWeather(alm, { lang, dayAt: sun.dayAt, city: () => city, asked });
+        sun.draw();
+      }, () => { /* offline or blocked: the almanac keeps to the clock and the sun */ });
+    };
+    if (alm && document.readyState === 'complete') start();
+    else if (alm) addEventListener('load', start, { once: true });
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Depth. The pointer, or the tilt of a phone that reports it without asking,
+   moves the light on the glass and drifts the home screen's layers a few
+   pixels against the city. `lean` runs from -1 to 1 on each axis.
+   ------------------------------------------------------------------------- */
+
+const lean = { x: { x: 0, v: 0 }, y: { x: 0, v: 0 }, tx: 0, ty: 0 };
+// What drifts, and how many pixels at full lean: more the nearer the eye.
+const drifters = [['.name', 3], ['.who', 5], ['.alm', 5], ['.apps', 7], ['.pg .head', 4]].flatMap(([sel, depth]) => [...document.querySelectorAll(sel)].map((el) => ({ el, depth })));
+if (screenEl && !reduceMotion.matches) {
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    lean.tx = clamp((e.clientX / innerWidth) * 2 - 1, -1, 1);
+    lean.ty = clamp((e.clientY / innerHeight) * 2 - 1, -1, 1);
+  }, { passive: true });
+  // iOS asks the visitor before it reports tilt; a portfolio does not ask.
+  if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') {
+    let rest = null;
+    addEventListener('deviceorientation', (e) => {
+      if (e.gamma === null || e.beta === null) return;
+      rest ??= { gamma: e.gamma, beta: e.beta };
+      lean.tx = clamp((e.gamma - rest.gamma) / 22, -1, 1);
+      lean.ty = clamp((e.beta - rest.beta) / 22, -1, 1);
+    }, { passive: true });
+  }
+}
+
+/* -------------------------------------------------------------------------
+   The 3D city: its sky in the stylesheet, its tower in the layout, the glass
+   bending it, and the dial that runs its day.
+   ------------------------------------------------------------------------- */
+
+const wallCanvas = document.querySelector('canvas.wall');
+let cityMounted = Promise.resolve();
+
+if (wallCanvas) {
+  // The city is asked for once the first picture is on the screen, so the stylesheet and the fonts have
+  // the line to themselves until then. The glass and the mascot start after the city, one by one, but
+  // their files are fetched beside it: three round trips at once, not one after the other.
+  const painted = new Promise((done) => { requestAnimationFrame(() => setTimeout(done)); });
+  cityMounted = painted.then(() => {
+    for (const name of [!reduceGlass.matches && 'glass', smedEl && 'smed3d'].filter(Boolean)) {
+      const link = document.createElement('link');
+      link.rel = 'modulepreload';
+      link.href = `/assets/js/${name}.js`;
+      document.head.append(link);
+    }
+    return import('./city.js');
+  }).then(async ({ mountCity }) => {
+    // The hour the city starts at: `?hour=N`, else now. It is an hour on
+    // Malmö's clock, so the answer is the nearest moment that clock reads
+    // it, wherever the visitor is.
+    const at = () => {
+      if (asked === null) return new Date();
+      return new Date(Date.now() + (asked * 60 - minutesOf(malmoTime.format(new Date()))) * 60000);
+    };
+    city = mountCity(wallCanvas, { at, front: document.querySelector('.wall-front') });
+    if (!city) return;
+    root.classList.add('has-city');
+    if (pager) city.setProgress(pageAt());
+    sun?.draw();
+
+    showSky = () => {
+      const sky = city.sky;
+      const tint = city.tint;
+      paintSky(sky, tint);
+      if (dialHeld) return;
+      try { sessionStorage.setItem('sky', JSON.stringify({ sky, tint })); } catch (e) { /* the other pages keep the stylesheet's sky */ }
+    };
+    showSky();
+    setInterval(() => { if (!dialHeld) showSky(); }, 30000);
+
+    // Which side the tower stands on, and where its near edge is, so the
+    // layout can keep the name and the widgets clear of it.
+    let towerAt = '';
+    const placeTower = () => {
+      const box = city.towerRect();
+      if (!screenEl || !box.w) return;
+      const next = `${Math.round(box.x)} ${Math.round(box.x + box.w)} ${Math.round(box.y + box.h)}`;
+      if (next === towerAt) return;
+      towerAt = next;
+      screenEl.style.setProperty('--tower-l', `${Math.round(box.x)}px`);
+      screenEl.style.setProperty('--tower-r', `${Math.round(box.x + box.w)}px`);
+      screenEl.style.setProperty('--tower-b', `${Math.round(box.y + box.h)}px`);
+      screenEl.dataset.tower = box.x + box.w / 2 < wallCanvas.clientWidth / 2 ? 'left' : 'right';
+      fitName();
+    };
+
+    // Every glass shape over the city gets the scene itself, bent at its rim.
+    // This loop is the only place a shape is handed to the shader, and it
+    // passes over anything that lies on another: one glass per place.
+    const glass = reduceGlass.matches ? null : (await import('./glass.js')).mountGlass(wallCanvas);
+    const lensed = [];
+    if (glass) {
+      const body = bar && bar.querySelector('.tabbar__body');
+      for (const el of [body, ...screenEl.querySelectorAll('.glass, .glass-card, .cv-actions .btn--quiet')]) {
+        if (!el || el.parentElement.closest('.glass, .glass-card')) continue;
+        glass.add(el, { blur: el.matches('.glass-card') ? 3.5 : 2.5 });
+        lensed.push(el);
+      }
+    }
+    // Tell the city how much of its foot the interface covers: the bar, the mascot's lane over it and
+    // the row of apps where that stands on the lane. A rail covers none of it. And how far down the words
+    // at the top reach, with the apps where they stand on the sky.
+    const words = [...document.querySelectorAll('.masthead, .name, .who, .alm')];
+    const cover = () => {
+      if (!bar) return;
+      const lane = bar.getBoundingClientRect().top - parseFloat(getComputedStyle(screenEl).getPropertyValue('--lane'));
+      const apps = appsGrid?.getBoundingClientRect();
+      const low = apps && apps.bottom > lane - 24 && !rail.matches;
+      city.setUiBottom?.(rail.matches ? 0 : Math.max(0, innerHeight - (low ? apps.top : lane)));
+      city.setUiTop?.(Math.ceil(Math.max(...words.map((el) => el.getBoundingClientRect().bottom), low ? 0 : apps?.bottom || 0) + 4));
+    };
+    let n = 0;
+    placeTower();
+    cover();
+    addEventListener('resize', () => { placeTower(); cover(); });
+    // In a small window the row is still on its way when the resize is heard: the name is fitted a frame later.
+    const sized = new ResizeObserver(cover);
+    for (const el of [appsGrid?.parentElement, ...words]) if (el) sized.observe(el);
+    // The ink the city asks for the words at the top and at the foot; a rail's apps stand with the top.
+    let inked = '';
+    city.onFrame(() => {
+      n += 1;
+      if (n % 30 === 2 && pageAt() < 0.01) placeTower();
+      glass?.refresh();
+      sun?.follow(city.sunPx);
+      const ink = city.ink;
+      const key = ink && ink.top + ink.bottom + rail.matches;
+      if (!key || key === inked) return;
+      inked = key;
+      screenEl.dataset.top = ink.top;
+      screenEl.dataset.foot = rail.matches ? ink.top : ink.bottom;
+    });
+
+    // One loop for the light, the drift and the glass. The rim's bright
+    // corner turns with the lean, with the page and with the scroll.
+    // Under an open window only a sheet leaves the home screen in view.
+    // The status in the header is glass only while it is not standing bare on the sky.
+    const live = (el) => (!root.dataset.app || (sheet.matches && screenEl.contains(el))) && !(el.matches('.island') && masthead.classList.contains('is-bare'));
+    let turned = null;
+    let drifted = '';
+    let before = 0;
+    let moved = 0;
+    let checked = 0;
+    const stir = () => { moved = performance.now(); };
+    for (const type of ['scroll', 'pointerdown', 'pointermove', 'transitionrun', 'toggle']) addEventListener(type, stir, { passive: true, capture: true });
+    addEventListener('resize', stir);
+    const frame = (now) => {
+      requestAnimationFrame(frame);
+      if (document.hidden) return;
+      const dt = Math.min(0.034, Math.max(0.001, (now - before) / 1000));
+      before = now;
+      // Where the pages stand is read first, while the last frame's layout still holds; the writes follow.
+      const scrolled = pageAt() * 1.4 + scrollTop() / 260;
+      spring(lean.x, lean.tx, 'calm', dt);
+      spring(lean.y, lean.ty, 'calm', dt);
+      const drift = `${lean.x.x.toFixed(2)} ${lean.y.x.toFixed(2)}`;
+      if (drift !== drifted) {
+        drifted = drift;
+        moved = now;
+        for (const { el, depth } of drifters) el.style.translate = `${(-lean.x.x * depth).toFixed(2)}px ${(-lean.y.x * depth).toFixed(2)}px`;
+        // The icons turn with the lean too.
+        appsGrid?.style.setProperty('--lx', lean.x.x.toFixed(2));
+        appsGrid?.style.setProperty('--ly', lean.y.x.toFixed(2));
+        // The camera leans the same way, so the pier slides against the far shore.
+        city.setLean(lean.x.x, lean.y.x);
+      }
+      // Nothing has moved and the city has no new frame: the glass stands as
+      // it is. A slow check still catches what no event announces.
+      const busy = steppers.size > 0 || now - moved < 400;
+      if (!busy && !glass?.stale && now - checked < 500) return;
+      checked = now;
+      const turn = Math.round(clamp(lean.x.x * 26 + Math.sin(scrolled) * 16, -40, 40));
+      if (turn !== turned) {
+        turned = turn;
+        for (const el of lensed) el.style.setProperty('--rim', `${135 + turn}deg`);
+      }
+      if (!glass) return;
+      const angle = ((225 + turn) * Math.PI) / 180;
+      glass.frame(now, [Math.cos(angle), Math.sin(angle)], live);
+    };
+    requestAnimationFrame(frame);
+  });
+}
+
+/* -------------------------------------------------------------------------
+   The mascot: drawn live in 3D where the browser can, else one still picture
+   that answers a tap. It waits for the city, to share its pixel size and its
+   light.
+   ------------------------------------------------------------------------- */
+
+if (smedEl) {
+  // The city's key light, turned into the mascot's view: its camera looks
+  // down -z, the city's has swung by its yaw.
+  const light = () => {
+    if (!city) return null;
+    const lit = city.light;
+    const [x, y, z] = lit.sun;
+    const cos = Math.cos(city.yaw);
+    const sin = Math.sin(city.yaw);
+    return { ...lit, sun: [cos * x + sin * z, y, cos * z - sin * x] };
+  };
+  const mountMascot = async () => {
+    try {
+      const { mountSmed3D } = await import('./smed3d.js');
+      const live = await mountSmed3D(smedEl, bar, { light });
+      if (live) return live;
+    } catch (e) { /* no 3D module, or it could not start: the still takes over */ }
+    const lines = JSON.parse(smedEl.dataset.lines || '[]');
+    const say = smedEl.querySelector('.smed__say');
+    let sayTimer = 0;
+    smedEl.classList.replace('smed--live', 'smed--still');
+    smedEl.addEventListener('click', () => {
+      say.textContent = lines[Math.floor(Math.random() * lines.length)] || smedEl.dataset.hello;
+      smedEl.classList.add('is-saying');
+      clearTimeout(sayTimer);
+      sayTimer = setTimeout(() => smedEl.classList.remove('is-saying'), 1800);
+    });
+    return { goTo() {}, hop() {}, play() {} };
+  };
+  smedEl.classList.add('smed--live');
+  const idle = () => new Promise((done) => { (window.requestIdleCallback || setTimeout)(done, { timeout: 1500 }); });
+  cityMounted.then(idle, idle).then(mountMascot).then((api) => {
+    smed = api;
+    if (api.first) cueMascot('dance');
+    else if (location.pathname.endsWith('/cv/')) cueMascot('think');
+  });
+  visitPage();
+  // A wave goodbye on the way to the other language; the page that opens says hello in it.
+  document.addEventListener('click', (e) => { if (e.target.closest('a[hreflang]')) cueMascot('wave'); });
+
+  // Late at night in Malmö he does not wait up: left alone he yawns and goes
+  // to sleep, until something is touched.
+  let dozeTimer = 0;
+  const stir = () => {
+    clearTimeout(dozeTimer);
+    dozeTimer = setTimeout(() => {
+      if (dialHeld || appOpen || city?.nextSun.kind !== 'rise' || !cueMascot('yawn')) return;
+      dozeTimer = setTimeout(() => smed.play('sleep'), 3200);
+    }, 8000);
+  };
+  for (const type of ['pointerdown', 'keydown', 'scroll']) addEventListener(type, stir, { passive: true, capture: true });
+  stir();
+}
+
+/* -------------------------------------------------------------------------
+   The status pill and the jiggle.
+   ------------------------------------------------------------------------- */
+
+if (island) {
+  document.addEventListener('pointerdown', (e) => { if (island.open && !island.contains(e.target)) island.open = false; });
+}
+
+const appsGrid = document.querySelector('.apps');
+if (appsGrid) {
+  let timer = 0;
+  let longPress = false;
+  const stop = () => clearTimeout(timer);
+  appsGrid.addEventListener('pointerdown', () => {
+    longPress = false;
+    timer = setTimeout(() => {
+      longPress = true;
+      if (reduceMotion.matches) return;
+      appsGrid.classList.add('is-jiggling');
+      setTimeout(() => appsGrid.classList.remove('is-jiggling'), 2200);
+    }, 480);
+  });
+  ['pointerup', 'pointercancel', 'pointermove'].forEach((t) => appsGrid.addEventListener(t, stop));
+  appsGrid.addEventListener('contextmenu', (e) => e.preventDefault());
+  // Each icon turns a few degrees toward a mouse over the row. Their places are read as it comes in.
+  const icons = [...appsGrid.querySelectorAll('.app')];
+  let places = null;
+  appsGrid.addEventListener('pointerenter', () => { places = icons.map((a) => a.getBoundingClientRect()); });
+  appsGrid.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse' || !places) return;
+    icons.forEach((a, i) => {
+      a.style.setProperty('--ry', `${(clamp((e.clientX - places[i].left - places[i].width / 2) / 90, -1, 1) * 9).toFixed(1)}deg`);
+      a.style.setProperty('--rx', `${(clamp((places[i].top + places[i].width / 2 - e.clientY) / 90, -1, 1) * 9).toFixed(1)}deg`);
+    });
+  }, { passive: true });
+  appsGrid.addEventListener('pointerleave', () => {
+    places = null;
+    for (const a of icons) { a.style.removeProperty('--rx'); a.style.removeProperty('--ry'); }
+  });
+  appsGrid.addEventListener('click', (e) => {
+    if (longPress) { e.preventDefault(); e.stopImmediatePropagation(); longPress = false; }
+  }, true);
+}
+
+/* -------------------------------------------------------------------------
+   Rows of screens. Touch scrolls and snaps them natively; a mouse can take
+   hold of a row, throw it, and it lands on the screen the throw would reach.
+   ------------------------------------------------------------------------- */
+
+{
+  let row = null;
+  let stopRow = null;
+  const finger = tracker();
+  document.addEventListener('pointerdown', (e) => {
+    const el = e.target.closest('.shots');
+    if (!el || e.pointerType !== 'mouse' || e.button || el.scrollWidth <= el.clientWidth) return;
+    if (stopRow) stopRow();
+    row = { el, x: e.clientX, from: el.scrollLeft, id: e.pointerId, moved: false };
+  });
+  document.addEventListener('pointermove', (e) => {
+    if (!row || e.pointerId !== row.id) return;
+    if (!row.moved && Math.abs(e.clientX - row.x) < 6) return;
+    if (!row.moved) { row.moved = true; row.el.classList.add('is-held'); row.el.setPointerCapture(e.pointerId); }
+    finger.add(e.timeStamp, e.clientX);
+    const want = row.from - (e.clientX - row.x);
+    const past = want - clamp(want, 0, row.el.scrollWidth - row.el.clientWidth);
+    row.el.scrollLeft = want;
+    // Past either end the row gives, as a scroll edge does, and comes back when let go.
+    row.el.style.translate = past ? `${(-Math.sign(past) * rubber(Math.abs(past), row.el.clientWidth)).toFixed(1)}px 0` : '';
+  });
+  const drop = (e) => {
+    if (!row || e.pointerId !== row.id) return;
+    const { el, moved } = row;
+    row = null;
+    if (!moved) return;
+    el.style.translate = '';
+    const [speed] = finger.speed(e.timeStamp);
+    const max = el.scrollWidth - el.clientWidth;
+    const aim = el.scrollLeft - speed * 0.3;
+    // The screen whose middle is nearest where the throw would stop.
+    const stops = [...el.children].map((c) => clamp(c.offsetLeft + c.offsetWidth / 2 - el.clientWidth / 2, 0, max));
+    const to = stops.reduce((best, s) => (Math.abs(s - aim) < Math.abs(best - aim) ? s : best), stops[0]);
+    const s = { x: el.scrollLeft, v: -speed };
+    const done = () => { stopRow = null; el.classList.remove('is-held'); };
+    if (reduceMotion.matches) { el.scrollLeft = to; done(); return; }
+    const cancel = animate((dt) => {
+      spring(s, to, 'move', dt);
+      el.scrollLeft = s.x;
+      if (Math.abs(s.x - to) < 0.5 && Math.abs(s.v) < 8) { el.scrollLeft = to; done(); return false; }
+      return true;
+    });
+    stopRow = () => { cancel(); done(); };
+  };
+  document.addEventListener('pointerup', drop);
+  document.addEventListener('pointercancel', drop);
+  // A drag is not a click on whatever it ended over.
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.shots.is-held')) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
+}
+
+/* -------------------------------------------------------------------------
+   The CV's section index: a tap rides a spring to the section, and the
+   index shows which section is being read. It works in the page and in the
+   window, where the copy has no ids.
+   ------------------------------------------------------------------------- */
+
+function wireIndex(index, scroller) {
+  const article = index.closest('.cv');
+  const links = [...index.querySelectorAll('a[data-to]')];
+  const sectionOf = (a) => article.querySelector(`[data-sec="${a.dataset.to}"]`);
+  const top = () => (scroller ? scroller.scrollTop : scrollY);
+  const lead = () => index.offsetHeight + parseFloat(getComputedStyle(index).top) + 12;
+  const offsetOf = (el) => el.getBoundingClientRect().top - (scroller ? scroller.getBoundingClientRect().top : 0) + top();
+  const scrollTo = (y) => (scroller || window).scrollTo(0, y);
+  let stop = null;
+  const cancel = () => { if (stop) stop(); stop = null; };
+  index.addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-to]');
+    if (!a) return;
+    e.preventDefault();
+    cancel();
+    const to = Math.max(0, offsetOf(sectionOf(a)) - lead());
+    if (reduceMotion.matches) { (scroller || root).style.scrollBehavior = 'auto'; scrollTo(to); (scroller || root).style.scrollBehavior = ''; return; }
+    const s = { x: top(), v: 0 };
+    (scroller || root).style.scrollBehavior = 'auto';
+    stop = animate((dt) => {
+      spring(s, to, 'move', dt);
+      const done = Math.abs(s.x - to) < 0.6 && Math.abs(s.v) < 8;
+      scrollTo(done ? to : s.x);
+      if (done) { stop = null; (scroller || root).style.scrollBehavior = ''; }
+      return !done;
+    });
+  });
+  for (const type of ['touchstart', 'wheel']) (scroller || window).addEventListener(type, cancel, { passive: true });
+  let queued = false;
+  const mark = () => {
+    queued = false;
+    const line = top() + lead() + 8;
+    let on = links[0];
+    for (const a of links) if (offsetOf(sectionOf(a)) <= line) on = a;
+    if (on.hasAttribute('aria-current')) return;
+    for (const a of links) {
+      if (a === on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+    }
+    // Keep the section being read in the middle of the strip.
+    index.scrollTo({ left: on.offsetLeft - (index.clientWidth - on.offsetWidth) / 2, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+  };
+  (scroller || window).addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(mark); } }, { passive: true });
+  mark();
+}
+document.querySelectorAll('.cv__index').forEach((index) => wireIndex(index, null));
+
+/* -------------------------------------------------------------------------
+   The window. A project, a section or the CV opens in place: the window
+   grows out of the tile or card that was tapped, and goes back into it. Its
+   box is driven by springs, so a tap, Back, Esc or a finger can turn it
+   round at any point. Drag the top bar down, or the page when it is at its
+   top, to carry the window off. Links keep their real addresses, so
+   everything also works as plain pages.
+   ------------------------------------------------------------------------- */
+
+const view = document.querySelector('.appview');
+
+if (view) {
+  const inner = view.querySelector('.appview__inner');
+  const body = view.querySelector('.appview__body');
+  const title = view.querySelector('.appview__title');
+  const backBtn = view.querySelector('.appview__back');
+  const ghost = view.querySelector('.appview__ghost');
+  const scrim = document.querySelector('.scrim');
+  let isOpen = false;
+  let opener = null;
+  let source = null;
+
+  // A copy must not repeat ids, or the transition names that pair a page's
+  // icon with its tile here.
+  const detach = (node) => {
+    node.querySelectorAll('[id], [style*="view-transition-name"]').forEach((n) => {
+      n.removeAttribute('id');
+      n.style.viewTransitionName = '';
+    });
+    return node;
+  };
+
+  // A case study and the CV bring their own stylesheets. The home screen does
+  // not use them, so they are fetched with the first page a window asks for.
+  let styled = null;
+  const styles = () => {
+    styled ??= Promise.all(['case-study', 'cv'].filter((name) => !document.querySelector(`link[href$="/${name}.css"]`)).map((name) => new Promise((done) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `/assets/css/${name}.css`;
+      link.onload = done;
+      link.onerror = done;
+      document.head.append(link);
+    })));
+    return styled;
+  };
+  const fetched = new Map();
+  function contentFor(href) {
+    if (href.startsWith('#')) {
+      const copy = document.createElement('div');
+      copy.className = 'shell';
+      copy.append(...document.getElementById(href.slice(1)).cloneNode(true).childNodes);
+      return Promise.resolve(detach(copy));
+    }
+    if (!fetched.has(href)) {
+      const page = fetch(href).then((res) => res.text()).then((text) => new DOMParser().parseFromString(text, 'text/html').querySelector('main .shell.nf, article.cv, main.case > .shell'));
+      fetched.set(href, Promise.all([page, styles()]).then(([node]) => node));
+    }
+    return fetched.get(href).then((node) => detach(node.cloneNode(true)));
+  }
+  // The bar names the window once its own heading has scrolled out of sight.
+  // A section has no heading of its own in the window, so there it stays.
+  let named = false;
+  body.addEventListener('scroll', () => title.classList.toggle('is-shown', named || body.scrollTop > 96), { passive: true });
+  const fill = (node) => {
+    named = !node.querySelector('h1');
+    body.replaceChildren(node);
+    body.scrollTop = 0;
+    title.classList.toggle('is-shown', named);
+    // A section brings its mark along to the bar.
+    const mark = node.querySelector('.head .sec');
+    if (mark) title.prepend(mark.cloneNode());
+    const index = body.querySelector('.cv__index');
+    if (index) wireIndex(index, body);
+  };
+
+  // The window's box: `open` runs from 0, the source's rectangle, to 1, its
+  // own; `pull` is how far a finger has carried it.
+  const open = { x: 0, v: 0 };
+  const pull = { x: 0, y: 0, vx: 0, vy: 0 };
+  let goal = 0;
+  let dragging = false;
+  let stopBox = null;
+  let from = null;
+
+  const sourceBox = () => {
+    const el = source && source.isConnected ? source : null;
+    const rect = el ? el.getBoundingClientRect() : null;
+    if (!rect || !rect.width || rect.bottom < 0 || rect.top > innerHeight) return null;
+    return { x: rect.left, y: rect.top, w: rect.width, h: rect.height, r: parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0, tile: el.matches('.app__tile') };
+  };
+  // The window's own box and corner, read when it is shown or the browser
+  // window changes, never between two frames of a spring.
+  let full = null;
+  let corner = 0;
+  const gauge = () => {
+    full = { x: view.offsetLeft, y: view.offsetTop, w: view.offsetWidth, h: view.offsetHeight };
+    corner = parseFloat(getComputedStyle(view).getPropertyValue('--view-r')) || 0;
+  };
+  addEventListener('resize', () => { if (view.classList.contains('is-open')) gauge(); });
+  const paint = () => {
+    // With nothing to grow from, the window rises a little and fades.
+    const box = from || { x: full.x + full.w * 0.04, y: full.y + full.h * 0.06, w: full.w * 0.92, h: full.h * 0.92, r: 40 };
+    const t = open.x;
+    const far = clamp(Math.hypot(pull.x, pull.y) / (full.h * 0.5), 0, 1);
+    const shrink = 1 - 0.16 * far;
+    const w = Math.max(8, box.w + (full.w - box.w) * t) * shrink;
+    const h = Math.max(8, box.h + (full.h - box.h) * t) * shrink;
+    const x = box.x + (full.x - box.x) * t + pull.x + (full.w * t + box.w * (1 - t) - w) / 2;
+    const y = box.y + (full.y - box.y) * t + pull.y;
+    const sx = w / full.w;
+    const sy = h / full.h;
+    const r = Math.max(0, box.r + (corner - box.r) * t) + 30 * far;
+    view.style.transform = `translate(${(x - full.x).toFixed(2)}px, ${(y - full.y).toFixed(2)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+    view.style.borderRadius = `${(r / sx).toFixed(2)}px / ${(r / sy).toFixed(2)}px`;
+    inner.style.transform = `scale(1, ${(sx / sy).toFixed(4)})`;
+    view.style.opacity = from ? clamp(t * 7, 0, 1).toFixed(3) : clamp(t * 1.6, 0, 1).toFixed(3);
+    ghost.style.opacity = from && from.tile ? clamp(1 - (t - 0.06) * 3.2, 0, 1).toFixed(3) : '0';
+    scrim.style.opacity = (clamp(t, 0, 1) * (1 - far * 0.8)).toFixed(3);
+    recede(clamp(t, 0, 1) * (1 - far * 0.8));
+    cover(t > 0.6 && far < 0.2);
+  };
+  // The home screen steps back as the window rises over it: smaller and
+  // fainter, and still sharp.
+  const skyEl = document.querySelector('.sky');
+  const recede = (k) => {
+    if (!pager) return;
+    pager.style.transform = k ? `scale(${(1 - 0.07 * k).toFixed(4)})` : '';
+    pager.style.opacity = k ? (1 - 0.45 * k).toFixed(3) : '';
+    skyEl.style.opacity = pager.style.opacity;
+  };
+  // Once the window covers the home screen the bar is over paper, not the city.
+  const cover = (on) => {
+    if (on === Boolean(root.dataset.app)) return;
+    if (on) root.dataset.app = '1'; else delete root.dataset.app;
+    // A city nobody can see is not drawn.
+    city?.setPaused(on && !sheet.matches);
+  };
+  const rest = () => {
+    for (const el of [view, inner, ghost, scrim]) el.removeAttribute('style');
+    view.classList.remove('is-moving');
+  };
+  const hideSource = (hidden) => { if (source && source.matches('.app__tile')) source.style.visibility = hidden ? 'hidden' : ''; };
+  const landed = () => {
+    stopBox = null;
+    cover(goal === 1);
+    recede(goal);
+    rest();
+    if (goal === 1) return;
+    view.classList.remove('is-open');
+    scrim.classList.remove('is-open');
+    hideSource(false);
+    body.replaceChildren();
+  };
+  const move = () => {
+    if (stopBox || dragging) return;
+    view.classList.add('is-moving');
+    if (reduceMotion.matches) {
+      open.x = goal; open.v = 0; pull.x = 0; pull.y = 0; landed();
+      // No travel: the window is there and fades in.
+      if (goal) view.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+      return;
+    }
+    const px = { x: pull.x, v: pull.vx };
+    const py = { x: pull.y, v: pull.vy };
+    stopBox = animate((dt) => {
+      // A window let go of springs back with a little life; one that leaves does not.
+      spring(open, goal, 'move', dt);
+      spring(px, 0, goal ? 'quick' : 'move', dt);
+      spring(py, 0, goal ? 'quick' : 'move', dt);
+      pull.x = px.x;
+      pull.y = py.x;
+      const done = Math.abs(open.x - goal) < 0.002 && Math.abs(open.v) < 0.02 && Math.hypot(pull.x, pull.y) < 0.5;
+      if (done) { open.x = goal; open.v = 0; pull.x = 0; pull.y = 0; pull.vx = 0; pull.vy = 0; landed(); return false; }
+      paint();
+      return true;
+    });
+  };
+  const halt = () => { if (stopBox) stopBox(); stopBox = null; };
+
+  function present() {
+    from = sourceBox();
+    ghost.src = from && from.tile ? (source.querySelector('img')?.currentSrc || '') : '';
+    view.classList.add('is-open');
+    scrim.classList.add('is-open');
+    gauge();
+    screenEl.inert = true;
+    appOpen = true;
+    cueMascot('think');
+    parkMascot();
+    goal = 1;
+    paint();
+    hideSource(true);
+    view.focus({ preventScroll: true });
+    move();
+  }
+
+  function dismiss() {
+    if (!isOpen) return;
+    isOpen = false;
+    screenEl.inert = false;
+    appOpen = false;
+    parkMascot();
+    opener?.focus?.({ preventScroll: true });
+    from = sourceBox();
+    goal = 0;
+    halt();
+    move();
+  }
+
+  async function openApp(href, label, link, push) {
+    halt();
+    hideSource(false);
+    opener = link;
+    source = link ? link.querySelector('.app__tile, .me') || link.closest('.project') : null;
+    document.body.classList.add('px');
+    isOpen = true;
+    title.textContent = label;
+    view.dataset.project = (href.match(/^\/work\/([\w-]+)\.html$/) || [])[1] || '';
+    body.replaceChildren();
+    present();
+    if (push) history.pushState({ app: href, label }, '', href);
+    try {
+      const node = await contentFor(href);
+      if (isOpen && title.textContent === label) fill(node);
+    } catch (err) {
+      location.href = href;
+    }
+  }
+
+  function close() {
+    if (history.state?.app) history.back();
+    else dismiss();
+  }
+
+  backBtn.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen) { e.preventDefault(); close(); } });
+  addEventListener('popstate', (e) => {
+    if (e.state?.app) openApp(e.state.app, e.state.label, null, false);
+    else dismiss();
+  });
+
+  const isAppLink = (a) => {
+    const href = a.getAttribute('href') || '';
+    return a.dataset.sheet || /^\/work\/[\w-]+\.html$/.test(href) || /^(\/sv)?\/cv\/$/.test(href);
+  };
+  // The page is asked for when a finger lands, so it is there when the window opens.
+  document.addEventListener('pointerdown', (e) => {
+    const a = e.target.closest('a[href]');
+    if (a && isAppLink(a) && !a.dataset.sheet) contentFor(a.getAttribute('href')).catch(() => {});
+  }, { passive: true });
+  document.addEventListener('click', (e) => {
+    const peek = e.target.closest('.peek[data-open]');
+    const a = peek ? peek.closest('.project').querySelector('h3 a') : e.target.closest('a[href]');
+    if (!a || !isAppLink(a) || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (a.closest('.footer__links') || a.hasAttribute('download')) return;
+    e.preventDefault();
+    const href = a.getAttribute('href');
+    const label = a.dataset.title || a.textContent.trim() || 'CV';
+    if (isOpen && view.contains(a)) {
+      title.textContent = label;
+      view.dataset.project = (href.match(/^\/work\/([\w-]+)\.html$/) || [])[1] || '';
+      history.replaceState({ app: href, label }, '', href);
+      body.replaceChildren();
+      contentFor(href).then(fill);
+      return;
+    }
+    openApp(href, label, a.closest('.app, .who, .project') ? a : null, true);
+  });
+
+  // Tabs that leave an open app close it first.
+  bar?.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a || !isOpen || isAppLink(a)) return;
+    close();
+  });
+
+  // Carry the window. Past the top it gives like a scroll edge; let go and
+  // the throw decides whether it leaves or comes back.
+  const finger = tracker();
+  let grab = null;
+  const carry = (x, y, t) => {
+    const dy = y - grab.y;
+    pull.y = dy >= 0 ? dy : -rubber(-dy, full.h);
+    pull.x = (x - grab.x) * 0.5;
+    finger.add(t, x, y);
+    paint();
+  };
+  const take = (x, y) => {
+    halt();
+    dragging = true;
+    grab = { x: x - pull.x * 2, y: y - pull.y };
+    view.classList.add('is-moving');
+  };
+  const letGo = (t) => {
+    if (!dragging) return;
+    dragging = false;
+    grab = null;
+    [pull.vx, pull.vy] = finger.speed(t);
+    pull.vx *= 0.5;
+    const lands = pull.y + pull.vy * 0.2;
+    if (isOpen && lands > full.h * 0.26) close();
+    else move();
+  };
+  const handle = view.querySelector('.appview__bar');
+  handle.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button') || e.button || !isOpen) return;
+    handle.setPointerCapture(e.pointerId);
+    take(e.clientX, e.clientY);
+  });
+  handle.addEventListener('pointermove', (e) => { if (dragging && grab) carry(e.clientX, e.clientY, e.timeStamp); });
+  handle.addEventListener('pointerup', (e) => letGo(e.timeStamp));
+  handle.addEventListener('pointercancel', (e) => letGo(e.timeStamp));
+  // On the page itself a downward drag from the very top carries the window;
+  // any other touch scrolls as usual.
+  let touch = null;
+  body.addEventListener('touchstart', (e) => {
+    touch = e.touches.length === 1 && body.scrollTop <= 0 && isOpen ? { x: e.touches[0].clientX, y: e.touches[0].clientY, on: false } : null;
+  }, { passive: true });
+  body.addEventListener('touchmove', (e) => {
+    if (!touch) return;
+    const { clientX: x, clientY: y } = e.touches[0];
+    if (!touch.on) {
+      const dx = Math.abs(x - touch.x);
+      const dy = y - touch.y;
+      if (dy < 6 && dx < 6) return;
+      if (dy <= dx || !e.cancelable || e.target.closest('.shots')) { touch = null; return; }
+      touch.on = true;
+      take(touch.x, touch.y);
+    }
+    e.preventDefault();
+    carry(x, y, e.timeStamp);
+  }, { passive: false });
+  const lift = (e) => { if (touch?.on) letGo(e.timeStamp); touch = null; };
+  body.addEventListener('touchend', lift);
+  body.addEventListener('touchcancel', lift);
+}
