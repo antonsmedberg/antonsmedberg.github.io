@@ -13,8 +13,8 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .no-gl .os .screen { background: #0c1a3c url("/assets/art/malmo-still.webp") 70% / cover; }
 /* Ink: cream on a deep picture, navy on a bright one, as the city asks at the top and at the foot
    (`data-top`, `data-foot`); cream until it does. Each keeps 4.5:1 on its promise, 0.12 or 0.32. */
-.os .screen, .apps { --sky-ink: #fbf5ea; --sky-ink-2: #ece5d4; --sky-depth: color-mix(in oklab, var(--sky-top) 68%, var(--sky-ink)); --alm-ink: #f5cd7a; }
-.os .screen[data-top="dark"], .os .screen[data-foot="dark"] .apps { --sky-ink: #101b3b; --sky-ink-2: #1f2c52; --sky-depth: color-mix(in oklab, var(--sky-horizon) 60%, var(--sky-ink)); --alm-ink: #1b2590; }
+.os .screen, .apps { --sky-halo: #101b3b; --sky-ink: #fbf5ea; --sky-ink-2: #ece5d4; --sky-depth: color-mix(in oklab, var(--sky-top) 68%, var(--sky-ink)); --alm-ink: #f5cd7a; }
+.os .screen[data-top="dark"], .os .screen[data-foot="dark"] .apps { --sky-halo: #fbf5ea; --sky-ink: #101b3b; --sky-ink-2: #1f2c52; --sky-depth: color-mix(in oklab, var(--sky-horizon) 60%, var(--sky-ink)); --alm-ink: #1b2590; }
 :is(.name span, .who, .alm, .app, .island) { transition: color 0.4s ease, text-shadow 0.4s ease; }
 .os .masthead--home { position: absolute; left: var(--rail-clear); right: 0; }
 
@@ -34,14 +34,44 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .pg {
   flex: 0 0 100%; width: 100%; height: 100%;
   overflow: hidden auto; overscroll-behavior-y: contain; scrollbar-width: none; touch-action: pan-y;
-  padding-top: calc(64px + env(safe-area-inset-top));
-  padding-bottom: calc(var(--bar-clear) + 28px);
+  --pg-top: calc(64px + env(safe-area-inset-top)); --pg-foot: calc(var(--bar-clear) + 28px);
+  padding-top: var(--pg-top);
+  padding-bottom: var(--pg-foot);
   padding-left: var(--rail-clear);
 }
 .pg::-webkit-scrollbar { display: none; }
 .pg .shell { position: relative; z-index: 3; }
 /* The lane above the bar belongs to the mascot. */
 #home.pg { padding-bottom: calc(var(--bar-clear) + var(--lane)); }
+/* Scroll edges: a page's text never runs readable under the header's pills
+   or the bar. On its way to them it passes into a band of soft blur that
+   deepens toward the edge, held by two sticky ends of the page itself that
+   take the room its padding took. Each band gathers the frost as it nears
+   the edge, so what passes under it is muted as well as blurred, even where
+   an engine draws a picture over the blur: the top one under the pills, the
+   bottom one into the frost made solid by the bar's lower edge, so nothing
+   of the page shows under or below the bar. The top one comes in as the page
+   leaves its top, so at rest the sky behind the header stays sharp. Home is
+   the scene and has none. */
+.pg:not(#home) { padding-block: 0; display: flex; flex-direction: column; }
+/* The page is a column, so the foot band stands at the window's foot however short the page is. */
+.pg:not(#home) > *, .pg:not(#home)::before, .pg:not(#home)::after { flex: none; }
+.pg:not(#home)::before, .pg:not(#home)::after {
+  content: ""; position: sticky; z-index: 4; display: block; pointer-events: none;
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+}
+.pg:not(#home)::before {
+  top: 0; height: var(--pg-top); background: linear-gradient(var(--frost), transparent);
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent);
+}
+.pg:not(#home)::after {
+  bottom: 0; height: var(--pg-foot); margin-top: auto; background: linear-gradient(transparent 20%, var(--frost) 50%, var(--frost-solid) 85%);
+  -webkit-mask-image: linear-gradient(transparent, #000 44%); mask-image: linear-gradient(transparent, #000 44%);
+}
+@supports (animation-timeline: scroll()) {
+  .pg:not(#home)::before { animation: edge-in linear both; animation-timeline: scroll(nearest); animation-range: 0 48px; }
+  @keyframes edge-in { from { opacity: 0; } to { opacity: 1; } }
+}
 
 /* Name: one line from 360 px wide, two below that, small enough to leave the sky its room. */
 #home .shell { position: static; }
@@ -91,11 +121,14 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
    when, the time as a lock screen sets it, the weather in one line. Each line keeps its height. */
 .alm { position: relative; z-index: 3; display: grid; justify-self: start; max-width: calc(var(--tower-l, 63cqw) - var(--gutter) - 10px); margin-top: 10px; color: var(--alm-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .alm > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.alm__eye { height: 16px; margin-left: -1px; font-size: var(--fs-2xs); font-weight: 600; letter-spacing: 0.1em; line-height: 16px; text-transform: uppercase; }
-.alm__time { height: 44px; margin-left: -0.04em; font-family: var(--font); font-size: 2.375rem; font-weight: 300; line-height: 44px; letter-spacing: -0.01em; }
-.alm__wx { display: flex; align-items: center; gap: 6px; height: 24px; font-size: var(--fs-sub); font-weight: 500; line-height: 1.25; letter-spacing: var(--tr-md); }
+/* Without the script there is no clock to show under its label. */
+.no-js .alm { display: none; }
+.alm__eye { min-height: 1.4545em; margin-left: -1px; font-size: var(--fs-2xs); font-weight: 600; letter-spacing: 0.1em; line-height: 1.4545; text-transform: uppercase; }
+.alm__time { min-height: 1.158em; margin-left: -0.04em; font-family: var(--font); font-size: 2.375rem; font-weight: 300; line-height: 1.158; letter-spacing: -0.01em; }
+.alm__wx { display: flex; align-items: center; gap: 6px; min-height: 1.6em; font-size: var(--fs-sub); font-weight: 500; line-height: 1.25; letter-spacing: var(--tr-md); }
 
-.who:focus-visible { outline-color: #fff; outline-offset: 4px; border-radius: var(--r-sm); }
+/* Rings on the scene are two-tone: the scene's ink on a band of its opposite, so they read on any sky. */
+.who:focus-visible { outline: 2.5px solid var(--sky-ink); outline-offset: 4px; box-shadow: 0 0 0 6.5px var(--sky-halo); border-radius: var(--r-sm); }
 
 /* The sun is the clock. The city draws it, and the moon by night, where the
    handle stands in `.sun`, its room in the layout: main.js moves the handle by
@@ -111,7 +144,7 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .sun[data-live] { visibility: visible; }
 /* The handle: nothing to see, 44 px to take hold of, and the ring a keyboard gets. */
 .sun__hand { position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; border-radius: 50%; cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent; }
-.sun__hand:focus-visible { outline: 2.5px solid #fff; outline-offset: 2px; border-radius: 50%; }
+.sun__hand:focus-visible { outline: 2.5px solid var(--sky-ink); outline-offset: 2px; box-shadow: 0 0 0 4.5px var(--sky-halo); border-radius: 50%; }
 .sun.is-held .sun__hand { cursor: grabbing; }
 
 /* Apps: the four projects as one compact group of small tiles, low over
@@ -144,8 +177,8 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .app:focus-visible .app__note { opacity: 1; visibility: visible; }
 /* The focus ring rings the tile, on its own corner, not the name that runs wider than it. */
 .app:focus-visible { outline: none; }
-.app:focus-visible .app__tile { outline: 2px solid #fff; outline-offset: 3px; }
-.app__name { width: calc(var(--tile) + var(--gap) - 4px); margin-top: 7px; font-size: 0.65625rem; font-weight: 500; letter-spacing: -0.015em; line-height: var(--lh-xs); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app:focus-visible .app__tile { outline: 2.5px solid var(--sky-ink); outline-offset: 3px; box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.4), 0 0 0 7px var(--sky-halo); }
+.app__name { width: calc(var(--tile) + var(--gap) - 4px); margin-top: 7px; font-size: var(--fs-2xs); font-weight: 500; letter-spacing: -0.015em; line-height: var(--lh-xs); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .is-jiggling .app__tile { animation: jiggle 0.32s ease-in-out infinite alternate; }
 .is-jiggling .app:nth-child(2n) .app__tile { animation-delay: -0.15s; animation-direction: alternate-reverse; }
@@ -163,14 +196,20 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .island__links .btn { flex: 1 1 auto; min-height: var(--h-md); padding-inline: 16px; font-size: var(--fs-sub); }
 
 /* Other pages: titles on glass, content on paper. */
-.pg .head { width: fit-content; max-width: min(100%, 40rem); padding: 16px 20px; }
+.pg .head { width: fit-content; max-width: min(100%, 40rem); padding: 20px var(--card-pad); }
 .pg .head h2, .pg .head .kicker { color: inherit; }
-.pg .head p:not(.kicker) { color: oklch(1 0 0 / 0.94); }
+.pg .head p:not(.kicker) { color: var(--ink-2); }
 /* Work opens on the scene itself, as Home does: its title is set on the sky in the sky's ink, with no card
    under it, and the first project rises under it. */
-#work > .shell > .head { padding-inline: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; color: var(--sky-ink); }
+#work > .shell > .head { padding-top: 32px; padding-inline: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; color: var(--sky-ink); }
 #work > .shell > .head::after { content: none; }
 #work > .shell > .head p:not(.kicker) { color: var(--sky-ink); }
+/* On a wide screen the city's camera turns as the pages move, so on Work the tower can stand anywhere behind the
+   title: there the title stands on the frost like every other page's. */
+@media (min-width: 720px) and (min-height: 541px) {
+  #work > .shell > .head { padding: 24px var(--card-pad); background: var(--frost); color: var(--ink); -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(150%); backdrop-filter: blur(var(--frost-blur)) saturate(150%); box-shadow: inset 0 1px 0 var(--frost-rim), inset 0 0 0 0.5px var(--frost-line), var(--frost-shadow); }
+  #work > .shell > .head p:not(.kicker) { color: var(--ink-2); }
+}
 
 /* Work: the cards stack. main.js gives each one the place it sticks at, a
    little lower than the last and never before its own foot is in view, so
@@ -182,9 +221,6 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .pg .peek { content-visibility: auto; contain-intrinsic-size: auto 16rem; }
 .pg .project, .pg .panel { content-visibility: auto; contain-intrinsic-block-size: auto 24rem; }
 .pg .head { content-visibility: auto; contain-intrinsic-block-size: auto 7rem; }
-@container (max-width: 859px) {
-  .pg .project__line { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-}
 
 .cv-cols { display: grid; gap: 28px 20px; align-items: start; }
 @container (min-width: 900px) {
@@ -193,13 +229,15 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 }
 .cv-side { display: grid; gap: 28px; min-width: 0; }
 .cv-cols > section { min-width: 0; }
-.cv-actions .btn--quiet { --b-bg: var(--surface); }
+/* A head in a column runs the column's width, so it lines up with what stands under it. */
+.cv-cols .head { width: auto; max-width: none; }
 
 #contact .cta { max-width: 46rem; margin-top: 18svh; }
 /* The weather's source and licence, as SMHI's terms ask: one quiet line at the foot of the card, in the page's
    flow and clear of the bar and of Bit. */
 .cta .credit { margin-top: 24px; font-size: var(--fs-2xs); line-height: var(--lh-xs); }
-.credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+/* The link's own target reaches 44 px tall without moving the line. */
+.credit a { display: inline-block; padding-block: 15px; margin-block: -15px; color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
 /* Narrow phones: the gutters between the icons close up, so the names are
    set tighter, then in a narrower cut of the same size where the face has
@@ -218,7 +256,7 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 /* Phones with little height: a smaller sun, closer lines. */
 @media (max-width: 719px) and (max-height: 700px) {
   .os .screen { --orb: 80px; }
-  .pg { padding-top: calc(56px + env(safe-area-inset-top)); }
+  .pg { --pg-top: calc(56px + env(safe-area-inset-top)); }
   .who { margin-top: 0; }
   .alm { margin-top: 4px; }
   .sun { min-height: 32px; }
@@ -241,8 +279,8 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
   /* A big window gets bigger type, not more empty sky. */
   html { font-size: max(100%, min(1.0417vw, 1.85vh)); }
   .os .screen { --orb: 9rem; }
-  .pg { padding-top: calc(4.75rem + env(safe-area-inset-top)); }
-  #home.pg { padding-top: calc(4.25rem + env(safe-area-inset-top)); }
+  .pg { --pg-top: calc(4.75rem + env(safe-area-inset-top)); }
+  #home.pg { --pg-top: calc(4.25rem + env(safe-area-inset-top)); }
   .hero { --side: max(var(--gutter), (100cqw - 76rem) / 2 + var(--gutter)); --clear: 1.75rem; max-width: none; margin: 0; padding-inline: var(--side) 0; }
   .name { width: calc(var(--tower-l, 64cqw) - var(--side) - var(--clear)); --name-max: clamp(60px, 4.25rem, 72px); }
   .who { max-width: calc(var(--tower-l, 64cqw) - var(--side) - var(--clear)); gap: 16px; }
@@ -255,7 +293,7 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
   .alm__wx { height: 1.875rem; font-size: var(--fs-lg); }
   .sun { width: calc(var(--tower-l, 64cqw) - var(--side) + 2rem); }
   .apps { --tile: 3.75rem; --gap: 1.75rem; }
-  .pg .head { padding: 20px 24px; }
+  .pg .head { padding: 24px var(--card-pad); }
   #contact .cta { margin-top: 14svh; padding: 44px 40px; }
 }
 /* The widest windows: the tiles grow with the type. */
@@ -272,7 +310,7 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 }
 /* The same layout in a low window: a smaller sun. */
 @media (min-width: 720px) and (min-height: 541px) and (max-height: 820px) {
-  .pg, #home.pg { padding-top: calc(4rem + env(safe-area-inset-top)); }
+  .pg, #home.pg { --pg-top: calc(4rem + env(safe-area-inset-top)); }
   .os .screen { --orb: 7rem; }
   .sun { min-height: 32px; }
 }
@@ -281,7 +319,9 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
    rail, and the sun in the sky on the far side of the tower. */
 @media (max-height: 540px) and (min-width: 600px) {
   .os .screen { --orb: 80px; }
-  .pg { padding-top: calc(56px + env(safe-area-inset-top)); padding-bottom: 16px; }
+  .pg { --pg-top: calc(56px + env(safe-area-inset-top)); --pg-foot: 16px; }
+  /* No bar stands at the foot of the rail layout, so the page's foot is only its margin. */
+  .pg:not(#home)::after { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   #home.pg { padding-bottom: 8px; }
   .hero {
     --side: max(var(--gutter), env(safe-area-inset-left)); --clear: 16px;

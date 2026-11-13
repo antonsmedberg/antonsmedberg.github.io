@@ -35,13 +35,11 @@ PAGES = ["index.html", "sv/index.html", "work/*.html", "cv/index.html", "sv/cv/i
 # the Resource Timing list, plus the page and the favicon. The screenshots on
 # the Work page are not in it: that page renders them only once it is swiped
 # to (content-visibility in home.css). case-study.css and cv.css style what an
-# app window shows, and main.js fetches them with the first window. Pixelify
-# Sans sets labels on the other pages only, and main.js lets it in with the
-# first of them. The mascot is drawn by smed3d.js, which is fetched beside the
-# city and is counted. Its still picture and the city's load only where WebGL 2
+# app window shows, and main.js fetches them with the first window. The mascot, smed3d.js, is fetched only once the
+# city has started and rows in after it, so he is not counted. Its still picture and the city's load only where WebGL 2
 # is missing; until the city draws, the screen is a gradient for the hour.
-# The city and the mascot are asked for after the first paint, which can fall
-# just after the load event; they are counted all the same. Home's four app
+# The city is asked for after the first paint, which can fall just after the
+# load event; it is counted all the same. Home's four app
 # faces (three icons at 180 px on a phone, and the baked ring) are its only
 # pictures besides the portrait. Re-measure after changing the layout.
 FIRST_VIEW = [
@@ -51,7 +49,6 @@ FIRST_VIEW = [
     "assets/css/style.css",
     "assets/css/home.css",
     "assets/js/main.js",
-    "assets/js/smed3d.js",
     "assets/js/city.js",
     "assets/img/icons.svg",
     "assets/img/me-cut-168.webp",
@@ -64,16 +61,15 @@ FIRST_VIEW = [
 BUDGET = 450_000
 
 # Fetched once the home page has loaded: the weather with its symbols and
-# stylesheet (main.js), the shader glass (main.js, after the city's first
-# frame), the city's clouds, rain, snow and water (city.js, half a second
+# stylesheet (main.js), the city's clouds, rain, snow and water (city.js, half a second
 # after its first frame), and two and a half seconds on the four apps' pages
 # with their stylesheets, so a window opens with its page in it (main.js).
 AFTER_LOAD = [
     "assets/js/weather.js",
-    "assets/js/glass.js",
     "assets/js/sky.js",
     "assets/css/sky.css",
     "assets/js/city-sky.js",
+    "assets/js/smed3d.js",
     "assets/js/smed3d-fine.js",
     "assets/css/case-study.css",
     "assets/css/cv.css",

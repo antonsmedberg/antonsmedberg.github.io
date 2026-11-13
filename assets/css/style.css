@@ -27,13 +27,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Pixelify Sans";
-  src: url("/assets/fonts/pixelify-sans-wght.woff2") format("woff2");
-  font-weight: 400 700;
-  font-display: swap;
-}
-
 /* The display face is Bricolage Grotesque. If the file cannot load, the name
    resolves to a heavy face the device already has. */
 @font-face {
@@ -56,7 +49,6 @@
 :root {
   color-scheme: light dark;
   --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
-  --font-pixel: "Pixelify Sans", var(--font);
   --font-display: "Smedberg Display", "Smedberg Fallback", "Avenir Next", var(--font);
 
   /* Type scale: eight steps and no size outside them. Four for text, two
@@ -89,6 +81,10 @@
   --lh-md: 1.5rem;
   --lh-body: 1.75rem;
   --measure: 34rem;
+  /* Running text on a card: the body size at half again its height. */
+  --lh-read: 1.5;
+  /* One padding inside every card, a step up on larger screens. */
+  --card-pad: 24px;
 
   /* Colour: every ramp is OKLCH on one hue, so steps differ in lightness
      alone. `--h` is the accent hue; a project sets its own. */
@@ -110,13 +106,10 @@
   --shadow: light-dark(0 1px 2px oklch(0.19 0.02 262 / 0.06), 0 1px 2px oklch(0 0 0 / 0.4)), light-dark(0 12px 32px -12px oklch(0.19 0.02 262 / 0.22), 0 14px 34px -14px oklch(0 0 0 / 0.75));
 
   /* The live sky. main.js overwrites these from the city; the values per
-     `data-sky` are what shows before it has drawn, and without WebGL.
-     `--pane` is how much the small glass shapes hold back whatever is under
-     them, sky or page, in every key. */
+     `data-sky` are what shows before it has drawn, and without WebGL. */
   --sky-top: #131c5c;
   --sky-horizon: #f78e5e;
   --sky-accent: #ff9c6c;
-  --pane: 0.8;
 
   /* One radius scale. A nested shape takes its parent's radius less the gap
      between them, which for the usual gaps is the step below. */
@@ -128,17 +121,16 @@
   --r-full: 999px;
   --r-icon: 22.5%;
 
-  /* Glass, one material. `--g-fill` is what it is dimmed with, `--g-dim` how
-     much, `--g-ink` what is written on it. On paper the fill follows the
-     theme; on the city it is a dark neutral whose dim follows the backdrop. */
-  --g-fill: light-dark(oklch(0.995 0.002 262), oklch(0.24 0.014 262));
-  --g-dim: 0.88;
-  --g-ink: var(--ink);
-  --g-rim: light-dark(oklch(1 0 0 / 0.95), oklch(1 0 0 / 0.5));
-  --g-rim-low: light-dark(oklch(0.19 0.02 262 / 0.14), oklch(1 0 0 / 0.1));
-  --g-shadow: light-dark(0 6px 20px -10px oklch(0.19 0.02 262 / 0.3), 0 6px 20px -10px oklch(0 0 0 / 0.6));
+  /* Glass, one frosted material (see Glass below). Every value is a pair for
+     the page's light: light frost under navy ink, dark frost under cream. */
+  --frost: light-dark(rgb(250 251 255 / 0.74), rgb(16 22 40 / 0.76));
+  --frost-solid: light-dark(rgb(246 247 252 / 0.96), rgb(18 23 40 / 0.96));
+  --frost-tint: light-dark(rgb(16 27 59 / 0.06), rgb(255 255 255 / 0.08));
+  --frost-rim: light-dark(rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.2));
+  --frost-line: light-dark(rgb(16 27 59 / 0.1), rgb(255 255 255 / 0.1));
+  --frost-shadow: light-dark(0 12px 32px -16px rgb(16 27 59 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6));
+  --frost-blur: 20px;
   --g-edge: 1px;
-  --rim: 135deg;
 
   /* Spacing is whole steps of 4 px. A control is one of three heights; a
      capsule is half its height round; the bar is its tallest control plus
@@ -151,7 +143,6 @@
 
   --spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 17.2%, 1.017 20.3%, 1.077 24.2%, 1.097 28.1%, 1.094 33.3%, 1.04 44.5%, 1.015 51.7%, 0.995 64.1%, 1);
   --press: linear(0, 0.36 9%, 0.72 20%, 0.93 32%, 1.02 44%, 1.04 54%, 1.02 68%, 1);
-  --fold: cubic-bezier(0.25, 1, 0.5, 1);
 
   --gutter: 16px;
   --section: clamp(2.5rem, 8cqw, 4.5rem);
@@ -160,14 +151,19 @@
   --rail-clear: 0px;
 }
 
+@media (min-width: 720px) { :root { --card-pad: 32px; } }
+
 /* On dense screens the rim is two device pixels, not three. */
 @media (min-resolution: 2.5dppx) { :root { --g-edge: 0.67px; } }
 
-/* Left to itself, the page takes its light from Malmö's sky, which the home screen shows: paper by day and at
-   dawn, dark at dusk and by night, so a card never glares on the night city. A page that has not seen the sky
-   follows the system, and the toggle overrides both. */
+/* Left to itself, the page takes its light from the scene behind it: light frost while the picture is bright,
+   dark once it is dark (`data-key`, from the city's own measure), so a bright dusk keeps light frost and a card
+   never glares on the night city. Until the city has measured, the hour's name stands in; a page that has
+   seen neither follows the system, and the toggle overrides all three. */
 :root:not([data-theme]):is([data-sky="night"], [data-sky="dusk"]) { color-scheme: dark; }
 :root:not([data-theme]):is([data-sky="day"], [data-sky="dawn"]) { color-scheme: light; }
+:root:not([data-theme])[data-key="light"] { color-scheme: light; }
+:root:not([data-theme])[data-key="dark"] { color-scheme: dark; }
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }
 
@@ -181,12 +177,6 @@
 [data-project="giggledash"] { --h: 48; }
 [data-project="devicemonitor"] { --h: 232; }
 [data-project="metalvisualkit"] { --h: 296; }
-
-/* The pixel face sets small labels on the pages after the first. The home
-   screen shows none at first, so it names the face only once main.js has let
-   it in (`.px`), once the home page has loaded and gone quiet, or with the
-   first page or window that uses it; until then the file is not fetched. */
-body.os:not(.px) { --font-pixel: var(--font); }
 
 /* Base */
 
@@ -227,8 +217,11 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 main:focus { outline: none; }
 :focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+/* A tap is a tap at once: no wait to see whether it becomes a double tap. */
+a, button, summary, label { touch-action: manipulation; }
 
-h1, h2, h3, h4 { font-weight: 640; letter-spacing: var(--tr-lg); line-height: 1.1; text-wrap: balance; }
+/* A heading breaks between words only; a word too long for the line runs on rather than splitting. */
+h1, h2, h3, h4 { font-weight: 640; letter-spacing: var(--tr-lg); line-height: 1.1; text-wrap: balance; hyphens: manual; overflow-wrap: normal; }
 h1, h2 { font-family: var(--font-display); font-weight: 640; letter-spacing: var(--tr-xl); line-height: 1; }
 p, li, dd, figcaption { text-wrap: pretty; }
 /* Clocks, dates and counts keep their columns when a digit changes. */
@@ -256,76 +249,47 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 @container (min-width: 720px) { .shell { --gutter: 32px; } }
 @container (min-width: 1200px) { .shell { --gutter: 48px; } }
 
-/* Glass. Nearly clear: a dim, a light blur and a hairline rim that is
-   brightest at the top left and the bottom right. Over the city glass.js
-   replaces the blur with the scene itself, bent at the edge.
+/* Glass. One frosted material for every surface over the scene: the
+   header's pills, the bar, the cards, the chips and the quiet buttons. It is
+   a tint in the page's light (which follows Malmö's sky unless the toggle
+   says otherwise): light frost under navy ink by day and at dawn, dark frost
+   under cream ink at dusk and by night. Behind it the scene is blurred with a
+   little saturation and never darkened or lifted; the tint alone carries the
+   text, its share chosen by measuring the brightest and darkest scenes that
+   can stand behind it. One rim, a hairline lit from above, and one soft
+   shadow, all on the surface's own box.
+   - One glass per place: a surface inside another is a tint, not a second blur.
+   - Nothing that blurs is ever under a scale, since Safari then draws the
+     blur in the wrong place: the window grows by a scale, so it and all in it
+     are tints with no blur. */
 
-   One glass per place, and these rules are where that is decided:
-   - A surface is either the shader's (`.is-lensed`, set by glass.js) or the
-     blur here, never both: `.is-lensed` has no fill and no blur of its own.
-   - Either way it has one rim, the hairline in ::after, and one shadow.
-   - Nothing that lies on glass is glass. Whatever the markup says, a glass
-     shape or a quiet button inside another is a plain tint with a hairline:
-     no blur, no shadow, no picture from the shader (main.js skips it too).
-     The bar's selection is a brighter tint with no rim at all. */
-
-.glass, .glass-card {
+.glass, .glass-card, .panel, .cta, .project {
   position: relative; isolation: isolate;
-  color: var(--g-ink);
-  background: color-mix(in oklab, var(--g-fill) calc(var(--g-dim) * 100%), transparent);
-  -webkit-backdrop-filter: blur(var(--g-blur, 10px)) saturate(var(--g-sat, 130%));
-  backdrop-filter: blur(var(--g-blur, 10px)) saturate(var(--g-sat, 130%));
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.22), var(--g-shadow);
+  color: var(--ink);
+  background: var(--frost);
+  -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(150%);
+  backdrop-filter: blur(var(--frost-blur)) saturate(150%);
+  box-shadow: inset 0 1px 0 var(--frost-rim), inset 0 0 0 0.5px var(--frost-line), var(--frost-shadow);
+  /* A turn of the light cross-fades slowly. */
+  transition: background-color 1.2s ease, color 1.2s ease, box-shadow 1.2s ease;
 }
-:is(.glass, .glass-card) :is(.glass, .glass-card, .btn--quiet), .island__more .btn--quiet {
-  background: oklch(from currentColor l c h / 0.14); color: inherit;
+:is(.glass, .glass-card, .panel, .cta, .project) :is(.glass, .glass-card, .panel, .btn--quiet, .job__when), .island__more .btn--quiet, .appview :is(.glass, .glass-card, .panel, .cta, .project, .btn--quiet, .job__when):not(.cv__index) {
+  background: var(--frost-tint); color: inherit;
   -webkit-backdrop-filter: none; backdrop-filter: none;
-  box-shadow: inset 0 0 0 var(--g-edge) oklch(from currentColor l c h / 0.2);
+  box-shadow: inset 0 0 0 0.5px var(--frost-line);
 }
-:is(.glass, .glass-card) :is(.glass, .glass-card)::after { content: none; }
-/* The rim: one hairline for every glass shape, never dark anywhere along its
-   run. A press turns its light to the far side, as a pane does when it tips. */
-@property --sink { syntax: "<number>"; inherits: false; initial-value: 0; }
-.glass::after, .glass-card::after, .btn.is-lensed::after {
-  content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; padding: var(--g-edge); pointer-events: none;
-  background: linear-gradient(calc(var(--rim) + var(--sink) * 160deg), var(--g-rim), var(--g-rim-low) 40%, var(--g-rim-low) 62%, color-mix(in oklab, var(--g-rim) 64%, transparent));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  transition: --sink 0.4s var(--press);
-}
-:is(.glass, .glass-card, .btn):active::after { --sink: 1; transition-duration: 0.12s; }
-/* The scene drawn by glass.js sits under the element's content. */
-.glass__fx { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; border-radius: inherit; pointer-events: none; transition: opacity 0.2s ease; }
-@starting-style { .glass__fx { opacity: 0; } }
-.is-lensed { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: var(--g-shadow); }
-/* A quiet button that stands on the city is a piece of the same glass. */
-.btn.is-lensed { isolation: isolate; color: var(--g-ink); background: none; box-shadow: var(--g-shadow); }
+.glass-card, .panel { border-radius: var(--r-lg); }
+/* Where the browser cannot blur, or the reader has asked for less
+   transparency or more contrast, the frost is nearly solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { :root { --frost: var(--frost-solid); } }
 
-/* On the city: dark neutral glass with white ink. This fill is what shows
-   without the shader; the shader tints the scene itself and needs no fill.
-   It holds a fixed share of what is under it in every key, so the pane has a
-   body at night too, and the blur takes most of the colour out of what lies
-   under it, so a bright button or picture scrolling by does not tint it. */
-.os .screen .glass, .os .screen .glass-card, .os .screen .btn.is-lensed, :root:not([data-app]) .os .tabbar__body, .os .screen .masthead :is(.brand, .island) {
-  --g-fill: oklch(0.28 0.025 262); --g-dim: var(--pane); --g-ink: #fff; --g-sat: 40%; --g-blur: 16px;
-  --g-rim: oklch(1 0 0 / 0.7); --g-rim-low: oklch(1 0 0 / 0.2);
-  --g-shadow: 0 4px 12px -6px oklch(0.1 0.03 262 / 0.35);
-}
-.glass-card { border-radius: var(--r-lg); }
-/* The cards on the pages are not glass: a nearly opaque fill with the glass's rim and depth, and no blur, so the
-   live city behind them costs nothing to show through. */
-.os .screen .glass-card { --g-fill: oklch(0.2 0.018 262); --g-dim: 0.94; -webkit-backdrop-filter: none; backdrop-filter: none; }
-
-/* Paper: what long text is read on. */
-.panel { background: var(--surface); border-radius: var(--r-lg); box-shadow: 0 0 0 0.5px var(--line), var(--shadow); }
 
 /* The header: the mark with a name over a line of status, and beside it one
    capsule in two segments, flush with the page's left and right edges. A
    small dot is green while I am looking for work. On the home screen at rest
    the left group stands on the sky with no glass under it (`.is-bare`, set by
    main.js); on any other page, or once a page has scrolled, it is one glass
-   capsule, which then folds down to the mark. */
+   capsule. */
 
 /* The header's own sizes are in rem, so in a big window, where the type
    grows, the capsule grows with the words in it. */
@@ -336,41 +300,35 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
   pointer-events: none;
 }
 
-.masthead__inner { display: flex; align-items: flex-start; gap: 8px; }
+.masthead__inner { display: flex; align-items: flex-start; gap: 8px; container-type: inline-size; }
+/* Very large text: the status keeps its words and gives up its second line rather than be cut short. */
+@container (max-width: 18rem) { .island__text small { display: none; } }
+/* A page of its own scrolls under the header: a band of blur gathering the frost toward the top keeps its text
+   from running readable behind and between the pills, as on the home screen's pages. */
+body:not(.os) .masthead::before {
+  content: ""; position: absolute; inset: 0 0 -24px; z-index: -1; pointer-events: none;
+  background: linear-gradient(var(--frost), transparent);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent);
+}
 .masthead a, .masthead button, .masthead details { pointer-events: auto; }
 
 /* The mark is one colour, the ink of whatever it stands on. */
 .mark { width: 1.75rem; height: 1.75rem; flex: none; }
-.brand, .island { position: relative; isolation: isolate; color: var(--g-ink); }
+.brand, .island { position: relative; isolation: isolate; color: var(--ink); }
 .brand, .island summary {
   display: flex; align-items: center; gap: 8px; min-height: var(--h-md); padding: 0 1rem 0 0.5rem;
-  white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: translate 0.35s var(--fold);
+  white-space: nowrap; -webkit-tap-highlight-color: transparent;
 }
 .brand { border-radius: var(--r-full); }
 /* A press shows on the mark, never on the glass: Safari draws a blurred
    backdrop in the wrong place under a scaled box. */
 .mark { transition: scale 0.4s var(--press); }
 :is(.brand, .island summary):active .mark { scale: 0.9; }
-/* The rim of the header's glass takes some of the sky's colour. */
-.masthead .glass, .os .screen .masthead .glass { --g-rim: color-mix(in oklab, var(--sky-accent) 56%, oklch(1 0 0 / 0.86)); }
-/* Its glass is one pill under the words. Folding is one number, `--hp`,
-   0 open to 1 folded, that eases on its own: the pill narrows to a circle
-   round the mark and the words are gone before it is halfway there. Nothing
-   is scaled or crossfaded. Folded, only the circle takes a tap; opened from
-   there, the status unfolds again. */
-@property --hp { syntax: "<number>"; inherits: true; initial-value: 0; }
-.masthead :is(.brand, .island) { transition: --hp 0.35s var(--fold), color 0.4s ease; }
-.is-folded :is(.brand, .island) { --hp: 1; }
-.is-folded .island:has(> details[open]) { --hp: 0; }
-.island__pill {
-  position: absolute; z-index: -1; top: 0; left: 0; pointer-events: none;
-  width: calc(var(--h-md) + (100% - var(--h-md)) * (1 - var(--hp))); height: 100%; border-radius: inherit;
-  transition: opacity 0.2s ease;
-}
-:is(.brand, .island summary)::before { content: ""; position: absolute; top: 0; left: 0; width: var(--h-md); height: var(--h-md); }
-.is-folded :is(.brand, .island details:not([open])) { pointer-events: none; }
-.is-folded :is(.brand, .island summary)::before { pointer-events: auto; }
-.island__text { display: grid; opacity: calc(1 - min(1, var(--hp) * 2.5)); }
+/* Its glass is one pill under the words. */
+.masthead :is(.brand, .island) { transition: color 0.4s ease; }
+.island__pill { position: absolute; z-index: -1; inset: 0; pointer-events: none; border-radius: inherit; transition: opacity 0.2s ease; }
+.island__text { display: grid; }
 .island__text > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .island__text b { font-size: var(--fs-sub); font-weight: 600; letter-spacing: var(--tr-md); line-height: var(--lh-xs); }
 .island__text small { font-size: var(--fs-2xs); letter-spacing: var(--tr-xs); line-height: 0.875rem; opacity: 0.92; }
@@ -404,7 +362,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .tool--lang { grid-auto-flow: column; justify-content: center; gap: 4px; width: var(--seg); }
 .tool--lang svg { width: 1.125rem; height: 1.125rem; }
 .tools .tool + .tool::before { content: ""; position: absolute; left: -0.5px; top: 12px; bottom: 12px; width: 1px; background: currentColor; opacity: 0.22; }
-.tool:active { transform: scale(0.88); }
+.tool:active { transform: translateY(1px); background-color: color-mix(in oklab, currentColor 14%, transparent); transition-duration: 0.08s; }
 .tool:focus-visible { outline-offset: -3px; border-radius: var(--r-full); }
 
 /* The three theme icons share one place and turn into each other. */
@@ -421,16 +379,20 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
   min-height: var(--h-lg); padding: 0 20px; border-radius: var(--r-full);
   background: var(--b-bg);
   color: var(--b-ink);
-  font-size: var(--fs-body); font-weight: 640; letter-spacing: -0.008em; line-height: 1.2; white-space: nowrap;
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.2), 0 1px 2px oklch(0 0 0 / 0.16);
+  font-size: var(--fs-body); font-weight: 640; letter-spacing: -0.008em; line-height: 1.2; text-align: center;
+  /* A label wraps only where it cannot fit the width it has, as with large text; an address may break anywhere. */
+  max-width: 100%; overflow-wrap: anywhere;
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.24), 0 6px 16px -8px color-mix(in oklab, var(--accent-fill) 70%, transparent);
   transition: transform 0.4s var(--press), background-color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.btn:active { transform: scale(0.97); background-color: color-mix(in oklab, var(--b-bg), #000 12%); transition-duration: 0.08s; }
+/* A press drops a button a pixel and darkens it; it never scales, since a quiet one is glass. */
+.btn:active { transform: translateY(1px); background-color: color-mix(in oklab, var(--b-bg), #000 12%); transition-duration: 0.08s; }
 .btn:focus-visible { outline-offset: 3px; border-radius: var(--r-full); }
 .btn--quiet {
-  --b-bg: color-mix(in oklab, var(--ink) 7%, transparent); color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--line), inset 0 1px 0 oklch(1 0 0 / 0.14);
+  --b-bg: var(--frost); color: var(--ink);
+  -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(150%); backdrop-filter: blur(var(--frost-blur)) saturate(150%);
+  box-shadow: inset 0 1px 0 var(--frost-rim), inset 0 0 0 0.5px var(--frost-line), var(--frost-shadow);
 }
 .btn--icon { width: var(--h-lg); padding: 0; }
 .btn--sm { min-height: var(--h-md); padding-inline: 16px; font-size: var(--fs-sub); }
@@ -439,7 +401,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 /* Buttons that belong together wrap as one, so none is left alone on a line. */
-.actions__pair { display: flex; gap: 8px; }
+.actions__pair { display: flex; flex-wrap: wrap; gap: 8px; max-width: 100%; }
 
 .text-link {
   display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
@@ -449,33 +411,25 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 
 /* Chips: small names in a row, for a stack or a set of skills. */
 .chips, .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: var(--fs-note); font-weight: 500; line-height: 1.3; }
-.chips li, .tags li { padding: 4px 12px; border-radius: var(--r-full); background: color-mix(in oklab, var(--accent) 9%, var(--surface-2)); color: var(--ink); box-shadow: inset 0 0 0 0.5px var(--line); }
+/* Stack tags and date chips are one chip: one height, one corner, one type style. */
+.chips li, .tags li, .job__when { display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px; border-radius: var(--r-full); font-size: var(--fs-note); font-weight: 600; letter-spacing: var(--tr-sm); line-height: 1; background: color-mix(in oklab, var(--accent) 10%, var(--frost-tint)); color: var(--ink); box-shadow: inset 0 0 0 0.5px var(--frost-line); }
 
 /* Sections */
 
 .section { padding-top: var(--section); }
 
 .head { max-width: 44rem; margin-bottom: 20px; }
-.kicker { color: var(--accent); font-family: var(--font-pixel); font-size: var(--fs-sub); font-weight: 500; letter-spacing: 0.02em; }
-.head h2 { margin-top: 4px; font-size: var(--fs-2xl); letter-spacing: var(--tr-2xl); }
+/* A label: the text face, small, set in capitals and opened up, in the accent (a shade deeper on light frost, where
+   small capitals need it for 4.5:1). */
+.kicker, .project__facts dt, .case-facts dt { color: light-dark(color-mix(in oklab, var(--accent) 86%, #000), var(--accent)); font-size: 0.75rem; font-weight: 650; letter-spacing: 0.08em; line-height: var(--lh-xs); text-transform: uppercase; }
+.head h2 { margin-top: 8px; font-size: var(--fs-2xl); letter-spacing: var(--tr-2xl); }
 
-/* The arc under a page title: the dial's sun path as a rule. The dot rides it
-   at `--day`, how far Malmö's day has run, which main.js sets. */
-.head h2, .cv__name, .cta h2 { --arc-w: min(100%, 12rem); --arc-h: 10px; position: relative; padding-bottom: calc(var(--arc-h) + 12px); }
-.head h2::after, .cv__name::after, .cta h2::after, .case-body h2:not(:first-child)::before {
-  content: ""; display: block; height: 10px; border-top: 1.5px solid; border-radius: 50% / 100% 100% 0 0; opacity: 0.42;
-}
-.head h2::after, .cv__name::after, .cta h2::after { position: absolute; left: 0; bottom: 0; width: var(--arc-w); }
-.head h2::before, .cv__name::before, .cta h2::before {
-  content: ""; position: absolute; left: calc(var(--arc-w) * var(--day, 0.62) - 3px); bottom: calc(var(--arc-h) * sqrt(1 - pow(2 * var(--day, 0.62) - 1, 2)) - 4px);
-  width: 6px; height: 6px; border-radius: 50%; background: var(--sky-accent); box-shadow: 0 0 0 2px color-mix(in oklab, var(--sky-accent) 30%, transparent);
-}
 /* A section's mark: the picture that stands for it, cut and shadowed like an app's icon. */
 .sec { border-radius: var(--r-icon); box-shadow: 0 4px 10px -4px oklch(0.1 0.03 262 / 0.6); }
 .head:has(.sec) { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: center; }
 .head .sec { grid-row: 1 / span 2; align-self: start; width: 44px; height: 44px; }
 .head:has(.sec) p:not(.kicker) { grid-column: 1 / -1; }
-.head p:not(.kicker) { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-md); }
+.head p:not(.kicker) { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-read); }
 
 /* Projects: a deck. Each card is a project in its own colour with its screens
    along the bottom edge; the next one slides over it as you scroll. */
@@ -483,13 +437,11 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .projects { display: grid; gap: 16px; }
 
 .project {
-  --card: light-dark(oklch(0.955 0.03 var(--h)), oklch(0.235 0.05 var(--h)));
-  --card-2: light-dark(oklch(0.9 0.06 var(--h)), oklch(0.17 0.04 var(--h)));
-  position: relative; display: grid; grid-template-rows: auto auto; overflow: hidden;
-  border-radius: var(--r-xl); background: linear-gradient(168deg, var(--card), var(--card-2));
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.28), 0 0 0 0.5px var(--line-strong), 0 -10px 28px -18px oklch(0 0 0 / 0.55), var(--shadow);
+  --card: light-dark(oklch(0.955 0.03 var(--h)), oklch(0.235 0.026 var(--h)));
+  display: grid; grid-template-rows: auto auto; overflow: hidden;
+  border-radius: var(--r-xl); background: linear-gradient(168deg, color-mix(in oklab, var(--card) 40%, transparent), transparent 70%), var(--frost);
 }
-.project__body { padding: 16px 20px 20px; }
+.project__body { padding: 16px var(--card-pad) var(--card-pad); }
 .project__top { display: flex; align-items: center; gap: 12px; }
 .project__icon { width: 52px; height: 52px; border-radius: var(--r-icon); box-shadow: 0 8px 16px -8px oklch(0 0 0 / 0.5); }
 .project h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 640; letter-spacing: var(--tr-xl); }
@@ -499,9 +451,8 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .status--ok i { background: var(--ok); }
 .status--soon i { background: var(--accent); }
 
-.project__line { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-sub); line-height: var(--lh-md); }
+.project__line { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-read); }
 .project__facts { display: grid; gap: 8px; margin-top: 12px; }
-.project__facts dt, .case-facts dt { color: var(--accent); font-family: var(--font-pixel); font-size: var(--fs-note); font-weight: 500; }
 .project__facts dd { margin-top: 4px; font-size: var(--fs-sub); font-weight: 500; line-height: var(--lh-sm); }
 .project__links { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin-top: 16px; }
 
@@ -512,11 +463,6 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
   height: clamp(13rem, 34svh, 19rem); padding: 20px 20px 0; overflow: hidden; cursor: pointer;
   background: radial-gradient(120% 90% at 50% 0%, light-dark(oklch(0.86 0.09 var(--h)), oklch(0.36 0.1 var(--h))), transparent 72%);
   -webkit-mask: linear-gradient(#000 82%, transparent); mask: linear-gradient(#000 82%, transparent);
-}
-/* The screens rise in front of an arc, as the sun does on the dial. */
-.peek::before {
-  content: ""; position: absolute; left: 50%; top: 14%; width: 136%; height: 70%; translate: -50% 0; pointer-events: none;
-  border-top: 1.5px solid color-mix(in oklab, var(--accent) 44%, transparent); border-radius: 50% / 100% 100% 0 0;
 }
 .peek__shot { position: relative; flex: 0 1 40%; max-width: 12.5rem; transition: transform 0.5s var(--spring); }
 /* A screenshot in its frame: the screen's own corner, a hairline and one shadow. */
@@ -529,7 +475,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .project--wide .peek__shot img { border-radius: 5.8% / 12.5%; }
 
 @container (min-width: 520px) {
-  .project__body { padding: 20px 28px 24px; }
+  .project__body { padding: 24px var(--card-pad) var(--card-pad); }
   .peek { padding-inline: 28px; }
 }
 /* Room for the story beside the screens. */
@@ -549,11 +495,12 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .timeline::before { content: ""; position: absolute; left: 5px; top: 10px; bottom: 10px; width: 2px; border-radius: 1px; background: linear-gradient(var(--accent), color-mix(in oklab, var(--accent) 20%, transparent)); }
 .job { position: relative; }
 .job::before { content: ""; position: absolute; left: -22px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); box-shadow: 0 0 0 3px var(--accent); }
-.job__when { display: inline-block; margin-bottom: 8px; padding: 4px 12px; border-radius: var(--r-full); background: var(--surface); color: var(--ink); font-size: var(--fs-note); font-weight: 600; box-shadow: 0 0 0 0.5px var(--line-strong); }
-.job__card { padding: 20px; }
+/* A date beside the rail is a chip of frost made nearly solid, not a blur of its own: the CV has fewer glass layers to draw. */
+.job__when { margin-bottom: 8px; background: var(--frost-solid); color: var(--ink); box-shadow: inset 0 1px 0 var(--frost-rim), inset 0 0 0 0.5px var(--frost-line); }
+.job__card { padding: var(--card-pad); }
 .job h3 { font-size: var(--fs-lg); letter-spacing: var(--tr-lg); line-height: var(--lh-md); }
 .job__org { margin-top: 4px; color: var(--ink-2); font-weight: 500; }
-.job ul { display: grid; gap: 8px; margin-top: 16px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-sub); line-height: var(--lh-md); }
+.job ul { display: grid; gap: 8px; margin-top: 16px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-read); }
 .job li { position: relative; padding-inline-start: 16px; }
 .job li::before { content: ""; position: absolute; left: 0; top: 0.6em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
 
@@ -561,19 +508,19 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .quote p { font-size: var(--fs-lg); font-weight: 600; letter-spacing: var(--tr-md); line-height: var(--lh-md); }
 .quote footer { margin-top: 4px; color: var(--ink-2); font-size: var(--fs-sub); line-height: var(--lh-sm); }
 
-.edu { margin-top: 16px; padding: 20px 20px 4px; }
+.edu { margin-top: 16px; padding: var(--card-pad) var(--card-pad) 8px; }
 .edu li { padding-block: 12px; border-top: 1px solid var(--line); }
 .edu__head { margin-bottom: 16px; font-size: var(--fs-lg); letter-spacing: var(--tr-lg); }
 .edu h4 { font-size: var(--fs-lg); letter-spacing: var(--tr-md); line-height: var(--lh-md); }
-.edu p { margin-top: 4px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-sub); line-height: var(--lh-md); }
+.edu p { margin-top: 4px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-read); }
 
 /* Skills: one card per track. */
 
 .tracks { display: grid; gap: 12px; }
-.track { padding: 20px; }
+.track { padding: var(--card-pad); }
 .track h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 640; letter-spacing: var(--tr-xl); }
 .track dl { display: grid; gap: 12px; margin-top: 12px; }
-.track dt { margin-bottom: 6px; color: var(--ink-3); font-size: var(--fs-note); font-weight: 500; }
+.track dt { margin-bottom: 6px; color: var(--ink-2); font-size: var(--fs-note); font-weight: 500; }
 .track dl > div:only-child dt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 [data-track="android"] { --h: 150; }
 [data-track="java"] { --h: 40; }
@@ -582,7 +529,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 /* About */
 
 .about { display: grid; gap: 12px; }
-.about__copy { display: grid; gap: 16px; padding: 20px; color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-body); }
+.about__copy { display: grid; gap: 16px; padding: var(--card-pad); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-body); }
 .about__copy p { max-width: var(--measure); }
 .about__copy strong { color: var(--ink); font-weight: 600; }
 
@@ -593,15 +540,13 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 
 /* Contact */
 
-.cta {
-  padding: 32px 24px; border-radius: var(--r-xl); background: var(--surface); color: var(--ink);
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.16), var(--shadow);
-}
+.cta { padding: 32px var(--card-pad); border-radius: var(--r-xl); }
 .cta h2 { font-size: var(--fs-2xl); font-weight: 640; letter-spacing: var(--tr-2xl); line-height: 1; }
-.cta p { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-md); }
+.cta p { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-read); }
 .cta .actions { margin-top: 24px; }
 /* The other ways to reach me are tinted in the accent, as a secondary button is on iOS, so they read as live. */
-.cta .btn--quiet { --b-bg: var(--accent-soft); color: var(--accent); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.12), 0 1px 2px oklch(0 0 0 / 0.12); }
+.cta .btn--quiet { --b-bg: var(--accent-soft); color: var(--ink); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.12), 0 1px 2px oklch(0 0 0 / 0.12); }
+.cta .btn--quiet svg { color: var(--accent); }
 
 /* Footer */
 
@@ -615,87 +560,71 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 @container (min-width: 1200px) { .footer { --gutter: 48px; } }
 @container (min-width: 80rem) { .footer { margin-inline: auto; } }
 
-/* The bar: a floating glass dock along the bottom. The mascot stands on
-   `.tabbar`, so he rides its top edge; `.tabbar__body` is the glass. In short
-   windows it stands on its end as a rail.
-
-   Folding is one number, `--fp`, from 0 open to 1 folded, that eases on its
-   own. Every size is drawn from it, so the bar changes shape and is never
-   scaled: it narrows and lowers to a pill, its corner stays half its height,
-   the names give up their room and fade by halfway, and the icons close in
-   on the middle. The selection keeps the same gap on every side throughout,
-   and a tab stays 44 px tall and wider than that when folded. */
-@property --fp { syntax: "<number>"; inherits: true; initial-value: 0; }
+/* The bar: a floating glass dock along the bottom, the same size on every
+   page at every scroll. The mascot stands on `.tabbar`, so he rides its top
+   edge; `.tabbar__body` is the glass. In short windows it stands on its end
+   as a rail. */
 .tabbar {
-  --bw: min(100vw - 2 * max(16px, env(safe-area-inset-left), env(safe-area-inset-right)), 400px);
-  --bh: calc(var(--h-lg) + 2 * var(--bar-inset));
-  --fw: 240px; --fh: 48px;
-  --br: calc(var(--bar-r) + (var(--fh) / 2 - var(--bar-r)) * var(--fp));
-  --lf: min(1, var(--fp) * 2);
   position: fixed; z-index: 45;
   /* Centred by its margins, not a transform: nothing that carries the glass is ever transformed. */
-  inset: auto 0 calc(16px + env(safe-area-inset-bottom)); margin-inline: auto;
-  width: calc(var(--bw) + (var(--fw) - var(--bw)) * var(--fp)); height: calc(var(--bh) + (var(--fh) - var(--bh)) * var(--fp));
+  inset: auto 0 calc(12px + env(safe-area-inset-bottom)); margin-inline: auto;
+  width: min(100vw - 2 * max(16px, env(safe-area-inset-left), env(safe-area-inset-right)), 400px); height: calc(var(--h-lg) + 2 * var(--bar-inset));
   contain: layout style;
-  transition: --fp 0.35s var(--fold);
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
 }
-.is-folded .tabbar { --fp: 1; }
-.tabbar__body {
-  --g-blur: 12px;
-  width: 100%; height: 100%; padding: var(--bar-inset); display: flex; border-radius: var(--br);
-}
+.tabbar__body { width: 100%; height: 100%; padding: var(--bar-inset); display: flex; border-radius: var(--bar-r); }
 
 /* The selection lies inside the bar with the same gap on every side, and its
    corner is the bar's less that gap, so the two outlines run parallel. It is
    a brighter tint, with no rim, shadow or glass of its own, that stretches
    toward where it is going and settles on a spring. `--l` is the tab it
-   covers, counted from 0, so it follows the bar's size by itself. */
+   covers, counted from 0. */
 .tabbar__lens {
   position: absolute; top: var(--bar-inset); left: var(--bar-inset); z-index: 0;
-  width: calc((100% - 2 * var(--bar-inset)) / 4); height: calc(100% - 2 * var(--bar-inset)); border-radius: calc(var(--br) - var(--bar-inset));
+  width: calc((100% - 2 * var(--bar-inset)) / 4); height: calc(100% - 2 * var(--bar-inset)); border-radius: calc(var(--bar-r) - var(--bar-inset));
   background: color-mix(in oklab, var(--accent) 14%, transparent);
   opacity: 0; transform-origin: 0 0;
   transform: translateX(calc(var(--l, 0) * 100%)) scaleX(var(--ls, 1));
   transition: opacity 0.2s ease;
 }
 .tabbar.has-lens .tabbar__lens { opacity: 1; }
-:root:not([data-app]) .os .tabbar__lens { background: oklch(1 0 0 / 0.16); }
 
 .tabbar a {
-  position: relative; z-index: 2; flex: 1 1 0; min-width: 0; margin-block: calc(var(--bar-inset) * -1 * var(--fp));
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(4px * (1 - var(--lf)));
-  border-radius: calc(var(--br) - var(--bar-inset));
-  color: inherit; font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--tr-xs); line-height: var(--lh-xs);
+  position: relative; z-index: 2; flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  border-radius: calc(var(--bar-r) - var(--bar-inset));
+  color: var(--ink-2); font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--tr-xs); line-height: var(--lh-xs);
   -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
 }
-.tabbar a:focus-visible { outline-offset: -3px; border-radius: calc(var(--br) - var(--bar-inset)); }
-/* `--near` runs from 0 to 1 as the selection covers the tab. */
-.tabbar a i { display: block; transform: scale(calc(1 + var(--near, 0) * 0.08 - var(--down, 0) * 0.14)); transition: transform 0.4s var(--press); }
-.tabbar a span { height: calc(var(--lh-xs) * (1 - var(--lf))); overflow: hidden; opacity: calc((0.84 + var(--near, 0) * 0.16) * max(0, 1 - var(--lf) * 2.5)); transition: transform 0.4s var(--press); transform: scale(calc(1 - var(--down, 0) * 0.06)); }
+.tabbar a:focus-visible { outline-offset: -3px; border-radius: calc(var(--bar-r) - var(--bar-inset)); }
+/* `--near` runs from 0 to 1 as the selection covers the tab. A press presses the icon and the name, not the glass. */
+.tabbar a i { display: block; transform: scale(calc(1 + var(--near, 0) * 0.06 - var(--down, 0) * 0.12)); transition: transform 0.4s var(--press); }
+.tabbar a span { transition: transform 0.4s var(--press); transform: scale(calc(1 - var(--down, 0) * 0.06)); }
 .tabbar a[aria-current] { --near: 1; }
 .tabbar a:active { --down: 1; }
 .tabbar svg { width: 24px; height: 24px; }
 .tabbar .f { display: none; }
 .tabbar a[aria-current] .f { display: block; }
 .tabbar a[aria-current] .o { display: none; }
-.tabbar a[aria-current] { color: var(--accent); }
-:root:not([data-app]) .os .tabbar a[aria-current] { color: inherit; }
+/* The selected tab: its name in full ink, its icon in the accent, on a drop of the accent's tint. */
+.tabbar a[aria-current] { color: var(--ink); }
+.tabbar a[aria-current] i { color: var(--accent); }
 
-/* Mascot: stands on the bar's top edge, in a lane the pages keep clear. The
-   live 3D figure sizes and places its own box and moves it with `translate`,
-   so leaving and coming back use `scale` and `opacity`. Until main.js has
+/* Mascot: rows his boat on Home's water, in the lane between the app tiles
+   and the bar, his waterline 56 px over the bar's top (the bar's top is 20 px
+   under --bar-clear). He belongs to Home's page and travels with it. The live
+   figure sizes its own box and moves it along the lane with `translate`, so
+   going away under a window uses `scale` and `opacity`. Until main.js has
    picked the live figure or the still there is nothing to show. */
 .smed {
-  position: absolute; z-index: 2; left: 0; bottom: 100%;
-  width: 64px; height: 96px;
+  position: absolute; z-index: 2; left: 0; bottom: calc(var(--bar-clear) + 36px);
+  width: 124px; height: 56px;
   transform-origin: 50% 100%;
   transition: opacity 0.2s ease, scale 0.5s var(--spring);
   -webkit-tap-highlight-color: transparent;
 }
 .smed:not(.smed--live, .smed--still), .smed.is-away { display: none; }
-.smed.is-seated { scale: 0.8; }
 .smed.is-parked { opacity: 0; scale: 0.6; pointer-events: none; }
 .smed.is-parked .smed__say { visibility: hidden; }
 /* Without WebGL 2: one picture of the mascot, standing still. */
@@ -703,11 +632,12 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .smed__say {
   position: absolute; left: 100%; bottom: 55%; white-space: nowrap; padding: 6px 10px; border-radius: var(--r-sm);
   transform: scale(0.9); transform-origin: 0 100%; opacity: 0;
-  background: var(--surface); color: var(--ink); font-size: var(--fs-note); font-weight: 600; box-shadow: var(--shadow);
+  background: var(--frost-solid); color: var(--ink); font-size: var(--fs-note); font-weight: 600; box-shadow: inset 0 0 0 0.5px var(--frost-line), var(--frost-shadow);
   transition: opacity 0.2s ease, transform 0.5s var(--spring); pointer-events: none;
 }
 /* Beside his head, in the lane he keeps clear, so it never lands on the icons above it. */
 .smed.is-saying .smed__say { opacity: 1; transform: none; }
+.smed.is-right .smed__say { left: auto; right: 100%; transform-origin: 100% 100%; }
 
 /* The app window: a project, a section or the CV opens in it, growing out of
    what was tapped. main.js drives its box on springs; the content inside keeps
@@ -716,7 +646,8 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .scrim.is-open { display: block; }
 .appview {
   position: fixed; inset: 0; z-index: 42; visibility: hidden; contain: layout paint style;
-  background: var(--bg); color: var(--ink);
+  /* The frost made solid: it grows by a scale, so it cannot blur, and nothing of Home may read through it. */
+  background: light-dark(rgb(246 247 252), rgb(18 23 40)); color: var(--ink);
   transform-origin: 0 0; overflow: hidden;
   border-radius: var(--view-r, 0px);
   box-shadow: 0 30px 80px -30px oklch(0.1 0.03 262 / 0.7);
@@ -729,7 +660,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 /* The bar is a band of the window's own paper above the page, not controls floating on it: nothing scrolls
    under the back button or the title. */
 .appview__bar {
-  position: relative; z-index: 3; flex: none; display: flex; align-items: center; gap: 8px; background: var(--bg);
+  position: relative; z-index: 3; flex: none; display: flex; align-items: center; gap: 8px;
   padding: calc(12px + env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right)) 12px max(var(--gutter), env(safe-area-inset-left));
   touch-action: none; cursor: grab;
 }
@@ -740,13 +671,23 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 /* The title sits in the middle whatever stands beside it. */
 .appview__bar::after { content: ""; width: var(--h-md); flex: none; }
 .appview__grab { position: absolute; left: 50%; top: calc(4px + env(safe-area-inset-top)); width: 36px; height: 5px; margin-left: -18px; border-radius: 3px; background: var(--ink-3); opacity: 0.5; }
-.appview__body { flex: 1; container-type: inline-size; overflow: hidden auto; overscroll-behavior: contain; padding-bottom: var(--bar-clear); -webkit-overflow-scrolling: touch; }
-.appview__body .reveal { opacity: 1 !important; transform: none !important; }
+.appview__dock:not(:empty) { flex: none; padding: 0 max(var(--gutter), env(safe-area-inset-right)) 8px max(var(--gutter), env(safe-area-inset-left)); }
+.appview__dock .cv__index { position: static; margin: 0 auto; }
+/* The page fades into the window's own colour at its top edge and before it reaches the bar, so no line of it
+   is ever readable under the band or under or below the bar. */
+.appview__body {
+  flex: 1; container-type: inline-size; overflow: hidden auto; overscroll-behavior: contain; padding-bottom: var(--bar-clear); -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(transparent, #000 16px, #000 calc(100% - var(--bar-clear) - 24px), transparent calc(100% - var(--bar-clear) + 16px));
+  mask-image: linear-gradient(transparent, #000 16px, #000 calc(100% - var(--bar-clear) - 24px), transparent calc(100% - var(--bar-clear) + 16px));
+}
 .appview__body .head, .appview__body .back { display: none; }
 .appview__body > .shell { padding-top: 6px; }
-/* The window grows and shrinks by a scale, and Safari draws a blurred backdrop in the wrong place under one, so
-   the glass in it is a plain opaque pane. */
-.appview .glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: light-dark(oklch(0.995 0.002 262), oklch(0.24 0.014 262)); }
+/* On a phone an open window covers the whole home screen, so the home screen is not drawn under it. main.js sets
+   [data-app] once the window has opened and clears it before the first frame of a close. To compare, take out the
+   rule below. */
+@media (max-width: 599.98px), (max-width: 719.98px) and (min-height: 541px) {
+  :root[data-app] .screen { visibility: hidden; }
+}
 .appview.is-moving { will-change: transform; }
 .appview.is-moving .appview__body { overflow: hidden; }
 
@@ -760,6 +701,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
    type and spacing, never a word. */
 @media (max-width: 359px) {
   .island__text b { font-size: var(--fs-note); }
+  .brand, .island summary { gap: 6px; padding-inline: 0.375rem 0.75rem; }
   .tools { --seg: var(--h-md); }
   .tool--lang svg { display: none; }
 }
@@ -773,23 +715,11 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
     touch-action: pan-x;
   }
   .tabbar__body { flex-direction: column; }
-  .is-folded .tabbar { --fp: 0; }
   .tabbar__lens { width: calc(100% - 2 * var(--bar-inset)); height: calc((100% - 2 * var(--bar-inset)) / 4); transform: translateY(calc(var(--l, 0) * 100%)) scaleY(var(--ls, 1)); }
-  /* The live figure keeps 4 px from the bar's end, so this centres it on the rail. Beside the rail
-     there is no room for his words. */
-  .smed--live { left: -4px; }
-  .smed__say { display: none; }
-  .smed--still { left: 0; }
+  /* Under the app tiles there is no water lane left for the mascot. */
+  .smed { display: none; }
   .appview { left: var(--rail-clear); }
 }
-@media (max-height: 379px) and (min-width: 600px) {
-  .smed { display: none; }
-}
-
-/* Reveal: the hiding class is added by main.js, so no script means no hiding. */
-
-.io .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.4s ease, transform 0.5s var(--spring); }
-.io .reveal.is-visible { opacity: 1; transform: none; }
 
 @view-transition { navigation: auto; }
 
@@ -798,8 +728,8 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
    its radius on the curve, so the scale steps up to look the same size. */
 @supports (corner-shape: squircle) {
   :root { --r-xs: 13px; --r-sm: 20px; --r-md: 26px; --r-lg: 36px; --r-xl: 48px; --r-icon: 30%; }
-  .panel, .glass-card, .glass-card::after, .glass-card > .glass__fx, .stage, .project, .quote, .pull, .cta, .facts > div, .project__icon, .me, .sec, .island__pill, .island__pill::after, .island__pill > .glass__fx, .appview, .case-wide img, .smed__say, .skip-link { corner-shape: squircle; }
-  .app__tile, .tabbar__body, .tabbar__body::after, .tabbar__body > .glass__fx, .tabbar__lens, .tabbar a { corner-shape: squircle; }
+  .panel, .glass-card, .stage, .project, .quote, .pull, .cta, .facts > div, .project__icon, .me, .sec, .island__pill, .appview, .case-wide img, .smed__say, .skip-link { corner-shape: squircle; }
+  .app__tile, .tabbar__body, .tabbar__lens, .tabbar a { corner-shape: squircle; }
   .peek__shot img, .shot img { corner-shape: squircle; border-radius: 16% / 7.4%; }
   .project--wide .peek__shot img, .shots--wide .shot img { border-radius: 7.4% / 16%; }
 }
@@ -820,14 +750,12 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 }
 
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  :root:not(#x) { --g-dim: 1; --pane: 0.94; }
-  .glass, .glass-card { -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .glass__fx { display: none; }
+  :root:not(#x) { --frost: var(--frost-solid); }
+  .glass, .glass-card, .panel, .cta { -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .io .reveal { opacity: 1; transform: none; }
   @view-transition { navigation: none; }
 }

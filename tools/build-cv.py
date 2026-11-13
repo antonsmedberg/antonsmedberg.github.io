@@ -56,10 +56,9 @@ PAGES = {
         "headings": {"profile": "Summary", "experience": "Experience", "projects": "Projects", "education": "Education", "courses": "Courses (Higher Vocational Education)", "skills": "Skills", "other": "Other experience", "achievements": "Other achievements"},
         "tech": "Tech",
         "updated": "Updated",
-        "colophon": "Set in Bricolage Grotesque, the system font and Inter, with Pixelify Sans for the small labels, served from this site. This page is generated from assets/data/cv.json by tools/build-cv.py.",
+        "colophon": "Set in Bricolage Grotesque, the system font and Inter, served from this site. This page is generated from assets/data/cv.json by tools/build-cv.py.",
         "pdf_label": "CV (PDF)",
         "source": "Source",
-        "smed_label": "Bit, the mascot. Tap to say hi.", "smed_hello": "Hej. This is my CV.", "smed_lines": ["Hej. I am Bit.", "Still booting.", "Oops. Did you see that.", "Beep.", "I run on coffee and Swift."],
         "tab_label": "Sections",
         "tabs": [("Home", "/", "t-home"), ("Work", "/#work", "t-work"), ("CV", "/cv/", "t-cv"), ("Contact", "/#contact", "t-mail")],
     },
@@ -92,10 +91,9 @@ PAGES = {
         "headings": {"profile": "Profil", "experience": "Arbetslivserfarenhet", "projects": "Projekt", "education": "Utbildning", "courses": "Kurser (yrkeshögskola)", "skills": "Kompetenser", "other": "Övrig arbetslivserfarenhet", "achievements": "Övriga meriter"},
         "tech": "Teknik",
         "updated": "Uppdaterad",
-        "colophon": "Satt i Bricolage Grotesque, systemets typsnitt och Inter, med Pixelify Sans för de små etiketterna, som serveras från den här webbplatsen. Sidan genereras från assets/data/cv.json av tools/build-cv.py.",
+        "colophon": "Satt i Bricolage Grotesque, systemets typsnitt och Inter, som serveras från den här webbplatsen. Sidan genereras från assets/data/cv.json av tools/build-cv.py.",
         "pdf_label": "CV (PDF)",
         "source": "Källkod",
-        "smed_label": "Bit, maskoten. Tryck för att säga hej.", "smed_hello": "Hej. Det här är mitt CV.", "smed_lines": ["Hej. Jag heter Bit.", "Startar fortfarande.", "Hoppsan. Såg du det.", "Pip.", "Jag går på kaffe och Swift."],
         "tab_label": "Avsnitt",
         "tabs": [("Hem", "/sv/", "t-home"), ("Projekt", "/sv/#work", "t-work"), ("CV", "/sv/cv/", "t-cv"), ("Kontakt", "/sv/#contact", "t-mail")],
     },
@@ -171,7 +169,7 @@ $jsonld
     <div class="actions">
       <a class="btn" href="$pdf" download><svg class="icon" aria-hidden="true"><use href="$sprite#i-download"/></svg>$download</a>
       <a class="btn btn--quiet" href="$pdf_other" download hreflang="$other_lang"><svg class="icon" aria-hidden="true"><use href="$sprite#i-download"/></svg>$download_other</a>
-      <button class="btn btn--quiet" type="button" data-print>$print</button>
+      <button class="btn btn--quiet" type="button" data-print><svg class="icon" aria-hidden="true"><use href="$sprite#i-doc"/></svg>$print</button>
     </div>
   </header>
 
@@ -246,11 +244,9 @@ $jsonld
     <span class="tabbar__lens" aria-hidden="true"></span>
     $tabs
   </div>
-  <button class="smed" type="button" aria-label="$smed_label" data-hello="$smed_hello" data-lines="$smed_lines"><span class="smed__say" aria-hidden="true"></span></button>
 </nav>
 
 <script type="module" src="/assets/js/main.js"></script>
-<script>document.querySelector('[data-print]')?.addEventListener('click',()=>print())</script>
 </body>
 </html>
 """)
@@ -291,10 +287,17 @@ def bullets(items):
     return "<ul>%s</ul>" % "".join("<li>%s</li>" % text(b) for b in items)
 
 
-def experience(entries, tech):
+# A letter quoted in English on the Swedish page is marked as English, so it is read in its own language.
+QUOTED = re.compile(r"”([^”]+)”")
+
+
+def experience(entries, tech, lang):
     out = []
     for e in entries:
-        note = '<p class="cv__note">%s</p>' % text(e["note"]) if e.get("note") else ""
+        note = text(e["note"]) if e.get("note") else ""
+        if note and lang == "sv":
+            note = QUOTED.sub(r'”<span lang="en">\1</span>”', note)
+        note = '<p class="cv__note">%s</p>' % note if note else ""
         out.append(
             '<div class="cv__item"><h3>%s</h3><p class="cv__meta">%s, %s</p><p class="cv__when">%s</p>%s<p class="cv__tech">%s: %s</p>%s</div>'
             % (text(e["role"]), text(e["org"]), text(e["place"]), text(e["period"]), bullets(e["bullets"]), tech, text(e["tech"]), note)
@@ -448,7 +451,7 @@ def render(lang, data, build):
         "download": html.escape(page["download"]),
         "print": html.escape(page["print"]),
         "profile": text(content["profile"]),
-        "experience": experience(content["experience"], page["tech"]),
+        "experience": experience(content["experience"], page["tech"], lang),
         "projects": projects(content["projects"], page["tech"]),
         "education": education(content["education"]),
         "courses": courses(content["courses"]),
@@ -467,9 +470,6 @@ def render(lang, data, build):
         "pdf_label": html.escape(page["pdf_label"]),
         "source": SOURCE,
         "source_label": html.escape(page["source"]),
-        "smed_label": attr(page["smed_label"]),
-        "smed_hello": attr(page["smed_hello"]),
-        "smed_lines": attr(json.dumps(page["smed_lines"], ensure_ascii=False)),
         "tab_label": attr(page["tab_label"]),
         "tabs": tab_links(page["tabs"], page["url"]),
     }

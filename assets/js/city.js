@@ -1853,7 +1853,8 @@ function vertexArray(gl, data, usage) {
 }
 
 export function mountCity(canvas, { at, front } = {}) {
-  const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, preserveDrawingBuffer: true, powerPreference: 'low-power' });
+  // The drawing buffer is not kept past the frame that showed it: the only copy, to the front, is made in that frame.
+  const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, powerPreference: 'low-power' });
   if (!gl) return null;
 
   // Building runs a part per task.
@@ -2796,7 +2797,8 @@ export function mountCity(canvas, { at, front } = {}) {
       const k = zones[0].at < 0.5 ? 'light' : 'dark';
       return { top: k, bottom: k };
     },
-    // WCAG luminance in a CSS-pixel box as drawn: 2nd and 98th percentile.
+    // WCAG luminance in a CSS-pixel box as drawn: 2nd and 98th percentile. The last frame's screen pass is drawn again
+    // first, as the buffer it showed is not kept.
     lumIn(x, y, w, h) {
       const k = hd / px;
       const x0 = clamp(Math.round(x * k), 0, W * hd - 1);
@@ -2806,7 +2808,7 @@ export function mountCity(canvas, { at, front } = {}) {
       const a = new Uint8Array(pw * ph * 4);
       const count = new Uint32Array(1024);
       const t = Array.from({ length: 256 }, (_, i) => lum([i / 255, 0, 0]) / 0.2126);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      hdPass(beat / 1000, null);
       gl.readPixels(x0, H * hd - y0 - ph, pw, ph, gl.RGBA, gl.UNSIGNED_BYTE, a);
       for (let i = 0; i < a.length; i += 4) count[Math.min(1023, Math.floor((0.2126 * t[a[i]] + 0.7152 * t[a[i + 1]] + 0.0722 * t[a[i + 2]]) * 1024))] += 1;
       const at = (q) => {

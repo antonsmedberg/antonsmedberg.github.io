@@ -1,10 +1,9 @@
-// The ring of cubes on MetalVisualKit's tile, made the way Bit is made: a list of parts in his format (boxes of
-// cells around an anchor), meshed by his own buildMesh, rounded by smooth and lit by his own shaders, with only the
-// palette swapped for its colours. objects.html draws it; build-objects.py turns the drawing into the file the page
+// The ring of cubes on MetalVisualKit's tile, made the way the mascot was made in cubes: a list of parts (boxes of
+// cells around an anchor), meshed by cube.mjs's buildMesh, rounded by its smooth and lit by its shaders, with only
+// the palette swapped for its colours. objects.html draws it; build-objects.py turns the drawing into the file the page
 // loads.
 
-import { PARTS, SHADOW_FS, SHADOW_VS, buildMesh, program } from '../../assets/js/smed3d.js';
-import { FINE_FS, FINE_VS, smooth } from '../../assets/js/smed3d-fine.js';
+import { FINE_FS, FINE_VS, ROWS, SHADOW_FS, SHADOW_VS, buildMesh, program, smooth } from './cube.mjs';
 
 const FINE = [0.5, 0.5, 0.5];
 const TILT = 0.26; // Bit's camera: the sine of its downward pitch.
@@ -91,8 +90,8 @@ const LIGHT = { sun: unit([-0.798 * 0.5, 0.35, 0.6]), key: [0.998, 0.93, 0.831],
 function rows(parts) {
   const cs = Math.cos((TURN * Math.PI) / 180);
   const sn = Math.sin((TURN * Math.PI) / 180);
-  // Bit's shaders hold a row for each of his parts; a toy has fewer.
-  const out = new Float32Array(PARTS.length * 12);
+  // The shaders hold ROWS rows of parts; a toy has fewer.
+  const out = new Float32Array(ROWS * 12);
   parts.forEach((p, pi) => {
     const m = p.R.map((v, k) => v * p.s[k % 3]);
     const r0 = [0, 1, 2].map((k) => cs * m[k] + sn * m[3 + k]);

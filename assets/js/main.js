@@ -1,11 +1,10 @@
 // Progressive enhancement only. Everything reads and navigates without this
-// file. It adds the theme toggle, reveal, the swiped pages, the glass bar, the
+// file. It adds the theme toggle, the swiped pages, the glass bar, the
 // window that apps open in, the 3D city, the sun that is its clock, and the mascot.
 // Everything that moves is a spring, so a new touch can take it over mid-way.
 
 const root = document.documentElement;
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const reduceGlass = matchMedia('(prefers-reduced-transparency: reduce), (prefers-contrast: more)');
 // Short windows and phones on their side: the bar stands as a rail down the
 // side. The same query switches the layout in style.css.
 const rail = matchMedia('(max-height: 540px) and (min-width: 600px)');
@@ -19,12 +18,15 @@ const pages = pager ? [...pager.querySelectorAll(':scope > .pg')] : [];
 let pagerWidth = pager ? pager.clientWidth : 0;
 if (pager) addEventListener('resize', () => { pagerWidth = pager.clientWidth; });
 const pageAt = () => (pager ? pager.scrollLeft / Math.max(1, pagerWidth) : 0);
-const pageIndex = () => Math.round(pageAt());
-const scrollTop = () => (pager ? pages[pageIndex()].scrollTop : scrollY);
+// How far the pages have moved, kept as they move (`follow`) so no frame has to read it.
+let paged = 0;
+const pageIndex = () => (pager ? Math.round(paged) : 0);
 const lang = root.lang === 'sv' ? 'sv' : 'en';
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
 root.classList.remove('no-js');
+// Safari shows a control's pressed state on touch only where a touch listener is heard; this one does nothing else.
+document.addEventListener('touchstart', () => {}, { passive: true });
 
 /* -------------------------------------------------------------------------
    Springs. `springStep` is the exact step of a damped spring over dt, so the
@@ -169,35 +171,17 @@ function paintSky(sky, tint) {
   }
 }
 
+// The page's light follows the scene's own key, as the city measures it: light frost while the picture behind
+// it is bright, dark frost once it is dark (style.css), whatever the hour is called.
+function paintKey(key) {
+  if ((key === 'light' || key === 'dark') && root.dataset.key !== key) { root.dataset.key = key; syncTheme(); }
+}
+
 if (!document.querySelector('canvas.wall')) {
   try {
     const kept = JSON.parse(sessionStorage.getItem('sky'));
-    if (kept) paintSky(kept.sky, kept.tint);
+    if (kept) { paintSky(kept.sky, kept.tint); paintKey(kept.key); }
   } catch (e) { /* no storage or an old value: the stylesheet's sky stands */ }
-}
-
-/* -------------------------------------------------------------------------
-   Reveal: text blocks only. The class that hides them is added here, after
-   the observer exists, so a script failure can never hide content.
-   ------------------------------------------------------------------------- */
-
-const revealables = [...document.querySelectorAll('.reveal')];
-
-if (revealables.length && !reduceMotion.matches && 'IntersectionObserver' in window) {
-  const observer = new IntersectionObserver(
-    (entries, obs) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.classList.add('is-visible');
-        obs.unobserve(entry.target);
-      }
-    },
-    { rootMargin: '0px 0px -8% 0px', threshold: 0.05 }
-  );
-  // Every place is read before any class is written, so the page is laid out once here, not once per block.
-  const tops = revealables.map((el) => el.getBoundingClientRect().top);
-  root.classList.add('io');
-  revealables.forEach((el, i) => (tops[i] < innerHeight ? el.classList.add('is-visible') : observer.observe(el)));
 }
 
 /* -------------------------------------------------------------------------
@@ -207,6 +191,8 @@ if (revealables.length && !reduceMotion.matches && 'IntersectionObserver' in win
 document.querySelectorAll('[data-copy]').forEach((button) => {
   const label = button.querySelector('[data-copy-label]') || button;
   const original = label.textContent;
+  // The change of word is read out, so a screen reader hears that the copy worked.
+  label.setAttribute('aria-live', 'polite');
   button.hidden = !navigator.clipboard;
   button.addEventListener('click', async () => {
     try {
@@ -256,76 +242,43 @@ let city = null;
 let sun = null;
 let wx = null;
 let stopPage = null;
-const smedEl = bar && bar.querySelector('.smed');
+const smedEl = document.querySelector('.smed');
 let awayTimer = 0;
-let seated = false;
 let actedAt = -Infinity;
 
 // He stays on screen. Only under an open window does he shrink away, and he comes back when it closes.
+let parked = false;
 function parkMascot() {
   if (!smedEl) return;
   const on = appOpen;
-  smedEl.classList.toggle('is-seated', seated && !on);
-  if (on === smedEl.classList.contains('is-parked')) return;
+  if (on === parked) return;
+  parked = on;
   clearTimeout(awayTimer);
-  if (on) awayTimer = setTimeout(() => smedEl.classList.add('is-away'), 320);
-  else {
-    // Back in the layout first, so the way in is animated too.
+  if (on) {
+    awayTimer = setTimeout(() => smedEl.classList.add('is-away'), 320);
+    smedEl.classList.add('is-parked');
+  } else {
+    // Back in the layout first, and out of his parked pose a frame after that, so the way in is animated too
+    // without reading the layout in the tap that closes the window.
     smedEl.classList.remove('is-away');
-    smedEl.getBoundingClientRect();
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (!parked) smedEl.classList.remove('is-parked'); }));
   }
-  smedEl.classList.toggle('is-parked', on);
+  smed?.park?.(on);
 }
 
-// The header folds down to the mark and the dot once the page under it has
-// scrolled, and opens again at the top. Folded, it has no room for what the
-// status pill shows when open.
+// The header and the bar keep their full size on every page at every scroll; what changes as a page scrolls is
+// whether the status stands bare on the sky.
 const masthead = document.querySelector('.masthead');
 const island = document.querySelector('.island details');
-// The header and the bar fold together, on one class on the root: after 48 px down, and open again 24 px
-// up or near the top, so a page that wavers does not make them flicker. A new page starts from where it stands.
-// A page with less than 160 px to scroll never folds them: there is nothing to make room for.
-let folded = false;
-let down = false;
-let turned = 0;
-// While the pages carry him away from Home he waits under the bar, as under a folded one.
-let leaving = false;
-// Off Home he also waits there while a page has more to read: he comes up only at a page's end, where
-// nothing but its own margin is behind him, so he never stands on a line of text.
-let reading = false;
-const sink = () => smed?.duck?.(folded || leaving || reading);
-function condense(fresh) {
+function readPage() {
   if (!masthead) return;
   const i = pager ? clamp(pageIndex(), 0, pages.length - 1) : -1;
   const page = pager ? pages[i] : document.documentElement;
   const y = page.scrollTop;
   // On the home page at rest the status stands on the sky itself; anywhere else it needs its glass.
   masthead.classList.toggle('is-bare', i === 0 && y <= 40 && !island?.open);
-  if (fresh === true) { down = false; turned = y; }
-  const room = page.scrollHeight - page.clientHeight;
-  const fold = room >= 160
-    && (fresh === true ? y > 48 : folded ? y >= 24 && (down || turned - y <= 24) : y > 48 && down && y - turned > 48);
-  const read = i > 0 && y < room - 8;
-  if (fold === folded && read === reading) return;
-  reading = read;
-  if (fold !== folded) {
-    folded = fold;
-    root.classList.toggle('is-folded', fold);
-    if (fold && island) island.open = false;
-  }
-  // Bit goes down behind the folded bar and comes back up as it opens.
-  sink();
 }
-island?.addEventListener('toggle', condense);
-
-// Only Home keeps his lane. On the other tabs, and on a page of its own, the first screen is text to its edges,
-// so once the pages rest he sits on the bar's top edge, smaller, and the page scrolls under him as under the bar.
-function visitPage() {
-  const was = seated;
-  seated = !pager || pageIndex() > 0;
-  if (seated && !was) smed?.play('sit');
-  parkMascot();
-}
+island?.addEventListener('toggle', readPage);
 
 // He answers what happens on the site, lightly: one act every few seconds at
 // most. An act asked for mid-run waits in the figure until he stands still.
@@ -349,8 +302,6 @@ function settlePager() {
 // What follows the pager: the bar's selection, the layers' travel and the city's camera.
 // A spring calls it in the frame it moves the pager; a finger's scroll calls it from the scroll event.
 let follow = () => {};
-// How far the pages have moved, kept as they move so no frame has to read it.
-let paged = 0;
 
 // A city nobody can see is not drawn: under a window, and behind a page other than Home once the pages rest.
 // It wakes before the first frame that moves them.
@@ -390,9 +341,10 @@ function goToPage(i, speed = 0) {
 /* -------------------------------------------------------------------------
    Travel. The pages are one space seen from a moving camera: what a page holds
    lies at different depths, so on the way between two pages the far layers
-   lag, the near ones run ahead, shrink and fade, and everything turns a little
-   toward where it is going. It is a pure function of how far the pager has
-   scrolled, so it follows a finger exactly and settles with the page's spring.
+   lag and the near ones run ahead. Only a translate: a scale, a turn or a
+   fade on a layer would take the frost off its glass, or draw it in the wrong
+   place in Safari. It is a pure function of how far the pager has scrolled,
+   so it follows a finger exactly and settles with the page's spring.
    ------------------------------------------------------------------------- */
 
 // Per page, back to front: the first layer lies nearest the city.
@@ -412,11 +364,8 @@ function travel(p) {
     travelled[i] = d;
     const a = Math.abs(d);
     for (const { el, z } of strata[i]) {
-      if (!d) { el.style.transform = ''; el.style.opacity = ''; continue; }
       // Zero at both ends of the trip, so a layer neither starts nor lands with a step.
-      const x = d * (1 - a) * pagerWidth * (z - 0.4) * 0.5;
-      el.style.transform = `perspective(900px) translate3d(${x.toFixed(1)}px, 0, 0) rotateY(${(-d * (2 + 3 * z)).toFixed(2)}deg) scale(${(1 - a * (0.02 + 0.04 * z)).toFixed(4)})`;
-      el.style.opacity = (1 - a * (0.15 + 0.35 * z)).toFixed(3);
+      el.style.transform = d ? `translate3d(${(d * (1 - a) * pagerWidth * (z - 0.4) * 0.5).toFixed(1)}px, 0, 0)` : '';
     }
   });
 }
@@ -496,6 +445,7 @@ if (bar) {
   syncLens();
 
   if (pager) {
+    const langLink = document.querySelector('.tool--lang');
     const first = pageOfHash(location.hash);
     if (first > 0) pager.scrollLeft = first * pagerWidth;
     let current = -1;
@@ -508,14 +458,8 @@ if (bar) {
       clearTimeout(restTimer);
       restTimer = setTimeout(() => {
         if (fingers || stopPage) return;
-        if (current > 0) document.body.classList.add('px');
-        // Away from Home he keeps his seat on the bar; only Home sends him back to his own tab. Waiting under
-        // the bar, he is let up first and sent on at once: one rise, straight to his place.
-        leaving = false;
-        sink();
-        if (current > 0) smed?.play('sit'); else smed?.goTo(0);
-        // Whether he stays is settled here, once the pages are at rest: never while a finger or a spring moves them.
-        visitPage();
+        // The page is read once it rests, not in the frame that moved it, after that frame's writes.
+        readPage();
         pauseCity(current > 0);
       }, 300);
     };
@@ -526,20 +470,19 @@ if (bar) {
       travel(p);
       city?.setProgress(p);
       const i = clamp(Math.round(p), 0, tabs.length - 1);
-      // Off Home, by a tab, a throw or a page dragged past halfway, he goes under at once: never over a page's text.
-      const leave = !seated && (pageGoal ?? i) > 0;
-      if (leave !== leaving) { leaving = leave; sink(); }
       if (i !== current) {
         current = i;
         tabs.forEach((a, k) => (k === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
         // His words belong to the page they were said on.
         smedEl?.classList.remove('is-saying');
-        condense(true);
         history.replaceState(history.state, '', i === 0 ? location.pathname + location.search : `#${pages[i].id}`);
+        // The other language opens on the same tab: the pages carry the same ids in both.
+        if (langLink) langLink.hash = i === 0 ? '' : pages[i].id;
       }
       rested();
     };
     follow(pageAt(), true);
+    readPage();
     // A spring that is carrying the pager has already said where it is, in the same frame.
     pager.addEventListener('scroll', () => { if (!stopPage) follow(pageAt(), false); }, { passive: true });
     pager.addEventListener('touchstart', () => { fingers = true; }, { passive: true });
@@ -611,28 +554,15 @@ if (bar) {
     if (!a || pager) return;
     const i = tabs.indexOf(a);
     place(i, false);
-    smed?.goTo(i);
   });
 
-  let lastY = scrollTop();
   let ticking = false;
-  let hopped = false;
-  let still = 0;
   const onVertical = () => {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
       ticking = false;
-      const y = scrollTop();
-      if (y !== lastY && y > lastY !== down) { down = y > lastY; turned = lastY; }
-      // One hop for a fast scroll, not one a frame: he hops again only after the page has rested.
-      if (Math.abs(y - lastY) > 90 && !hopped) { hopped = true; smed?.hop(); }
-      clearTimeout(still);
-      still = setTimeout(() => { hopped = false; }, 300);
-      lastY = y;
-      // condense reads the page before anything is written; parkMascot only writes.
-      condense();
-      parkMascot();
+      readPage();
     });
   };
   (pager ? pages : [window]).forEach((s) => s.addEventListener('scroll', onVertical, { passive: true }));
@@ -654,8 +584,6 @@ const minutesOf = (text) => Number(text.slice(0, 2)) * 60 + Number(text.slice(3,
 const preview = new URLSearchParams(location.search).get('hour');
 const asked = preview === null ? null : Number(preview);
 const malmoNow = () => (asked === null ? minutesOf(malmoTime.format(new Date())) : asked * 60);
-// How far Malmö's day has run, for the dot on the arc under the page titles.
-root.style.setProperty('--day', (minutesOf(malmoTime.format(new Date())) / 1440).toFixed(3));
 let dialHeld = false;
 // Set once the city is up: it paints its sky's colours into the stylesheet.
 let showSky = () => {};
@@ -916,18 +844,21 @@ function mountSun(el, sky) {
 
 /* -------------------------------------------------------------------------
    Depth. The pointer, or the tilt of a phone that reports it without asking,
-   moves the light on the glass and drifts the home screen's layers a few
+   drifts the home screen's layers and the city's camera a few
    pixels against the city. `lean` runs from -1 to 1 on each axis.
    ------------------------------------------------------------------------- */
 
 const lean = { x: { x: 0, v: 0 }, y: { x: 0, v: 0 }, tx: 0, ty: 0 };
 // What drifts, and how many pixels at full lean: more the nearer the eye.
 const drifters = [['.name', 3], ['.who', 5], ['.alm', 5], ['.apps', 7], ['.pg .head', 4]].flatMap(([sel, depth]) => [...document.querySelectorAll(sel)].map((el) => ({ el, depth })));
+// Wakes the drift's loop once the city is up; the loop sleeps again when the lean has settled.
+let stirLean = () => {};
 if (screenEl && !reduceMotion.matches) {
   addEventListener('pointermove', (e) => {
     if (e.pointerType !== 'mouse') return;
     lean.tx = clamp((e.clientX / innerWidth) * 2 - 1, -1, 1);
     lean.ty = clamp((e.clientY / innerHeight) * 2 - 1, -1, 1);
+    stirLean();
   }, { passive: true });
   // iOS asks the visitor before it reports tilt; a portfolio does not ask.
   if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') {
@@ -937,6 +868,7 @@ if (screenEl && !reduceMotion.matches) {
       rest ??= { gamma: e.gamma, beta: e.beta };
       lean.tx = clamp((e.gamma - rest.gamma) / 22, -1, 1);
       lean.ty = clamp((e.beta - rest.beta) / 22, -1, 1);
+      stirLean();
     }, { passive: true });
   }
 }
@@ -951,17 +883,9 @@ let cityMounted = Promise.resolve();
 
 if (wallCanvas) {
   // The city is asked for once the first picture is on the screen, so the stylesheet and the fonts have
-  // the line to themselves until then. The mascot starts after the city, but his file is fetched beside
-  // it: two round trips at once, not one after the other. The shader glass waits for the city's first
-  // frame; until then every shape is the stylesheet's glass.
+  // the line to themselves until then. The mascot's file is asked for only once the city has started.
   const painted = new Promise((done) => { requestAnimationFrame(() => setTimeout(done)); });
   cityMounted = painted.then(() => {
-    if (smedEl) {
-      const link = document.createElement('link');
-      link.rel = 'modulepreload';
-      link.href = '/assets/js/smed3d.js';
-      document.head.append(link);
-    }
     return import('./city.js');
   }).then(async ({ mountCity }) => {
     // The hour the city starts at: `?hour=N`, else now. It is an hour on
@@ -972,8 +896,8 @@ if (wallCanvas) {
       return new Date(Date.now() + (asked * 60 - minutesOf(malmoTime.format(new Date()))) * 60000);
     };
     city = mountCity(wallCanvas, { at, front: document.querySelector('.wall-front') });
-    // Without WebGL 2 the still of the night stands, so the words take the light ink whatever the hour.
-    if (!city) { root.classList.add('no-gl'); delete screenEl.dataset.top; delete screenEl.dataset.foot; return; }
+    // Without WebGL 2 the still of the night stands, so the page keys dark whatever the hour.
+    if (!city) { root.classList.add('no-gl'); delete screenEl.dataset.top; delete screenEl.dataset.foot; paintSky('night'); paintKey('dark'); return; }
     // The city fades in over the screen's sky once it has drawn, not when its context is made.
     const drawn = () => { if (!root.classList.contains('has-city')) root.classList.add('has-city'); };
     city.onFrame(drawn);
@@ -985,7 +909,7 @@ if (wallCanvas) {
       const tint = city.tint;
       paintSky(sky, tint);
       if (dialHeld) return;
-      try { sessionStorage.setItem('sky', JSON.stringify({ sky, tint })); } catch (e) { /* the other pages keep the stylesheet's sky */ }
+      try { sessionStorage.setItem('sky', JSON.stringify({ sky, tint, key: root.dataset.key })); } catch (e) { /* the other pages keep the stylesheet's sky */ }
     };
     showSky();
     setInterval(() => { if (!dialHeld) showSky(); }, 30000);
@@ -993,6 +917,7 @@ if (wallCanvas) {
     // Which side the tower stands on, and where its near edge is, so the
     // layout can keep the name and the widgets clear of it.
     let towerAt = '';
+    let wallWidth = wallCanvas.clientWidth;
     const placeTower = () => {
       const box = city.towerRect();
       if (!screenEl || !box.w) return;
@@ -1002,29 +927,10 @@ if (wallCanvas) {
       screenEl.style.setProperty('--tower-l', `${Math.round(box.x)}px`);
       screenEl.style.setProperty('--tower-r', `${Math.round(box.x + box.w)}px`);
       screenEl.style.setProperty('--tower-b', `${Math.round(box.y + box.h)}px`);
-      screenEl.dataset.tower = box.x + box.w / 2 < wallCanvas.clientWidth / 2 ? 'left' : 'right';
+      screenEl.dataset.tower = box.x + box.w / 2 < wallWidth / 2 ? 'left' : 'right';
       fitName();
     };
 
-    // Every glass shape over the city gets the scene itself, bent at its rim.
-    // This loop is the only place a shape is handed to the shader, and it
-    // passes over anything that lies on another: one glass per place.
-    let glass = null;
-    const lensed = [];
-    let glassAsked = reduceGlass.matches;
-    const lens = async () => {
-      glass = (await import('./glass.js')).mountGlass(wallCanvas);
-      if (!glass) return;
-      const body = bar && bar.querySelector('.tabbar__body');
-      // Only the small shapes: the bar, the chips and the quiet button on the sky. The cards on the pages are plain.
-      for (const el of [body, ...screenEl.querySelectorAll('.glass, .cv-actions .btn--quiet')]) {
-        if (!el || el.parentElement.closest('.glass, .glass-card')) continue;
-        glass.add(el, { blur: 2.5 });
-        lensed.push(el);
-      }
-      // The rim's turn is written again for the shapes just handed over.
-      turned = null;
-    };
     // Tell the city how much of its foot the interface covers: the bar, the mascot's lane over it and
     // the row of apps where that stands on the lane. A rail covers none of it. And how far down the words
     // at the top reach, with the apps where they stand on the sky.
@@ -1040,20 +946,31 @@ if (wallCanvas) {
     let n = 0;
     placeTower();
     cover();
-    addEventListener('resize', () => { placeTower(); cover(); });
+    addEventListener('resize', () => { wallWidth = wallCanvas.clientWidth; placeTower(); cover(); });
     // In a small window the row is still on its way when the resize is heard: the name is fitted a frame later.
     const sized = new ResizeObserver(cover);
     for (const el of [appsGrid?.parentElement, ...words]) if (el) sized.observe(el);
     // The ink the city asks for the words at the top and at the foot; a rail's apps stand with the top.
     let inked = '';
+    // The scene's key turns the page's light at once on the first frame, and after that only once the new key
+    // has held for three seconds and nothing moves, so a scene near the line never makes it flip while one reads.
+    let keyed = false;
+    let keyWant = null;
+    let keySince = 0;
     city.onFrame(() => {
       drawn();
-      if (!glassAsked) { glassAsked = true; lens(); }
       n += 1;
-      if (n % 30 === 2 && pageAt() < 0.01) placeTower();
-      glass?.refresh();
+      if (n % 30 === 2 && paged < 0.01) placeTower();
       sun?.follow(city.sunPx);
       const ink = city.ink;
+      if (ink) {
+        const want = ink.top === 'dark' ? 'light' : 'dark';
+        const now = performance.now();
+        if (!keyed) { keyed = true; paintKey(want); }
+        else if (want === root.dataset.key) keyWant = null;
+        else if (want !== keyWant) { keyWant = want; keySince = now; }
+        else if (now - keySince > 3000 && !steppers.size) { keyWant = null; paintKey(want); }
+      }
       const key = ink && ink.top + ink.bottom + rail.matches;
       if (!key || key === inked) return;
       inked = key;
@@ -1061,50 +978,32 @@ if (wallCanvas) {
       screenEl.dataset.foot = rail.matches ? ink.top : ink.bottom;
     });
 
-    // One loop for the light, the drift and the glass. The rim's bright
-    // corner turns with the lean and with the page.
-    // Under an open window only a sheet leaves the home screen in view.
-    // The status in the header is glass only while it is not standing bare on the sky.
-    const live = (el) => (!root.dataset.app || (sheet.matches && screenEl.contains(el))) && !(el.closest('.island') && masthead.classList.contains('is-bare'));
-    let turned = null;
+    // One loop for the drift: the home screen's layers and the city's camera lean together. It runs only from a
+    // move of the pointer or a tilt until the lean stands on its goal.
     let drifted = '';
     let before = 0;
-    let moved = 0;
-    let checked = 0;
-    const stir = () => { moved = performance.now(); };
-    for (const type of ['scroll', 'pointerdown', 'pointermove', 'transitionrun', 'toggle']) addEventListener(type, stir, { passive: true, capture: true });
-    addEventListener('resize', stir);
+    let drifting = 0;
     const frame = (now) => {
-      requestAnimationFrame(frame);
-      if (document.hidden) return;
       const dt = Math.min(0.1, Math.max(0.001, (now - before) / 1000));
       before = now;
       spring(lean.x, lean.tx, 'calm', dt);
       spring(lean.y, lean.ty, 'calm', dt);
+      const settled = Math.abs(lean.x.x - lean.tx) + Math.abs(lean.y.x - lean.ty) < 0.001 && Math.abs(lean.x.v) + Math.abs(lean.y.v) < 0.01;
+      if (settled) { lean.x.x = lean.tx; lean.y.x = lean.ty; lean.x.v = 0; lean.y.v = 0; }
+      drifting = settled ? 0 : requestAnimationFrame(frame);
       const drift = `${lean.x.x.toFixed(2)} ${lean.y.x.toFixed(2)}`;
-      if (drift !== drifted) moved = now;
-      // Nothing has moved and the city has no new frame: the glass stands as
-      // it is. A slow check still catches what no event announces. The glass
-      // reads where the shapes stand before this frame writes, so no layout is forced.
-      const look = steppers.size > 0 || now - moved < 400 || glass?.stale || now - checked >= 500;
-      const turn = Math.round(clamp(lean.x.x * 26 + Math.sin(paged * 1.4) * 16, -40, 40));
-      const angle = ((225 + turn) * Math.PI) / 180;
-      // Until the city has drawn there is no scene to bend: the stylesheet's glass stands.
-      if (look && root.classList.contains('has-city')) glass?.frame(now, [Math.cos(angle), Math.sin(angle)], live);
-      if (drift !== drifted) {
-        drifted = drift;
-        for (const { el, depth } of drifters) el.style.translate = `${(-lean.x.x * depth).toFixed(2)}px ${(-lean.y.x * depth).toFixed(2)}px`;
-        // The camera leans the same way, so the pier slides against the far shore.
-        city.setLean(lean.x.x, lean.y.x);
-      }
-      if (!look) return;
-      checked = now;
-      if (turn !== turned) {
-        turned = turn;
-        for (const el of lensed) el.style.setProperty('--rim', `${135 + turn}deg`);
-      }
+      if (drift === drifted) return;
+      drifted = drift;
+      for (const { el, depth } of drifters) el.style.translate = `${(-lean.x.x * depth).toFixed(2)}px ${(-lean.y.x * depth).toFixed(2)}px`;
+      // The camera leans the same way, so the pier slides against the far shore.
+      city.setLean(lean.x.x, lean.y.x);
     };
-    requestAnimationFrame(frame);
+    stirLean = () => {
+      if (drifting) return;
+      before = performance.now();
+      drifting = requestAnimationFrame(frame);
+    };
+    stirLean();
   });
 }
 
@@ -1116,19 +1015,19 @@ if (wallCanvas) {
 
 if (smedEl) {
   // The city's key light, turned into the mascot's view: its camera looks
-  // down -z, the city's has swung by its yaw.
+  // down -z, the city's has swung by its yaw. And whether it rains, for his brim.
   const light = () => {
     if (!city) return null;
     const lit = city.light;
     const [x, y, z] = lit.sun;
     const cos = Math.cos(city.yaw);
     const sin = Math.sin(city.yaw);
-    return { ...lit, sun: [cos * x + sin * z, y, cos * z - sin * x] };
+    return { ...lit, sun: [cos * x + sin * z, y, cos * z - sin * x], rain: city.weather.rain };
   };
   const mountMascot = async () => {
     try {
       const { mountSmed3D } = await import('./smed3d.js');
-      const live = await mountSmed3D(smedEl, bar, { light });
+      const live = await mountSmed3D(smedEl, { light });
       if (live) return live;
     } catch (e) { /* no 3D module, or it could not start: the still takes over */ }
     const lines = JSON.parse(smedEl.dataset.lines || '[]');
@@ -1141,28 +1040,35 @@ if (smedEl) {
       clearTimeout(sayTimer);
       sayTimer = setTimeout(() => smedEl.classList.remove('is-saying'), 1800);
     });
-    return { goTo() {}, hop() {}, play() {} };
+    return { play() {} };
   };
   smedEl.classList.add('smed--live');
   const idle = () => new Promise((done) => { (window.requestIdleCallback || setTimeout)(done, { timeout: 1500 }); });
-  cityMounted.then(idle, idle).then(mountMascot).then((api) => {
-    smed = api;
-    if (api.first) cueMascot('dance');
-    else if (location.pathname.endsWith('/cv/')) cueMascot('think');
-  });
-  visitPage();
+  cityMounted.then(idle, idle).then(mountMascot).then((api) => { smed = api; });
   // A wave goodbye on the way to the other language; the page that opens says hello in it.
   document.addEventListener('click', (e) => { if (e.target.closest('a[hreflang]')) cueMascot('wave'); });
 
   // Late at night in Malmö he does not wait up: left alone he yawns and goes
   // to sleep, until something is touched.
+  // A touch only notes the time; the one timer pending looks at it when it fires and waits out the rest.
   let dozeTimer = 0;
-  const stir = () => {
-    clearTimeout(dozeTimer);
+  let stirredAt = 0;
+  const doze = () => {
+    const wait = stirredAt + 8000 - performance.now();
+    // In whole milliseconds: a timer may fire a fraction early, and a wait under one would go round again at once.
+    if (wait > 0) { dozeTimer = setTimeout(doze, Math.ceil(wait)); return; }
+    dozeTimer = 0;
+    if (dialHeld || appOpen || city?.nextSun.kind !== 'rise' || !cueMascot('yawn')) return;
+    const yawned = stirredAt;
     dozeTimer = setTimeout(() => {
-      if (dialHeld || appOpen || city?.nextSun.kind !== 'rise' || !cueMascot('yawn')) return;
-      dozeTimer = setTimeout(() => smed.play('sleep'), 3200);
-    }, 8000);
+      if (stirredAt !== yawned) { doze(); return; }
+      dozeTimer = 0;
+      smed.play('sleep');
+    }, 3200);
+  };
+  const stir = () => {
+    stirredAt = performance.now();
+    dozeTimer ||= setTimeout(doze, 8000);
   };
   for (const type of ['pointerdown', 'keydown', 'scroll']) addEventListener(type, stir, { passive: true, capture: true });
   stir();
@@ -1173,7 +1079,14 @@ if (smedEl) {
    ------------------------------------------------------------------------- */
 
 if (island) {
+  // It closes on a press outside it, on Escape (focus going back to what opened it) and when focus leaves it.
   document.addEventListener('pointerdown', (e) => { if (island.open && !island.contains(e.target)) island.open = false; });
+  island.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !island.open) return;
+    island.open = false;
+    island.querySelector('summary').focus();
+  });
+  island.addEventListener('focusout', (e) => { if (island.open && e.relatedTarget && !island.contains(e.relatedTarget)) island.open = false; });
 }
 
 const appsGrid = document.querySelector('.apps');
@@ -1260,12 +1173,14 @@ if (appsGrid) {
    window, where the copy has no ids.
    ------------------------------------------------------------------------- */
 
-function wireIndex(index, scroller) {
-  const article = index.closest('.cv');
+// A window's copy is wired with a signal, so its listeners go with it when the next page is laid in.
+function wireIndex(index, scroller, article = index.closest('.cv'), signal) {
+  // Seated above the page in a window's top band, it covers none of the page; in the page it sticks over it.
+  const docked = scroller && !scroller.contains(index);
   const links = [...index.querySelectorAll('a[data-to]')];
   const sectionOf = (a) => article.querySelector(`[data-sec="${a.dataset.to}"]`);
   const top = () => (scroller ? scroller.scrollTop : scrollY);
-  const lead = () => index.offsetHeight + parseFloat(getComputedStyle(index).top) + 12;
+  const lead = () => (docked ? 12 : index.offsetHeight + parseFloat(getComputedStyle(index).top) + 12);
   const offsetOf = (el) => el.getBoundingClientRect().top - (scroller ? scroller.getBoundingClientRect().top : 0) + top();
   const scrollTo = (y) => (scroller || window).scrollTo(0, y);
   let stop = null;
@@ -1287,7 +1202,7 @@ function wireIndex(index, scroller) {
       return !done;
     });
   });
-  for (const type of ['touchstart', 'wheel']) (scroller || window).addEventListener(type, cancel, { passive: true });
+  for (const type of ['touchstart', 'wheel']) (scroller || window).addEventListener(type, cancel, { passive: true, signal });
   let queued = false;
   const mark = () => {
     queued = false;
@@ -1301,8 +1216,10 @@ function wireIndex(index, scroller) {
     // Keep the section being read in the middle of the strip.
     index.scrollTo({ left: on.offsetLeft - (index.clientWidth - on.offsetWidth) / 2, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
   };
-  (scroller || window).addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(mark); } }, { passive: true });
-  mark();
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(mark); } };
+  (scroller || window).addEventListener('scroll', queue, { passive: true, signal });
+  // The first mark waits for a frame too: inside the tap that lays a page in, it would lay that page out.
+  queue();
 }
 document.querySelectorAll('.cv__index').forEach((index) => wireIndex(index, null));
 
@@ -1316,6 +1233,8 @@ document.querySelectorAll('.cv__index').forEach((index) => wireIndex(index, null
    ------------------------------------------------------------------------- */
 
 const view = document.querySelector('.appview');
+// A page with no window prints itself.
+if (!view) document.addEventListener('click', (e) => { if (e.target.closest('[data-print]')) print(); });
 
 if (view) {
   const inner = view.querySelector('.appview__inner');
@@ -1327,13 +1246,15 @@ if (view) {
   let opener = null;
   let source = null;
 
-  // A copy must not repeat ids, or the transition names that pair a page's
-  // icon with its tile here.
+  // A copy must not repeat ids, or the transition names that pair a page's icon with its tile here. Its ids
+  // take a prefix, and what points at them inside it follows, so its labels still name their sections.
   const detach = (node) => {
-    node.querySelectorAll('[id], [style*="view-transition-name"]').forEach((n) => {
-      n.removeAttribute('id');
-      n.style.viewTransitionName = '';
-    });
+    node.querySelectorAll('[style*="view-transition-name"]').forEach((n) => { n.style.viewTransitionName = ''; });
+    node.querySelectorAll('[id]').forEach((n) => { n.id = `win-${n.id}`; });
+    for (const attr of ['aria-labelledby', 'aria-describedby', 'aria-controls', 'for']) {
+      [node, ...node.querySelectorAll(`[${attr}]`)].filter((n) => n.hasAttribute(attr)).forEach((n) => n.setAttribute(attr, n.getAttribute(attr).split(/\s+/).map((id) => `win-${id}`).join(' ')));
+    }
+    node.querySelectorAll('a[href^="#"]').forEach((a) => { if (a.hash.length > 1) a.setAttribute('href', `#win-${a.hash.slice(1)}`); });
     return node;
   };
 
@@ -1362,7 +1283,13 @@ if (view) {
   function contentFor(href) {
     if (href.startsWith('#')) return Promise.resolve(sectionCopy(href));
     if (!fetched.has(href)) {
-      const page = fetch(href).then((res) => res.text()).then((text) => new DOMParser().parseFromString(text, 'text/html').querySelector('main .shell.nf, article.cv, main.case > .shell'));
+      // A page in another language than this one says so, so it is read in its own.
+      const page = fetch(href).then((res) => res.text()).then((text) => {
+        const doc = new DOMParser().parseFromString(text, 'text/html');
+        const node = doc.querySelector('main .shell.nf, article.cv, main.case > .shell');
+        if (node && doc.documentElement.lang && doc.documentElement.lang !== root.lang) node.lang = doc.documentElement.lang;
+        return node;
+      });
       fetched.set(href, Promise.all([page, styles()]).then(([node]) => node));
     }
     return fetched.get(href).then((node) => detach(node.cloneNode(true)));
@@ -1377,11 +1304,18 @@ if (view) {
   // The hidden window is laid out (style.css), so the pictures in the first screen of a page laid into it are
   // fetched then, by the browser's own lazy loading, and not in the first frames of its opening. Its scroll goes
   // back to the top as it closes; setting it here would lay the new page out at once, inside the tap.
+  // The CV's section index is seated in the window's top band, under the back button and the title, so the
+  // page never scrolls under it.
+  const dock = view.querySelector('.appview__dock');
+  let wired = null;
   const fill = (node, href) => {
+    const index = node.querySelector('.cv__index');
+    dock.replaceChildren(...(index ? [index] : []));
     body.replaceChildren(node);
     laid = href;
-    const index = body.querySelector('.cv__index');
-    if (index) wireIndex(index, body);
+    wired?.abort();
+    wired = new AbortController();
+    if (index) wireIndex(index, body, node.matches('.cv') ? node : node.querySelector('.cv'), wired.signal);
   };
   const entitle = () => {
     const node = body.firstElementChild;
@@ -1403,8 +1337,7 @@ if (view) {
   let from = null;
 
   // A Home tile where it stands on the screen, with its corner. It is read from its place in the layout, not
-  // from its painted box, so a press or a settle on the tile does not move it; the home screen's scale as it
-  // stands back is in the row's own box.
+  // from its painted box, so a press or a settle on the tile does not move it.
   const tileBox = (tile) => {
     const row = tile.offsetParent;
     const box = row.getBoundingClientRect();
@@ -1421,18 +1354,16 @@ if (view) {
     const corner = getComputedStyle(el).borderTopLeftRadius;
     return { x: rect.left, y: rect.top, w: rect.width, h: rect.height, r: parseFloat(corner) || 0 };
   };
-  // The window's own box and corner, read when it is shown or the browser
-  // window changes, never between two frames of a spring.
+  // The window's own box and corner, read after the first picture, when the layout is already done, and again
+  // when the browser window changes, so neither the tap that opens it nor a frame of a spring reads them.
   let full = null;
-  let mid = null;
   let corner = 0;
   const gauge = () => {
     full = { x: view.offsetLeft, y: view.offsetTop, w: view.offsetWidth, h: view.offsetHeight };
-    // The middle of the pages, which the home screen steps back toward.
-    mid = pager ? { x: pager.offsetLeft + pager.offsetWidth / 2, y: pager.offsetTop + pager.offsetHeight / 2 } : { x: 0, y: 0 };
     corner = parseFloat(getComputedStyle(view).getPropertyValue('--view-r')) || 0;
   };
-  addEventListener('resize', () => { if (view.classList.contains('is-open')) gauge(); });
+  requestAnimationFrame(() => setTimeout(gauge));
+  addEventListener('resize', gauge);
   // Every frame of the window is a transform and opacities only. Its corner is painted while the pane is still
   // empty on its way out, then once as its page shows, once when a finger takes it, and on the way back to its
   // tile only after its page has faded: never a frame of a page. From a tile it shows over the first third of the
@@ -1451,7 +1382,6 @@ if (view) {
     inner.style.visibility = fade ? '' : 'hidden';
     view.style.opacity = clamp(k * (from?.tile ? 3 : from ? 7 : 1.6), 0, 1).toFixed(3);
     scrim.style.opacity = (k * (1 - far * 0.8)).toFixed(3);
-    recede(k * (1 - far * 0.8));
   };
   // With nothing to grow from, the window rises a little and fades.
   const icon = () => from || { x: full.x + full.w * 0.04, y: full.y + full.h * 0.06, w: full.w * 0.92, h: full.h * 0.92, r: 40 };
@@ -1466,17 +1396,8 @@ if (view) {
     return { x: box.x + (full.x - box.x) * t + pull.x + (full.w * t + box.w * (1 - t) - w) / 2, y: box.y + (full.y - box.y) * t + pull.y, w, h, r: Math.max(0, box.r + (corner - box.r) * t), far };
   };
   const paint = () => { const f = frame(); draw(f, open.x, f.far, goal && !dragging && !held ? clamp((open.x - 0.1) / 0.25, 0, 1) : 1); };
-  // The home screen steps back as the window rises over it: smaller and
-  // fainter, and still sharp.
-  const skyEl = document.querySelector('.sky');
-  let receded = 0;
-  const recede = (k) => {
-    if (!pager) return;
-    receded = k;
-    pager.style.transform = k ? `scale(${(1 - 0.07 * k).toFixed(4)})` : '';
-    pager.style.opacity = k ? (1 - 0.45 * k).toFixed(3) : '';
-    skyEl.style.opacity = pager.style.opacity;
-  };
+  // The home screen stays where it is under the window, only the scrim dims it: a scale or a fade on the pages
+  // would take the frost off every card on them (a blur sees nothing through a faded or scaled parent).
   // Once the window covers the home screen the bar is over paper, not the city, and the city rests. The root's
   // attribute that says so, and the home screen's `inert`, restyle the whole page, so they change only before a
   // motion's first frame or after its last: on when the window has opened, off as it sets off to close or a finger
@@ -1497,7 +1418,6 @@ if (view) {
   let waiting = null;
   const landed = () => {
     stopBox = null;
-    recede(goal);
     rest();
     if (!goal) {
       view.classList.remove('is-open');
@@ -1532,13 +1452,9 @@ if (view) {
       // Back to the tile in one straight motion from where the window stands, on one spring with no bounce,
       // carrying on with the finger's throw along the way. Its page fades over the first quarter; on the way to a
       // tile it stays and fades with the window over the last third, so it is never a bare pane.
-      // The tile was measured on the home screen as it stands back; each frame aims at where the tile is
-      // in that frame, as the screen comes forward again, so window and tile land as one.
+      // Each frame aims at where the tile stands in that frame, so window and tile land as one.
       const a = frame();
-      const b = icon();
-      const s0 = 1 - 0.07 * receded;
-      const { x: cx, y: cy } = mid;
-      const home = { x: cx + (b.x - cx) / s0, y: cy + (b.y - cy) / s0, w: b.w / s0, h: b.h / s0, r: b.r / s0 };
+      const home = icon();
       const dx = home.x + home.w / 2 - a.x - a.w / 2;
       const dy = home.y + home.h / 2 - a.y - a.h / 2;
       const u = { x: 0, v: clamp((pull.vx * dx + pull.vy * dy) / (dx * dx + dy * dy || 1), 0, 8) };
@@ -1547,14 +1463,17 @@ if (view) {
       const span = Math.max(Math.abs(home.x - a.x), Math.abs(home.y - a.y), Math.abs(home.w - a.w), Math.abs(home.h - a.h));
       const tile = source?.matches('.app__tile') ? source : null;
       let settled = !tile || reduceMotion.matches;
+      // The tile was read as the close set off (`from`); it is read again only if the lean has drifted it since.
+      const leanAt = () => `${lean.x.x.toFixed(2)} ${lean.y.x.toFixed(2)}`;
+      let leant = leanAt();
+      let to = tile && !home.tile ? tileBox(tile) : home;
       stopBox = animate((dt) => {
         spring(u, 1, 'page', dt);
         if ((1 - u.x) * span < 0.1 && Math.abs(u.v) * span < 5) { open.x = 0; open.v = 0; pull.x = 0; pull.y = 0; pull.vx = 0; pull.vy = 0; landed(); return false; }
         const m = Math.min(1, u.x);
         const k = k0 * (1 - m);
-        const sc = 1 - 0.07 * k * (1 - a.far * 0.8);
         // A tile is read where it stands, before this frame's writes: the lean may drift it a pixel or two.
-        const to = tile ? tileBox(tile) : { x: cx + (home.x - cx) * sc, y: cy + (home.y - cy) * sc, w: home.w * sc, h: home.h * sc, r: home.r * sc };
+        if (tile && leanAt() !== leant) { leant = leanAt(); to = tileBox(tile); }
         const at = (p) => a[p] + (to[p] - a[p]) * m;
         draw({ x: at('x'), y: at('y'), w: at('w'), h: at('h'), r: at('r') }, k, a.far, tile ? clamp((1 - m) * 3, 0, 1) : clamp(1 - m / 0.25, 0, 1));
         // As the window fades into it, the tile gives a small settle: once, as a scale of its own.
@@ -1617,8 +1536,7 @@ if (view) {
     opener = link;
     source = link ? link.querySelector('.app__tile, .me') || link.closest('.project') : null;
     from = sourceBox();
-    gauge();
-    document.body.classList.add('px');
+    if (!full) gauge();
     isOpen = true;
     waiting = null;
     title.textContent = label;
@@ -1653,6 +1571,21 @@ if (view) {
     else dismiss();
   });
 
+  // Print: the page's own print where it stands; from the window, the CV's own page, from a frame that is never
+  // shown, so its print styles apply and not the home screen's.
+  document.addEventListener('click', (e) => {
+    const button = e.target.closest('[data-print]');
+    if (!button) return;
+    if (!view.contains(button) || !laid) { print(); return; }
+    const frame = Object.assign(document.createElement('iframe'), { src: laid, title: '', tabIndex: -1 });
+    frame.setAttribute('aria-hidden', 'true');
+    frame.style.cssText = 'position: fixed; width: 0; height: 0; border: 0; visibility: hidden';
+    frame.addEventListener('load', () => {
+      frame.contentWindow.addEventListener('afterprint', () => frame.remove(), { once: true });
+      frame.contentWindow.print();
+    }, { once: true });
+    document.body.append(frame);
+  });
   const isAppLink = (a) => {
     const href = a.getAttribute('href') || '';
     return a.dataset.sheet || /^\/work\/[\w-]+\.html$/.test(href) || /^(\/sv)?\/cv\/$/.test(href);
@@ -1663,16 +1596,12 @@ if (view) {
     const a = e.target.closest('a[href]');
     if (!a || !isAppLink(a) || a.dataset.sheet || view.contains(a)) return;
     const href = a.getAttribute('href');
-    document.body.classList.add('px');
     contentFor(href).then((node) => { if (!isOpen && !stopBox && laid !== href) fill(node, href); }).catch(() => {});
   }, { passive: true });
   // The Home apps' pages are asked for once the page has loaded and gone quiet, so the first tap too opens a
   // window with its page in it and not an empty pane. Not where the visitor has asked to save data.
-  // The labels' pixel face is let in then too: letting it in restyles the whole page, which at a tap would
-  // cost the opening its first frame.
   const warm = () => setTimeout(() => {
     if (navigator.connection?.saveData) return;
-    document.body.classList.add('px');
     for (const a of document.querySelectorAll('.apps .app')) contentFor(a.getAttribute('href')).catch(() => {});
   }, 2500);
   if (document.readyState === 'complete') warm();
@@ -1684,7 +1613,8 @@ if (view) {
     if (a.hasAttribute('download')) return;
     e.preventDefault();
     const href = a.getAttribute('href');
-    const label = a.dataset.title || a.textContent.trim() || 'CV';
+    // The CV is named CV in the window, whatever the link that opened it says.
+    const label = a.dataset.title || (/^(\/sv)?\/cv\/$/.test(href) ? 'CV' : a.textContent.trim());
     if (isOpen && view.contains(a)) {
       title.textContent = label;
       view.dataset.project = (href.match(/^\/work\/([\w-]+)\.html$/) || [])[1] || '';

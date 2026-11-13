@@ -53,7 +53,6 @@
 .case-body { max-width: var(--measure); min-width: 0; }
 .case-body h2 { margin-top: 40px; font-size: var(--fs-xl); letter-spacing: var(--tr-xl); line-height: 1.1; }
 .case-body h2:first-child { margin-top: 0; }
-.case-body h2:not(:first-child)::before { margin-bottom: 24px; }
 .case-body p { margin-top: 12px; color: var(--ink-2); }
 .case-body a { color: var(--accent); font-weight: 500; }
 .case-body code { font: 0.92em ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink); overflow-wrap: anywhere; }
@@ -74,7 +73,7 @@
 
 .case-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 40px; }
 .case-nav a { display: grid; gap: 4px; padding: 16px; border-radius: var(--r-md); transition: transform 0.4s var(--press); }
-.case-nav a:active { transform: scale(0.97); }
+.case-nav a:active { transform: translateY(1px); }
 .case-nav a:last-child { justify-items: end; text-align: end; }
 .case-nav span { color: var(--ink-3); font-size: var(--fs-note); }
 .case-nav b { display: inline-flex; align-items: center; gap: 6px; font-weight: 640; letter-spacing: -0.012em; }
