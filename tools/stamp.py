@@ -38,8 +38,12 @@ PAGES = ["index.html", "sv/index.html", "work/*.html", "cv/index.html", "sv/cv/i
 # app window shows, and main.js fetches them with the first window. Pixelify
 # Sans sets labels on the other pages only, and main.js lets it in with the
 # first of them. The mascot is drawn by smed3d.js, which is fetched beside the
-# city and is counted; its still picture loads only where WebGL 2 is missing.
-# Re-measure after changing the layout.
+# city and is counted. Its still picture and the city's load only where WebGL 2
+# is missing; until the city draws, the screen is a gradient for the hour.
+# The city and the mascot are asked for after the first paint, which can fall
+# just after the load event; they are counted all the same. Home's four app
+# faces (three icons at 180 px on a phone, and the baked ring) are its only
+# pictures besides the portrait. Re-measure after changing the layout.
 FIRST_VIEW = [
     "index.html",
     "assets/img/favicon.svg",
@@ -49,27 +53,34 @@ FIRST_VIEW = [
     "assets/js/main.js",
     "assets/js/smed3d.js",
     "assets/js/city.js",
-    "assets/js/glass.js",
-    "assets/art/malmo-still.webp",
-    "assets/art/icon-metalvisualkit.png",
     "assets/img/icons.svg",
     "assets/img/me-cut-168.webp",
     "work/img/icon-subtl-180.webp",
     "work/img/icon-giggledash-180.webp",
     "work/img/icon-devicemonitor-180.webp",
+    "assets/art/obj-metalvisualkit.webp",
 ]
 
 BUDGET = 450_000
 
 # Fetched once the home page has loaded: the weather with its symbols and
-# stylesheet (main.js), and the city's clouds, rain, snow and water (city.js,
-# half a second after its first frame).
+# stylesheet (main.js), the shader glass (main.js, after the city's first
+# frame), the city's clouds, rain, snow and water (city.js, half a second
+# after its first frame), and two and a half seconds on the four apps' pages
+# with their stylesheets, so a window opens with its page in it (main.js).
 AFTER_LOAD = [
     "assets/js/weather.js",
+    "assets/js/glass.js",
     "assets/js/sky.js",
     "assets/css/sky.css",
     "assets/js/city-sky.js",
     "assets/js/smed3d-fine.js",
+    "assets/css/case-study.css",
+    "assets/css/cv.css",
+    "work/subtl.html",
+    "work/giggledash.html",
+    "work/devicemonitor.html",
+    "work/metalvisualkit.html",
 ]
 
 STAMP = re.compile(r'(<span\b[^>]*\bdata-stamp="([a-z]+)"[^>]*>)([^<]*)(</span>)')

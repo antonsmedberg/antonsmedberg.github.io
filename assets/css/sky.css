@@ -4,7 +4,7 @@
 .alm__wx svg { width: 1em; height: 1em; flex: none; }
 .alm__wx b { font-weight: inherit; }
 .alm__wx span { overflow: hidden; text-overflow: ellipsis; }
-.alm__wx > * { transition: opacity 0.3s ease; }
+.alm__wx > * { transition: opacity 0.2s ease; }
 @starting-style { .alm__wx > * { opacity: 0; } }
 .alm.is-held .alm__wx > * { transition: none; }
 @media (prefers-reduced-motion: reduce) {

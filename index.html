@@ -34,7 +34,6 @@
 <meta name="twitter:image" content="https://antonsmedberg.github.io/assets/img/og-image.jpg">
 <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="preload" href="/assets/fonts/bricolage-grotesque-wght.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/art/malmo-still.webp" as="image" fetchpriority="high">
 <link rel="stylesheet" href="/assets/css/style.css">
 <link rel="stylesheet" href="/assets/css/home.css">
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/assets/*"}}]},"eagerness":"moderate"}]}</script>
@@ -45,9 +44,9 @@
 <body class="os">
 <div class="screen">
 <a class="skip-link" href="#main">Skip to content</a>
-<header class="masthead masthead--home">
+<header class="masthead masthead--home is-bare">
   <div class="shell masthead__inner">
-    <div class="island glass"><details>
+    <div class="island"><span class="island__pill glass" aria-hidden="true"></span><details>
       <summary aria-label="Open to junior roles in iOS, Android and Java. Show contact options"><svg class="mark" aria-hidden="true"><use href="/assets/img/icons.svg#i-mark"/></svg><span class="island__text"><b>Open to junior roles<i class="island__dot" aria-hidden="true"></i></b><small>iOS · Android · Java</small></span></summary>
       <div class="island__more">
         <p>Junior roles in iOS, Android or Java, in Skåne, Copenhagen or remote.</p>
@@ -56,11 +55,12 @@
     </details></div>
     <div class="tools glass" role="group" aria-label="Language and theme">
       <a class="tool tool--lang" href="/sv/" hreflang="sv" lang="sv" aria-label="Svenska"><svg class="" aria-hidden="true"><use href="/assets/img/icons.svg#i-globe"/></svg>SV</a>
-      <button class="tool theme" type="button" data-theme-toggle aria-label="Theme: follows the system. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="/assets/img/icons.svg#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="/assets/img/icons.svg#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="/assets/img/icons.svg#i-moon"/></svg></button>
+      <button class="tool theme" type="button" data-theme-toggle aria-label="Theme: automatic. Switch to light"><svg class="i-auto" aria-hidden="true"><use href="/assets/img/icons.svg#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="/assets/img/icons.svg#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="/assets/img/icons.svg#i-moon"/></svg></button>
     </div>
   </div>
 </header>
 
+<script>(()=>{const q=location.search.match(/[?&]hour=(\d+)/),[h,n]=new Intl.DateTimeFormat('en',{timeZone:'Europe/Stockholm',hour:'numeric',minute:'numeric',hourCycle:'h23'}).format().split(':'),t=q?+q[1]:+h+n/60,m=new Date().getMonth(),r=[8.5,7.6,6.5,6.2,5.1,4.4,4.7,5.7,6.8,7.8,7.6,8.5][m],s=[15.9,16.9,17.9,20,20.9,21.8,21.6,20.6,19.3,18,16.1,15.5][m],k=t<r-.8||t>s+.8?'night':t<r+1?'dawn':t>s-1?'dusk':'day',e=document.currentScript.parentNode;document.documentElement.dataset.sky=k;e.dataset.top=e.dataset.foot=k=='day'?'dark':'light'})()</script>
 <canvas class="wall" aria-hidden="true"></canvas>
 <div class="sky" aria-hidden="true"></div>
 <canvas class="wall-front" aria-hidden="true"></canvas>
@@ -79,7 +79,7 @@
       <p class="alm__wx" data-now></p>
     </div>
     <div class="sun"><div class="sun__hand" data-dial="Time of day in Malmö"></div></div>
-    <nav class="apps" aria-label="Apps"><a class="app" href="/work/subtl.html" data-title="Subtl"><span class="app__tile"><img src="/work/img/icon-subtl-120.webp" srcset="/work/img/icon-subtl-120.webp 120w, /work/img/icon-subtl-180.webp 180w" sizes="(min-width: 1700px) and (min-height: 900px) 120px, 60px" width="120" height="120" alt="" decoding="async"></span><span class="app__name">Subtl</span></a><a class="app" href="/work/giggledash.html" data-title="Giggle Dash"><span class="app__tile"><img src="/work/img/icon-giggledash-120.webp" srcset="/work/img/icon-giggledash-120.webp 120w, /work/img/icon-giggledash-180.webp 180w" sizes="(min-width: 1700px) and (min-height: 900px) 120px, 60px" width="120" height="120" alt="" decoding="async"></span><span class="app__name">Giggle Dash</span></a><a class="app" href="/work/devicemonitor.html" data-title="DeviceMonitor"><span class="app__tile"><img src="/work/img/icon-devicemonitor-120.webp" srcset="/work/img/icon-devicemonitor-120.webp 120w, /work/img/icon-devicemonitor-180.webp 180w" sizes="(min-width: 1700px) and (min-height: 900px) 120px, 60px" width="120" height="120" alt="" decoding="async"></span><span class="app__name">DeviceMonitor</span></a><a class="app" href="/work/metalvisualkit.html" data-title="MetalVisualKit"><span class="app__tile"><img src="/assets/art/icon-metalvisualkit.png" width="120" height="120" alt="" decoding="async"></span><span class="app__name">MetalVisualKit</span></a></nav>
+    <nav class="apps" aria-label="Apps"><a class="app" href="/work/subtl.html" data-title="Subtl" draggable="false"><span class="app__tile" style="--face: url(/work/img/icon-subtl-180.webp)"></span><span class="app__name">Subtl</span><span class="app__note">A caption editor for iPhone.</span></a><a class="app" href="/work/giggledash.html" data-title="Giggle Dash" draggable="false"><span class="app__tile" style="--face: url(/work/img/icon-giggledash-180.webp)"></span><span class="app__name">Giggle Dash</span><span class="app__note">A landscape chase game for iPhone and iPad.</span></a><a class="app" href="/work/devicemonitor.html" data-title="DeviceMonitor" draggable="false"><span class="app__tile" style="--face: url(/work/img/icon-devicemonitor-180.webp)"></span><span class="app__name">DeviceMonitor</span><span class="app__note">A network monitor for iPhone and iPad.</span></a><a class="app" href="/work/metalvisualkit.html" data-title="MetalVisualKit" draggable="false"><span class="app__tile" style="--face: url(/assets/art/obj-metalvisualkit.webp) center 117% / 112% no-repeat, radial-gradient(120% 100% at 50% 20%, #1c2a6b, #070c2a)"></span><span class="app__name">MetalVisualKit</span><span class="app__note">A Swift package of GPU-driven SwiftUI views.</span></a></nav>
   </div>
 </section>
 
@@ -177,26 +177,14 @@
       <p>I am happy to walk through the code, the decisions behind it and what I learned at Axis.</p>
       <div class="actions">
         <a class="btn" href="mailto:anton@smedberg.eu?subject=iOS%20role"><svg class="icon" aria-hidden="true"><use href="/assets/img/icons.svg#i-mail"/></svg>anton@smedberg.eu</a>
-        <button class="btn btn--quiet" type="button" data-copy="anton@smedberg.eu" data-copied="Copied"><svg class="icon" aria-hidden="true"><use href="/assets/img/icons.svg#i-copy"/></svg><span data-copy-label>Copy address</span></button>
-        <a class="btn btn--quiet" href="/cv/"><svg class="icon" aria-hidden="true"><use href="/assets/img/icons.svg#i-doc"/></svg>CV</a>
-        <a class="btn btn--quiet btn--icon" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" rel="me" aria-label="LinkedIn"><svg class="icon" aria-hidden="true"><use href="/assets/img/icons.svg#i-linkedin"/></svg></a>
+        <span class="actions__pair"><button class="btn btn--quiet" type="button" data-copy="anton@smedberg.eu" data-copied="Copied"><svg class="icon" aria-hidden="true"><use href="/assets/img/icons.svg#i-copy"/></svg><span data-copy-label>Copy address</span></button>
+        <a class="btn btn--quiet" href="/cv/"><svg class="icon" aria-hidden="true"><use href="/assets/img/icons.svg#i-doc"/></svg>CV</a></span>
+        <span class="actions__pair"><a class="btn btn--quiet btn--icon" href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" rel="me" aria-label="LinkedIn"><svg class="icon" aria-hidden="true"><use href="/assets/img/icons.svg#i-linkedin"/></svg></a>
+        <a class="btn btn--quiet btn--icon" href="https://github.com/antonsmedberg" rel="me" aria-label="GitHub"><svg class="icon" aria-hidden="true"><use href="/assets/img/icons.svg#i-github"/></svg></a></span>
       </div>
+      <p class="credit">Weather: SMHI, CC BY 4.0 · <a href="https://github.com/antonsmedberg/antonsmedberg.github.io">Source</a></p>
     </div>
   </div>
-  <footer class="footer panel">
-  <div class="shell footer__inner">
-    <p class="colophon">Set in Bricolage Grotesque, the system font and Inter, with Pixelify Sans for the small labels, served from this site. No analytics, no CDN, no framework. Weather: SMHI’s forecast, CC BY 4.0, in my own symbols. Updated <span data-stamp="build">2026-11-11</span>. <span data-stamp="requests">16</span> requests · <span data-stamp="weight">450 KB</span> on a phone.</p>
-    <div class="footer__links">
-      <a href="mailto:anton@smedberg.eu">anton@smedberg.eu</a>
-      <a href="/assets/cv/Anton-Smedberg-CV.pdf">CV (PDF)</a>
-      <a href="https://github.com/antonsmedberg/antonsmedberg.github.io">Source</a>
-      <a href="/sv/" hreflang="sv" lang="sv">Svenska</a>
-      <a href="https://github.com/antonsmedberg" rel="me">GitHub</a>
-      <a href="https://www.linkedin.com/in/anton-smedberg-a9aa6121b/" rel="me">LinkedIn</a>
-    </div>
-  </div>
-</footer>
-
 </section>
 
 </main>
@@ -208,7 +196,6 @@
     <div class="appview__bar"><button class="appview__back tool glass" type="button" aria-label="Close"><svg class="" aria-hidden="true"><use href="/assets/img/icons.svg#i-down"/></svg></button><p class="appview__title glass" id="app-title"></p><span class="appview__grab" aria-hidden="true"></span></div>
     <div class="appview__body"></div>
   </div>
-  <img class="appview__ghost" alt="" aria-hidden="true">
 </div>
 <nav class="tabbar" aria-label="Sections">
   <div class="tabbar__body glass">

@@ -6,7 +6,11 @@
    window gets the rail layout. */
 
 body.os { padding: 0; height: 100dvh; overflow: hidden; }
-.os .screen { position: fixed; inset: 0; overflow: hidden; --lane: 112px; --orb: 112px; background: #0c1a3c url("/assets/art/malmo-still.webp") 70% / cover; }
+.os .screen { position: fixed; inset: 0; overflow: hidden; --lane: 112px; --orb: 112px; background: linear-gradient(#0a1436, #1c2f5e); }
+/* Until the city draws, a calm sky for the hour the page's first script picks; the still only without WebGL 2. */
+[data-sky="day"] .os .screen { background: linear-gradient(#7fb2e6, #cfe6f8); }
+[data-sky="dawn"] .os .screen, [data-sky="dusk"] .os .screen { background: linear-gradient(#1a1f5c, #3a3478); }
+.no-gl .os .screen { background: #0c1a3c url("/assets/art/malmo-still.webp") 70% / cover; }
 /* Ink: cream on a deep picture, navy on a bright one, as the city asks at the top and at the foot
    (`data-top`, `data-foot`); cream until it does. Each keeps 4.5:1 on its promise, 0.12 or 0.32. */
 .os .screen, .apps { --sky-ink: #fbf5ea; --sky-ink-2: #ece5d4; --sky-depth: color-mix(in oklab, var(--sky-top) 68%, var(--sky-ink)); --alm-ink: #f5cd7a; }
@@ -14,26 +18,22 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 :is(.name span, .who, .alm, .app, .island) { transition: color 0.4s ease, text-shadow 0.4s ease; }
 .os .masthead--home { position: absolute; left: var(--rail-clear); right: 0; }
 
-.wall, .wall-front { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
-/* A still of the night until the city fades in; a tall window sets its skyline low. */
-.wall { z-index: 0; opacity: 0; transition: opacity 0.6s ease; }
+/* The city's picture is coarser than the screen; scaled smoothly it reads as one picture, not a grid of pixels. */
+.wall, .wall-front { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* The city fades in once it has drawn; a tall window sets the still's skyline low. */
+.wall { z-index: 0; opacity: 0; transition: opacity 0.5s ease; }
 .has-city .wall { opacity: 1; }
-@media (max-aspect-ratio: 2/3) { .os .screen { background-size: auto 150%; background-position: 40% 0; } }
+@media (max-aspect-ratio: 2/3) { .no-gl .os .screen { background-size: auto 150%; background-position: 40% 0; } }
 .wall-front { z-index: 2; pointer-events: none; }
 
-.pager {
-  position: absolute; inset: 0; display: flex;
-  overflow: auto hidden; scroll-snap-type: x mandatory; scroll-behavior: auto;
-  overscroll-behavior: contain; scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.pager::-webkit-scrollbar { display: none; }
-.pager.is-scrub { scroll-snap-type: none; }
+/* The pages lie side by side; main.js moves them under a finger and on springs, and leaves up and down to each page. */
+.pager { position: absolute; inset: 0; display: flex; overflow: hidden; touch-action: pan-y; }
+/* A sideways drag that starts on a link or a picture is a swipe, never a drag of the link or its long-press preview. */
+.pager :is(a, img) { -webkit-user-drag: none; -webkit-touch-callout: none; }
 
 .pg {
   flex: 0 0 100%; width: 100%; height: 100%;
-  overflow: hidden auto; overscroll-behavior-y: contain; scrollbar-width: none;
-  scroll-snap-align: start; scroll-snap-stop: always;
+  overflow: hidden auto; overscroll-behavior-y: contain; scrollbar-width: none; touch-action: pan-y;
   padding-top: calc(64px + env(safe-area-inset-top));
   padding-bottom: calc(var(--bar-clear) + 28px);
   padding-left: var(--rail-clear);
@@ -77,7 +77,7 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
   position: relative; flex: none; width: var(--me-w); height: var(--me-w); margin: var(--me-rise) 0 var(--me-step); border-radius: var(--me-r);
   background: radial-gradient(100% 70% at 50% 100%, var(--me-glow), transparent), linear-gradient(var(--me-tile), var(--me-tile-low));
   box-shadow: inset 0 0 0 var(--g-edge) oklch(1 0 0 / 0.14), inset 0 var(--g-edge) 0 oklch(1 0 0 / 0.5), 0 var(--me-step) 0 color-mix(in oklab, var(--me-tile-low) 38%, var(--sky-top));
-  transition: transform 0.45s var(--press);
+  transition: transform 0.4s var(--press);
 }
 /* The lit lower edge of the tile, where it turns into the side. */
 .me::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 calc(-1 * var(--g-edge)) 0 oklch(1 0 0 / 0.3); }
@@ -101,7 +101,7 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
    handle stands in `.sun`, its room in the layout: main.js moves the handle by
    transform. While held, the path and its three ticks come out in `.sky`. */
 .sky { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.sky__arc { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; fill: none; stroke: var(--sky-ink); stroke-linecap: round; opacity: 0; transition: opacity 0.3s ease; }
+.sky__arc { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; fill: none; stroke: var(--sky-ink); stroke-linecap: round; opacity: 0; transition: opacity 0.2s ease; }
 .sky.is-held .sky__arc { opacity: 1; }
 .sky__arc path { stroke-width: 1.25; stroke-opacity: 0.8; }
 .sky__arc path:first-child { stroke-width: 1; stroke-opacity: 0.4; }
@@ -114,36 +114,38 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .sun__hand:focus-visible { outline: 2.5px solid #fff; outline-offset: 2px; border-radius: 50%; }
 .sun.is-held .sun__hand { cursor: grabbing; }
 
-/* Apps: the four projects as one row of icons on the scene, low over the
-   water, with their names under them. An icon is one layer: the picture, cut to the
-   squircle by its own outline, with one shadow under it and one hairline of
-   light along its top left. It turns a few degrees toward the pointer, or
-   with a tilted phone, lifts under a pointer and sinks when pressed. */
+/* Apps: the four projects as one compact group of small tiles, low over
+   the water and flush left, so the skyline and the tower's reflection stay
+   free. A tile is one box with one outline: its picture (`--face`, cover,
+   a little larger than the box so any corner baked into the art falls
+   outside it), a soft highlight across the top and one hairline are its
+   own background layers and its own inset shadow, all cut by its one
+   corner. It casts no mirror on the water: a second picture under each
+   tile read as a doubled tile. */
 .apps {
-  --tile: 60px; --gap: calc((100cqw - 2 * var(--gutter) - 4 * var(--tile)) / 3);
-  position: relative; z-index: 3; display: grid; grid-template-columns: repeat(4, var(--tile)); justify-content: space-between; margin-top: 8px;
+  --tile: 54px; --gap: 28px;
+  position: relative; z-index: 3; display: grid; grid-template-columns: repeat(4, var(--tile)); column-gap: var(--gap); justify-content: start; justify-self: start; margin-top: 8px;
 }
-.app { display: grid; grid-template-columns: var(--tile); align-content: start; gap: 4px; min-height: var(--h-md); perspective: 240px; color: var(--sky-ink); -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+.app { display: grid; grid-template-columns: var(--tile); justify-items: center; align-content: start; color: var(--sky-ink); -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
 .app__tile {
-  display: block; position: relative; width: var(--tile); height: var(--tile); border-radius: var(--r-icon); overflow: hidden;
-  box-shadow: 0 6px 12px -6px oklch(0.1 0.03 262 / 0.7);
-  --turn: rotateX(calc(var(--rx, 0deg) + var(--ly, 0) * 6deg)) rotateY(calc(var(--ry, 0deg) - var(--lx, 0) * 6deg));
-  transform: var(--turn);
-  transition: transform 0.45s var(--press), box-shadow 0.25s ease;
+  display: block; width: var(--tile); height: var(--tile); border-radius: var(--r-icon);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.04) 42%, transparent 52%), var(--face) center / 104% no-repeat;
+  box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.4);
+  transition: transform 0.4s var(--press), filter 0.2s ease;
 }
-.app__tile::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: var(--g-edge); pointer-events: none;
-  background: linear-gradient(135deg, oklch(1 0 0 / 0.62), transparent 44%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+/* A press is a key going down: the tile drops a pixel, gives a little and darkens, and comes back up on release. */
+.app:active .app__tile { transform: translateY(1px) scale(0.95); filter: brightness(0.86); transition-duration: 0.08s; }
+/* What the app is, in the first sentence of its card on Work: under the row, for a pointer or a key. */
+.app__note {
+  position: absolute; left: 0; top: 100%; margin-top: 10px;
+  color: var(--sky-ink); font-size: var(--fs-note); font-weight: 500; line-height: var(--lh-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s;
 }
-.app__tile img { width: 100%; height: 100%; object-fit: cover; }
-/* The MetalVisualKit icon is 30 art pixels across, so its tile shows each of them as a whole square. */
-.app__tile img[src$=".png"] { image-rendering: pixelated; }
-.app:active .app__tile { transform: var(--turn) scale(0.88); box-shadow: 0 2px 4px -2px oklch(0.1 0.03 262 / 0.6); }
-.app:focus-visible { outline-color: #fff; border-radius: var(--r-sm); }
-.app__name { --over: min((var(--gap) - 4px) / 2, var(--gutter) - 4px); width: calc(var(--tile) + 2 * var(--over)); margin-inline: calc(-1 * var(--over)); font-size: var(--fs-2xs); font-weight: 500; line-height: var(--lh-xs); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app:focus-visible .app__note { opacity: 1; visibility: visible; }
+/* The focus ring rings the tile, on its own corner, not the name that runs wider than it. */
+.app:focus-visible { outline: none; }
+.app:focus-visible .app__tile { outline: 2px solid #fff; outline-offset: 3px; }
+.app__name { width: calc(var(--tile) + var(--gap) - 4px); margin-top: 7px; font-size: 0.65625rem; font-weight: 500; letter-spacing: -0.015em; line-height: var(--lh-xs); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .is-jiggling .app__tile { animation: jiggle 0.32s ease-in-out infinite alternate; }
 .is-jiggling .app:nth-child(2n) .app__tile { animation-delay: -0.15s; animation-direction: alternate-reverse; }
@@ -164,6 +166,11 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .pg .head { width: fit-content; max-width: min(100%, 40rem); padding: 16px 20px; }
 .pg .head h2, .pg .head .kicker { color: inherit; }
 .pg .head p:not(.kicker) { color: oklch(1 0 0 / 0.94); }
+/* Work opens on the scene itself, as Home does: its title is set on the sky in the sky's ink, with no card
+   under it, and the first project rises under it. */
+#work > .shell > .head { padding-inline: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; color: var(--sky-ink); }
+#work > .shell > .head::after { content: none; }
+#work > .shell > .head p:not(.kicker) { color: var(--sky-ink); }
 
 /* Work: the cards stack. main.js gives each one the place it sticks at, a
    little lower than the last and never before its own foot is in view, so
@@ -186,25 +193,25 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 }
 .cv-side { display: grid; gap: 28px; min-width: 0; }
 .cv-cols > section { min-width: 0; }
-.cv-actions .btn--quiet:not(.is-lensed) { background: var(--surface); }
+.cv-actions .btn--quiet { --b-bg: var(--surface); }
 
 #contact .cta { max-width: 46rem; margin-top: 18svh; }
-.pg .footer { max-width: 46rem; margin: 12px 0 0; padding: 16px 0 12px; }
-#contact .shell + .footer { margin-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right)); }
+/* The weather's source and licence, as SMHI's terms ask: one quiet line at the foot of the card, in the page's
+   flow and clear of the bar and of Bit. */
+.cta .credit { margin-top: 24px; font-size: var(--fs-2xs); line-height: var(--lh-xs); }
+.credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
 /* Narrow phones: the gutters between the icons close up, so the names are
    set tighter, then in a narrower cut of the same size where the face has
    one (the system font on Apple devices does). The second line about me
-   gives way first, and the last name keeps inside the gutter. */
-@media (max-width: 719px) {
-  .app:last-child .app__name { margin-inline: calc(-2 * var(--over)) 0; }
-}
+   gives way first. */
 @media (max-width: 389px) {
   .me { --me-w: 40px; }
   .who__text small { display: none; }
   .app__name { letter-spacing: -0.03em; }
 }
 @media (max-width: 359px) {
+  .apps { --tile: 48px; --gap: 20px; }
   .name br { display: inline; }
   .app__name { font-stretch: 85%; letter-spacing: -0.05em; }
 }
@@ -247,17 +254,14 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
   .alm__time { height: 3.75rem; font-size: 3.25rem; line-height: 3.75rem; }
   .alm__wx { height: 1.875rem; font-size: var(--fs-lg); }
   .sun { width: calc(var(--tower-l, 64cqw) - var(--side) + 2rem); }
-  .apps { --gap: 40px; justify-content: start; justify-self: start; column-gap: var(--gap); }
+  .apps { --tile: 3.75rem; --gap: 1.75rem; }
   .pg .head { padding: 20px 24px; }
   #contact .cta { margin-top: 14svh; padding: 44px 40px; }
 }
-/* The widest windows: bigger icons, in step with the name. */
+/* The widest windows: the tiles grow with the type. */
 @media (min-width: 1700px) and (min-height: 900px) {
   .hero { --side: var(--gutter); }
   .masthead--home .shell { max-width: none; }
-  .apps { --tile: 80px; --gap: 40px; }
-  .app { gap: 8px; }
-  .app__name { font-size: var(--fs-note); }
 }
 /* Computers: the time and the weather stand apart, under the header's capsule. */
 @media (min-width: 1000px) and (min-height: 541px) {
@@ -290,18 +294,19 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
   .me { --me-w: 44px; }
   .alm { grid-area: 3 / 1; max-width: none; margin-top: 6px; }
   .alm__time { height: 36px; font-size: 2rem; line-height: 36px; }
-  .apps { --gap: 24px; grid-area: 4 / 1; justify-content: start; justify-self: start; column-gap: var(--gap); }
+  .apps { --tile: 44px; --gap: 16px; grid-area: 4 / 1; }
   /* Names over the town are left to screen readers. */
-  .app__name { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); }
+  .app__name, .app__note { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); }
   .sun { grid-area: 1 / 2 / -1 / -1; justify-self: stretch; width: auto; margin: 0; }
   .pg .head { padding: 12px 16px; }
   .pg .head h2 { font-size: var(--fs-xl); }
   #contact .cta { margin-top: 0; padding: 24px; }
 }
 
-@media (hover: hover) {
-  .app:hover .app__tile { transform: var(--turn) translateZ(14px); box-shadow: 0 14px 22px -10px oklch(0.1 0.03 262 / 0.8); }
-  .app:active .app__tile { transform: var(--turn) scale(0.88); }
+@media (hover: hover) and (pointer: fine) {
+  .app:hover .app__tile { transform: translateY(-3px); }
+  .app:hover .app__note { opacity: 1; visibility: visible; }
+  .app:active .app__tile { transform: translateY(1px) scale(0.95); }
 }
 
 @media (prefers-reduced-motion: reduce) {

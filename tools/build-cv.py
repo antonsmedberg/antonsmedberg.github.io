@@ -43,7 +43,7 @@ PAGES = {
         "brand": "Anton Smedberg, home",
         "status": "Open to junior roles",
         "lang_label": "SV", "lang_name": "Svenska",
-        "theme": "Theme: follows the system. Switch to light",
+        "theme": "Theme: automatic. Switch to light",
         "download": "Download PDF",
         "pdf_other": "/assets/cv/Anton-Smedberg-CV-SV.pdf",
         "download_other": "PDF in Swedish",
@@ -80,7 +80,7 @@ PAGES = {
         "brand": "Anton Smedberg, startsida",
         "status": "Söker juniorroll",
         "lang_label": "EN", "lang_name": "English",
-        "theme": "Tema: följer systemet. Byt till ljust",
+        "theme": "Tema: automatiskt. Byt till ljust",
         "download": "Ladda ner PDF",
         "pdf_other": "/assets/cv/Anton-Smedberg-CV.pdf",
         "download_other": "PDF på engelska",
@@ -105,15 +105,6 @@ SPRITE = "/assets/img/icons.svg"
 MARK = '<svg class="mark" aria-hidden="true"><use href="/assets/img/icons.svg#i-mark"/></svg>'
 
 # The sections that have a mark of their own in the index: the same pictures that head them on the home page.
-SECTION_MARKS = {"profile": "cv", "experience": "experience", "skills": "skills"}
-
-
-def section_mark(key):
-    if key not in SECTION_MARKS:
-        return ""
-    name = SECTION_MARKS[key]
-    return '<img class="sec" src="/assets/art/tile-%s-60.webp" srcset="/assets/art/tile-%s-60.webp 60w, /assets/art/tile-%s-120.webp 120w" sizes="20px" width="60" height="60" alt="" decoding="async">' % (name, name, name)
-
 PAGE = Template("""<!DOCTYPE html>
 <html lang="$lang" class="no-js">
 <head>
@@ -161,7 +152,7 @@ $jsonld
 <a class="skip-link" href="#main">$skip</a>
 <header class="masthead">
   <div class="shell masthead__inner">
-    <a class="brand glass" href="$home" aria-label="$brand">$mark<span class="island__text"><b>Anton Smedberg</b><small>$status<i class="island__dot" aria-hidden="true"></i></small></span></a>
+    <a class="brand" href="$home" aria-label="$brand"><span class="island__pill glass" aria-hidden="true"></span>$mark<span class="island__text"><b>Anton Smedberg</b><small>$status<i class="island__dot" aria-hidden="true"></i></small></span></a>
     <div class="tools glass" role="group" aria-label="$tools">
       <a class="tool tool--lang" href="$other" hreflang="$other_lang" lang="$other_lang" aria-label="$lang_name"><svg aria-hidden="true"><use href="$sprite#i-globe"/></svg>$lang_label</a>
       <button class="tool theme" type="button" data-theme-toggle aria-label="$theme"><svg class="i-auto" aria-hidden="true"><use href="$sprite#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="$sprite#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="$sprite#i-moon"/></svg></button>
@@ -463,7 +454,7 @@ def render(lang, data, build):
         "courses": courses(content["courses"]),
         "skills": skills(content["skills"], page["tracks"]),
         "index": attr(page["index"]),
-        "index_links": "".join('<a href="#cv-%s" data-to="%s">%s%s</a>' % (key, key, section_mark(key), html.escape(label)) for key, label in page["index_items"]),
+        "index_links": "".join('<a href="#cv-%s" data-to="%s">%s</a>' % (key, key, html.escape(label)) for key, label in page["index_items"]),
         "tools": attr(page["tools"]),
         "pdf_other": page["pdf_other"],
         "download_other": html.escape(page["download_other"]),

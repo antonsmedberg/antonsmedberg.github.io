@@ -6,7 +6,7 @@
 .cv__cols, .cv__main, .cv__side { display: grid; gap: 12px; align-content: start; min-width: 0; }
 .cv__cols { margin-top: 16px; }
 
-.cv__name { font-size: var(--fs-3xl); font-weight: 800; letter-spacing: var(--tr-3xl); line-height: 0.94; }
+.cv__name { font-size: var(--fs-3xl); font-weight: 640; letter-spacing: var(--tr-3xl); line-height: 0.94; }
 .cv__role { margin-top: 12px; font-size: var(--fs-lg); font-weight: 640; letter-spacing: var(--tr-lg); line-height: var(--lh-md); }
 .cv__keys { margin-top: 4px; max-width: var(--measure); color: var(--ink-3); font-size: var(--fs-sub); line-height: var(--lh-md); }
 .cv__contact { display: flex; flex-wrap: wrap; gap: 0 16px; margin-top: 12px; color: var(--ink-2); font-size: var(--fs-sub); }
@@ -17,15 +17,18 @@
 
 /* The index: a strip of glass that sticks under the top bar and scrolls
    sideways when the names do not fit. */
+/* It has a body of its own, an opaque fill written out in full, so the text that scrolls under it never
+   shows through, whatever the browser makes of the glass. Its chips change at once, with no tap highlight of
+   the system's own, so there is never a second shape beside the one selected. */
 .cv__index {
   position: sticky; top: calc(var(--head-h) + env(safe-area-inset-top)); z-index: 5;
+  background: light-dark(oklch(0.995 0.002 262), oklch(0.24 0.014 262));
   display: flex; gap: 2px; width: fit-content; max-width: 100%; margin-top: 24px; padding: 4px; border-radius: var(--r-full);
   overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
 }
 .cv__index::-webkit-scrollbar { display: none; }
-.cv__index a { flex: none; display: inline-flex; align-items: center; min-height: var(--h-md); padding: 0 16px; border-radius: var(--r-full); color: var(--ink-2); font-size: var(--fs-sub); font-weight: 600; transition: transform 0.4s var(--press), background-color 0.2s ease, color 0.2s ease; }
+.cv__index a { flex: none; display: inline-flex; align-items: center; min-height: var(--h-md); padding: 0 16px; border-radius: var(--r-full); color: var(--ink-2); font-size: var(--fs-sub); font-weight: 600; -webkit-tap-highlight-color: transparent; transition: transform 0.4s var(--press); }
 .cv__index a:active { transform: scale(0.94); }
-.cv__index .sec { width: 20px; height: 20px; margin-right: 6px; box-shadow: none; }
 .cv__index a[aria-current] { background: var(--accent-fill); color: var(--on-accent); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.3), 0 4px 10px -6px var(--accent-fill); }
 .cv__index a:focus-visible { outline-offset: -3px; border-radius: var(--r-full); }
 .appview__body .cv__index { top: 0; }
@@ -56,10 +59,10 @@
 .cv__timeline .cv__item { position: relative; display: flex; flex-direction: column; padding-block: 0 20px; border-bottom: 0; }
 .cv__timeline .cv__item:last-child { padding-bottom: 0; }
 .cv__timeline .cv__item::before { content: ""; position: absolute; left: -22px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); box-shadow: 0 0 0 3px var(--accent); }
-.cv__timeline .cv__when { order: -1; align-self: flex-start; margin-bottom: 8px; padding: 4px 12px; border-radius: var(--r-full); background: var(--accent-soft); color: var(--ink); font-family: var(--font-pixel); font-size: var(--fs-note); }
+.cv__timeline .cv__when { order: -1; align-self: flex-start; margin-bottom: 8px; padding: 4px 12px; border-radius: var(--r-full); background: var(--accent-soft); color: var(--ink); font-size: var(--fs-note); font-weight: 600; }
 
 .cv__track { margin-top: 16px; }
-.cv__track h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: 720; letter-spacing: var(--tr-lg); }
+.cv__track h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: 640; letter-spacing: var(--tr-lg); }
 .cv__skills > div { padding-block: 8px; }
 .cv__skills > div:last-child { padding-bottom: 0; }
 .cv__skills dt { color: var(--ink-3); font-size: var(--fs-note); font-weight: 600; }

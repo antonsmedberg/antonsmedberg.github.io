@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>The ring</title>
+<style>body{margin:0;background:#8a96a8}canvas{width:216px;height:216px}</style>
+<pre id="out"></pre>
+<script type="module">
+  // Draws the ring and lists it as a PNG data URL with where it reaches; build-objects.py reads the list.
+  import { OBJECTS, draw } from './objects.mjs';
+
+  const out = document.getElementById('out');
+  try {
+    for (const name of Object.keys(OBJECTS)) {
+      const canvas = document.body.appendChild(document.createElement('canvas'));
+      const reach = await draw(canvas, name);
+      out.textContent += `obj-${name} ${canvas.toDataURL('image/png')} ${JSON.stringify(reach)}\n`;
+    }
+    document.title = 'done';
+  } catch (e) {
+    out.textContent += `error ${e.message}\n`;
+    document.title = 'error';
+  }
+</script>

@@ -127,6 +127,11 @@ export function mountGlass(source) {
   let scale = Math.min(2, devicePixelRatio || 1);
   let slow = 0;
   let last = 0;
+  // Safari copies the scene across on the main thread: 3 ms a frame on a phone at rest, 8 to 14 ms
+  // while the pages move, against well under 1 ms in Chrome. Where the last six copies cost more
+  // than 1.5 ms, the stylesheet's glass, which the browser blurs itself, is the better glass.
+  const cost = [];
+  let off = false;
 
   return {
     add(el, { blur = 3 } = {}) {
@@ -144,26 +149,42 @@ export function mountGlass(source) {
     get stale() { return fresh; },
     // Draw what changed. `light` is the unit direction the rim catches most.
     frame(now, light, live) {
+      if (off) return;
       // Slow frames: draw the glass coarser, once, rather than drop the scene's own.
       if (last && now - last > 30) slow += 1; else slow = Math.max(0, slow - 0.2);
       last = now;
       if (slow > 40 && scale > 1) { scale = Math.max(1, scale * 0.7); slow = 0; }
       if (fresh && source.width) {
+        const t0 = performance.now();
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.uniform2f(u.uTexels, source.width, source.height);
+        if (cost.push(performance.now() - t0) > 6) cost.shift();
+        if (cost.length === 6 && [...cost].sort((a, b) => a - b)[3] > 1.5) {
+          off = true;
+          for (const item of items) {
+            item.on = false;
+            item.el.classList.remove('is-lensed');
+            item.fx.hidden = true;
+          }
+          return;
+        }
       }
       const wall = source.getBoundingClientRect();
       for (const item of items) {
         const { el, fx } = item;
         const box = live(el) ? el.getBoundingClientRect() : null;
-        const shown = Boolean(box && box.width > 0 && box.right > 0 && box.left < innerWidth && box.bottom > 0 && box.top < innerHeight);
+        // A shape on the next page over is drawn before it slides into view, so no shape changes its glass
+        // on screen while the pages move.
+        const shown = Boolean(box && box.width > 0 && box.right > -innerWidth && box.left < 2 * innerWidth && box.bottom > 0 && box.top < innerHeight);
         // The class and the picture go on and off together: while a shape is
-        // this glass the stylesheet draws none, and the other way round.
+        // this glass the stylesheet draws none, and the other way round. The
+        // picture fades, so a shape that turns glass in view does so softly.
         if (shown !== item.on) {
           item.on = shown;
           el.classList.toggle('is-lensed', shown);
-          fx.hidden = !shown;
+          fx.hidden = false;
+          fx.style.opacity = shown ? '' : '0';
           item.key = '';
         }
         if (!shown) continue;

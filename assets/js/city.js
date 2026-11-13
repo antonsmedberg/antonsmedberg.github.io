@@ -4,7 +4,6 @@
 const FPS = 24;
 const NEAR = 4;
 const FAR = 16000;
-const BUDGET = 4; // Milliseconds of our own work per frame before the grain steps coarser.
 const GROUND = 2.4;
 const REACH = 90; // A plane this many metres off slides half as far as one at the lens.
 
@@ -13,7 +12,6 @@ const mix3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a
 const rad = (d) => (d * Math.PI) / 180;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (t) => t * t * (3 - 2 * t);
-const sstep = (a, b, x) => smooth(clamp((x - a) / (b - a), 0, 1));
 // WCAG relative luminance.
 const lum = (c) => [0.2126, 0.7152, 0.0722].reduce((s, k, i) => s + k * (c[i] <= 0.04045 ? c[i] / 12.92 : ((c[i] + 0.055) / 1.055) ** 2.4), 0);
 const toHex = (c) => `#${c.map((v) => Math.round(clamp(v, 0, 1) * 255).toString(16).padStart(2, '0')).join('')}`;
@@ -142,7 +140,7 @@ function rngFrom(seed) {
 /* ---------------------------------------------------------------- Geometry */
 
 const K = { plain: 0, torso: 1, glass: 2, block: 3, truss: 4, road: 5, light: 6, leaf: 7, office: 8, deck: 9, train: 11, pool: 12, balcony: 13 };
-const FLOATS = 14; // position, normal, colour, (u, v, kind), (openness to the sky, seed)
+const FLOATS = 10; // 4-byte slots: position, normal and colour as bytes, (u, v, kind), (openness to the sky, seed)
 const UP = [0, 1, 0];
 const BELOW = [0, -100, 0];
 const ZERO = [0, 0, 0, 0];
@@ -164,10 +162,12 @@ const norm = (a) => {
 };
 const circle = (x, z, r, n, a0 = 0) => Array.from({ length: n }, (_, j) => [x + Math.cos(a0 + (j / n) * 6.2832) * r, z + Math.sin(a0 + (j / n) * 6.2832) * r]);
 
-// Vertices in a growing typed array: movers make no garbage.
+// Vertices in a growing typed array.
+// 40 bytes a vertex: a phone's browser pays for uploads by the byte.
 class Buf {
   constructor(size) {
     this.a = new Float32Array(size);
+    this.b = new Uint8ClampedArray(this.a.buffer);
     this.n = 0;
   }
 
@@ -176,14 +176,17 @@ class Buf {
       const grown = new Float32Array(this.a.length * 2);
       grown.set(this.a);
       this.a = grown;
+      this.b = new Uint8ClampedArray(grown.buffer);
     }
-    const a = this.a;
-    let i = this.n;
-    a[i++] = p[0]; a[i++] = p[1]; a[i++] = p[2];
-    a[i++] = n[0]; a[i++] = n[1]; a[i++] = n[2];
-    a[i++] = c[0]; a[i++] = c[1]; a[i++] = c[2];
-    a[i++] = u; a[i++] = v; a[i++] = kind; a[i++] = ao; a[i++] = seed;
-    this.n = i;
+    const { a, b } = this;
+    const i = this.n;
+    a[i] = p[0]; a[i + 1] = p[1]; a[i + 2] = p[2];
+    for (let k = 0; k < 3; k += 1) {
+      b[i * 4 + 12 + k] = Math.round(n[k] * 127) & 255;
+      b[i * 4 + 16 + k] = c[k] * 255;
+    }
+    a[i + 5] = u; a[i + 6] = v; a[i + 7] = kind; a[i + 8] = ao; a[i + 9] = seed;
+    this.n = i + FLOATS;
   }
 }
 
@@ -194,6 +197,14 @@ class Mesh {
     this.seed = 0;
     this.ao = FREE;
     this.fix = null;
+  }
+
+  // Triangles `from` to `to`, then `l` floats of lines.
+  data(from = 0, to = this.t.n, l = this.l.n) {
+    const d = new Float32Array(to - from + l);
+    d.set(this.t.a.subarray(from, to));
+    d.set(this.l.a.subarray(0, l), to - from);
+    return d;
   }
 
   // A quad facing away from `inside`; `ao`: openness along a-b, c-d.
@@ -210,7 +221,7 @@ class Mesh {
   tri(a, b, c, col, toward = UP) {
     let n = norm(cross(sub(b, a), sub(c, a)));
     if (dot(n, toward) < 0) n = [-n[0], -n[1], -n[2]];
-    for (const p of [a, b, c]) this.t.put(p, n, col, 0, 0, K.plain, 1, 0);
+    for (const p of [a, b, c]) this.t.put(p, n, col, 0, 0, K.plain, 1, this.seed);
   }
 
   // A flat polygon from a ring.
@@ -221,9 +232,8 @@ class Mesh {
     }
   }
 
-  // A rounded mass of leaves, flat-toned.
-  lobe(x, y, z, r, tall, col) {
-    const N = 7;
+  // A rounded mass of leaves, flat-toned, of `N` sides; `u` -1 marks bare twigs for the shader.
+  lobe(x, y, z, r, tall, col, N = 7, u = 0) {
     const row = (lat) => Array.from({ length: N }, (_, i) => {
       const a = (i / N) * 6.2832 + lat;
       const k = Math.cos(lat) * r;
@@ -233,7 +243,7 @@ class Mesh {
     const open = [0.2, 0.5, 1, 1];
     const put = (j, i) => {
       const p = rows[j][i % rows[j].length];
-      this.t.put(p, norm([p[0] - x, (p[1] - y) / tall, p[2] - z]), col, 0, 0, K.leaf, open[j], this.seed);
+      this.t.put(p, norm([p[0] - x, (p[1] - y) / tall, p[2] - z]), col, u, 0, K.leaf, open[j], this.seed);
     };
     for (let i = 0; i < N; i += 1) {
       put(0, 0); put(1, i); put(1, i + 1);
@@ -289,8 +299,8 @@ class Mesh {
   }
 
   line(a, b, col) {
-    this.l.put(a, UP, col, 0, 0, K.plain, 1, 0);
-    this.l.put(b, UP, col, 0, 0, K.plain, 1, 0);
+    this.l.put(a, UP, col, 0, 0, K.plain, 1, this.seed);
+    this.l.put(b, UP, col, 0, 0, K.plain, 1, this.seed);
   }
 
   // A glowing cube, `day` and `night` strong.
@@ -327,10 +337,11 @@ function buildTorso(m) {
   const BLOCKS = 9;
   const crown = 6;
   const h = (H - crown) / BLOCKS;
-  const band = 1.7;
+  const band = 1.1;
   const floor = (h - band) / 5;
   const white = hex('#ece9df');
-  const dark = hex('#2a2f3a');
+  // The joints are dark glass in shade, not voids: grey enough to read as a seam.
+  const dark = hex('#59606c');
   const steel = hex('#f7f7f1');
   const angle = (y) => rad(-42 + (90 * y) / H);
   const plan = [[-14, -15], [11, -15], [22, 0], [11, 15], [-14, 15]];
@@ -365,7 +376,7 @@ function buildTorso(m) {
     cover(ringAt(y0, 0.93), y0, ringAt(y0 + band, 0.93), y0 + band);
     cover(ringAt(y0 + band), y0 + band, ringAt(y0 + h), y0 + h);
     // The recess between blocks lies in shade.
-    m.ao = [0.25, 0.25];
+    m.ao = [0.5, 0.5];
     m.wall(ringAt(y0, 0.93), y0, ringAt(y0 + band, 0.93), y0 + band, dark);
     // The block's underside, seen from the quay.
     m.cap(ringAt(y0 + band), y0 + band, dark, K.plain, [0, -1, 0]);
@@ -375,6 +386,9 @@ function buildTorso(m) {
       m.wall(ringAt(a), a, ringAt(a + floor), a + floor, white, kindFor, [(k * 5 + i) * floor, (k * 5 + i + 1) * floor]);
     }
     m.cap(ringAt(y0 + h), y0 + h, dark);
+    // White frames up the corners show the twist.
+    const up = ringAt(y0 + h, 1.004);
+    ringAt(y0 + band, 1.004).forEach((p, i) => m.line([p[0], y0 + band, p[1]], [up[i][0], y0 + h, up[i][1]], steel));
   }
   m.ao = FREE;
   const top = H - crown;
@@ -472,11 +486,12 @@ function buildBoardwalk(m) {
     for (let k = 1; k <= 3; k += 1) {
       const o = (k - 1) * 2.4;
       const top = y - 0.6 * (k - 1);
-      m.quad([xa, top - 0.6, za + o], [xb, top - 0.6, zb + o], [xb, top, zb + o], [xa, top, za + o], riser, K.plain, ZERO, [0, 0, -14000], [0.3, 1]);
+      m.quad([xa, top - 0.6, za + o], [xb, top - 0.6, zb + o], [xb, top, zb + o], [xa, top, za + o], riser, K.deck, [ua, 2 + o / 3, ub, 2 + o / 3], [0, 0, -14000], [0.3, 1]);
       strip(o, o + 2.4, top - 0.6);
     }
-    m.quad([xa, 0, za + 7.2], [xb, 0, zb + 7.2], [xb, 0.6, zb + 7.2], [xa, 0.6, za + 7.2], riser, K.plain, ZERO, [0, 0, -14000]);
-    // The deck shader pools light every 38 m; lamps stand in them.
+    m.quad([xa, 0, za + 7.2], [xb, 0, zb + 7.2], [xb, 0.6, zb + 7.2], [xa, 0.6, za + 7.2], riser, K.deck, [ua, 4.4, ub, 4.4], [0, 0, -14000]);
+    // The deck shader pools light every 38 m; lamps stand in them, and the steps' faces, seen from the water, take
+    // the pools at a third of their distance.
     for (let u = Math.ceil((ua - 19) / 38) * 38 + 19; u < ub; u += 38) {
       const x = xa + ((xb - xa) * (u - ua)) / (ub - ua);
       const z = coastZ(x) - 6;
@@ -507,7 +522,12 @@ function buildHarbour(m) {
   // A seed's quarter picks the wall: render, brick, timber, or glazed balconies.
   const made = new Map([...[2, 3, 6, 10].map((i) => [walls[i], 1]), ...[4, 8].map((i) => [walls[i], 2])]);
   const taken = [[46, 34, 30], [-44, 8, 24]];
-  const free = (x, z, r) => !near(x, z, 58 + r, 0, 10) && taken.every(([bx, bz, br]) => !near(x, z, br + r, bx, bz));
+  const free = (x, z, r) => {
+    if (near(x, z, 58 + r, 0, 10)) return false;
+    // Asked some thousand times over a thousand plots: a plain loop.
+    for (const t of taken) if ((x - t[0]) ** 2 + (z - t[1]) ** 2 < (t[2] + r) ** 2) return false;
+    return true;
+  };
 
   // One Bo01 house, its roof unlike its neighbours'.
   const block = (x, z, w, d, floors, col, yaw, close) => {
@@ -583,22 +603,21 @@ function buildHarbour(m) {
       taken.push([x, z, 1]);
     }
   }
-  // Two cranes: still being built.
+  // Two cranes: still being built. Flat-topped, of beams a picture pixel thick or more, so far off nothing of them
+  // thins away and leaves a part hanging in the air.
   const crane = (x, z, tall, reach, yaw) => {
     const orange = hex('#e8863a');
     m.post(x, Y, z, 3, 3, tall, 2.4, 2.4, orange);
     const c = Math.cos(yaw);
     const s = Math.sin(yaw);
-    const tip = [x + c * reach, tall + 1.5, z + s * reach];
-    const back = [x - c * reach * 0.3, tall + 1.5, z - s * reach * 0.3];
-    const peak = [x, tall + 11, z];
-    m.line(back, tip, orange);
-    m.line([back[0], back[1] - 1, back[2]], [tip[0], tip[1] - 1, tip[2]], orange);
-    m.line(peak, tip, orange);
-    m.line(peak, back, orange);
-    m.post(back[0], tall - 3, back[2], 4, 4, tall + 1, 4, 4, hex('#6a7078'));
-    m.line([x + c * reach * 0.7, tall + 1, z + s * reach * 0.7], [x + c * reach * 0.7, tall - 26, z + s * reach * 0.7], hex('#2a2f3a'));
-    m.light(peak[0], peak[1], peak[2], 1.6, RED, 0.2, 1);
+    const along = (k, y, w, h, d, col) => m.box(x + c * reach * k, y, z + s * reach * k, w, h, d, col, { yaw });
+    // Jib and counter-jib are one beam over the cab; the weights hang under its back end.
+    along(0.35, tall, reach * 1.3, 2, 2, orange);
+    along(0, tall - 3, 3.4, 3, 3.4, hex('#e8e4da'));
+    along(-0.24, tall - 3.5, 5, 3.5, 3.5, hex('#6a7078'));
+    along(0.7, tall - 26, 0.6, 26, 0.6, hex('#2a2f3a'));
+    along(0.7, tall - 28, 1.6, 2, 1.6, hex('#e0b23a'));
+    m.light(x + c * reach, tall + 2.6, z + s * reach, 1.6, RED, 0.2, 1);
   };
   crane(-290, -120, 48, 40, rad(12));
   crane(330, -210, 74, 50, rad(160));
@@ -608,7 +627,7 @@ function buildHarbour(m) {
 // The season: foliage, autumn turn (a beech hedge stays copper), new green.
 function season(doy) {
   const ramp = (a, b) => smooth(clamp((doy - a) / (b - a), 0, 1));
-  return { leaf: ramp(105, 140) * (1 - 0.92 * ramp(285, 330)), turn: doy < 110 ? 1 : ramp(250, 295), fresh: 1 - ramp(125, 170) };
+  return { leaf: ramp(105, 140) * (1 - 0.92 * ramp(275, 318)), turn: doy < 110 ? 1 : ramp(250, 295), fresh: 1 - ramp(125, 170) };
 }
 
 // Autumn as one ramp, gold to rust; each tree its own step.
@@ -619,16 +638,14 @@ const TREES = {
   lime: [11, 4, 0.26, '#4b4039', '#5f7d49', 0, [[0, 0.42, 0.27, 1.15], [0, 0.8, 0.17, 1.3]]],
   oak: [10, 3, 0.24, '#453c35', '#516f43', 2, [[-0.2, 0.4, 0.22, 0.85], [0.2, 0.46, 0.23, 0.85], [0, 0.74, 0.25, 0.8]]],
   maple: [9, 3, 0.26, '#4f433b', '#64823f', 3, [[0, 0.56, 0.3, 0.95], [0.22, 0.28, 0.16, 0.9]]],
-  birch: [11, 4, 0.34, '#e6e2d8', '#7b9556', 0, [[0.05, 0.22, 0.12, 1.3], [-0.06, 0.56, 0.13, 1.3], [0.03, 0.88, 0.1, 1.4]]],
+  birch: [11, 4, 0.34, '#a59e94', '#7b9556', 0, [[0.05, 0.22, 0.12, 1.3], [-0.06, 0.56, 0.13, 1.3], [0.03, 0.88, 0.1, 1.4]]],
   poplar: [16, 5, 0.12, '#5a5148', '#58774a', 1, [[0, 0.5, 0.1, 4.2]]],
-  pine: [11, 4, 0.4, '#8d5d43', '#35584a', 0, []],
+  pine: [11, 4, 0.16, '#6b4a39', '#35584a', 0, []],
 };
 
 // Trees as planted; `free`: no house there.
 function buildPlanting(m, doy, free) {
   const rng = rngFrom(8123);
-  // Seasonal detail has its own sequence, so no tree moves day to day.
-  const fine = rngFrom(4409);
   const pick = (a) => a[Math.floor(rng() * a.length)];
   const S = season(doy);
   const Y = GROUND;
@@ -647,35 +664,40 @@ function buildPlanting(m, doy, free) {
     const kept = clamp(S.leaf + (rng() - 0.5) * 0.55, 0, 1);
     const leaf = shade(mix3(mix3(hex(green), fresh, S.fresh * 0.5), AUTUMN[(turn + (rng() < 0.3 ? 1 : 0)) % 4], clamp(S.turn + (rng() - 0.5) * 0.5, 0, 1)), 0.12);
     const wide = 0.25 + h * 0.02;
+    const bare = kind !== 'pine' && kept <= 0.34;
     m.blot(x, Y + 0.3, z, h * 0.2 + 1, ground);
-    m.post(x, Y, z, wide, wide, fork + (top - fork) * 0.5, 0.12, 0.12, hex(bark));
+    m.post(x, Y, z, wide, wide, bare ? fork + 0.4 : fork + (top - fork) * 0.5, bare ? wide * 0.7 : 0.12, bare ? wide * 0.7 : 0.12, hex(bark));
     m.seed = rng();
     if (kind === 'pine') {
-      // Three cone skirts.
-      for (let i = 0; i < 3; i += 1) {
-        const y0 = fork + (top - fork) * i * 0.3;
-        m.wall(circle(x, z, h * (0.2 - 0.045 * i), 7, a0), y0, circle(x, z, 0.05, 7, a0), y0 + (top - fork) * 0.44, hex(green), () => K.leaf);
+      // A spruce: four tiers narrowing to a point, each a little lighter as it nears the sky.
+      for (let i = 0; i < 4; i += 1) {
+        const y0 = fork + (top - fork) * i * 0.23;
+        m.wall(circle(x, z, h * (0.2 - 0.042 * i), 8, a0 + i), y0, circle(x, z, 0.05, 8, a0 + i), y0 + (top - fork) * (0.42 - 0.05 * i), mix3(hex(green), hex('#6f9a78'), i * 0.09), () => K.leaf);
       }
       return;
     }
-    if (kept > 0.34) {
+    if (!bare) {
       for (const [off, up, r, tall] of crown) m.lobe(x + Math.cos(a0) * off * h, fork + (top - fork) * up, z + Math.sin(a0) * off * h, r * h, tall, leaf);
       return;
     }
-    // Bare: forked boughs, last leaves at the tips.
-    const twig = mix3(hex(bark), hex('#8a7480'), 0.5);
-    const lean = kind === 'poplar' ? 0.18 : kind === 'birch' ? 0.45 : 0.85;
-    for (let i = -2; i <= 2; i += 1) {
-      const b = i * 0.42 * lean;
-      const l = (top - fork) * (1 - 0.12 * Math.abs(i));
-      const a = a0 + (i & 1) * 1.57;
-      const at = (ang, len) => [x + Math.cos(a) * Math.sin(ang) * len, fork + Math.cos(ang) * len, z + Math.sin(a) * Math.sin(ang) * len];
-      const tip = at(b, l * 0.62);
-      m.line([x, fork - h * 0.06, z], tip, hex(bark));
-      for (const t of [-0.3, 0.26]) m.line(tip, at(b + t * lean, l), twig);
-      if (fine() < kept * 2.2) m.lobe(...at(b + 0.26 * lean, l * 0.95), h * 0.055, 1, leaf);
+    // Bare: the trunk forks into a leader and one or two limbs, each carrying a loose mass of twigs; the masses
+    // overlap into one lumpy crown, and the limbs, a picture pixel thick or more, tie it to the trunk at any distance.
+    // The kind sets the limbs' lean and the crown's shape; neighbours take turns in limbs and spread.
+    const v = (row += 1) % 3;
+    const lean = { poplar: 0.1, birch: 0.25, lime: 0.4, maple: 0.6, oak: 0.85 }[kind];
+    const R = Math.max(...crown.map((c) => c[2])) * h * (0.9 + 0.1 * v);
+    const tall = crown[0][3];
+    const cy = top - R * tall * 0.75;
+    const twig = mix3(mix3(hex(bark), hex('#8f7f70'), 0.65), leaf, kept);
+    for (let i = 0, n = 2 + (v & 1); i < n; i += 1) {
+      const a = a0 + (i / n) * 6.28 + v;
+      const d = i ? Math.min(R * 0.6, (cy - fork) * Math.tan(lean)) : 0;
+      const e = [x + Math.cos(a) * d, i ? cy - R * tall * 0.25 : cy, z + Math.sin(a) * d];
+      m.wall(circle(x, z, wide * 0.32, 3, a), fork, circle(e[0], e[2], wide * 0.2, 3, a), e[1], hex(bark));
+      m.lobe(e[0], e[1], e[2], R * (i ? 0.62 : 0.8), tall, twig, 5, -1);
     }
   };
+  let row = 0;
 
   // A pollarded willow: short trunk, a burst of shoots.
   const willow = (x, z, ground) => {
@@ -751,6 +773,7 @@ function buildPlanting(m, doy, free) {
   // Ribersborg: sand into the water, marram on it, reeds in the shallows.
   const sand = hex('#d9caa2');
   const reed = mix3(hex('#7d9550'), hex('#c4a35c'), S.turn);
+  const marram = mix3(hex('#8ea06a'), hex('#bfae74'), S.turn);
   for (const [xa, xb] of [[-1500, QUAY[0]], [QUAY[1], 1080]]) {
     for (const [x0, x1] of shore(xa, xb)) {
       const z0 = coastZ(x0);
@@ -768,7 +791,7 @@ function buildPlanting(m, doy, free) {
         m.line([x, 0, z + out], [x + (rng() - 0.5) * 0.8, 1.5 + rng() * 1.4, z + out], shade(reed, 0.3));
       } else if (bed < -0.5) {
         const back = 1 + rng() * 9;
-        m.line([x, Y + 0.1, z - back], [x + (rng() - 0.5) * 0.7, Y + 0.6 + rng() * 0.6, z - back], shade(mix3(hex('#8ea06a'), hex('#bfae74'), S.turn), 0.3));
+        m.line([x, Y + 0.1, z - back], [x + (rng() - 0.5) * 0.7, Y + 0.6 + rng() * 0.6, z - back], shade(marram, 0.3));
       }
     }
   }
@@ -844,7 +867,7 @@ function buildPier(m) {
   const T = 1.5;
   const deck = (s0, s1, w) => {
     const [cx, cz] = at((s0 + s1) / 2, 0);
-    m.box(cx, T - 0.45, cz, s1 - s0, 0.45, w * 2, side, { yaw });
+    m.box(cx, T - 0.45, cz, s1 - s0, 0.45, w * 2, side, { yaw, kind: K.deck });
     const [a, b, c, e] = [at(s0, -w), at(s1, -w), at(s1, w), at(s0, w)];
     m.quad([a[0], T + 0.03, a[1]], [b[0], T + 0.03, b[1]], [c[0], T + 0.03, c[1]], [e[0], T + 0.03, e[1]], wood, K.deck, [s0, -w, s1, w], BELOW);
     for (let t = s0 + 1; t < s1; t += 7.5) {
@@ -883,7 +906,7 @@ function buildPier(m) {
   const [hx, hz] = at(-8.2, -4.2);
   m.post(hx, T, hz, 0.34, 0.34, T + 2.6, 0.22, 0.22, WHITE);
   m.light(hx, T + 2.6, hz, 0.36, hex('#48e07a'), 0.25, 1);
-  m.line([FLAG[0], T, FLAG[1]], [FLAG[0], FLAG_TOP, FLAG[1]], WHITE);
+  m.post(FLAG[0], T, FLAG[1], 0.24, 0.24, FLAG_TOP, 0.14, 0.14, WHITE);
   boat(m, ...at(-3.5, -7), yaw + Math.PI, 5.6, 2.1, hex('#3f6f6b'), false);
   boat(m, ...at(44, 5), yaw + Math.PI, 7.4, 2.6, WHITE, true);
   boat(m, ...at(96, -3.6), yaw, 5.2, 1.9, hex('#b8452f'), false);
@@ -1154,30 +1177,30 @@ const SKIN = hex('#e3b596');
 const FLAG_BLUE = hex('#1f5fa8');
 const FLAG_GOLD = hex('#f2c230');
 
-// A bird at p along dir, wings up `flap` radians; a gull by default.
-function bird(m, p, dir, flap, s = 1, col = WHITE) {
-  const nose = [p[0] + dir[0] * 0.5 * s, p[1], p[2] + dir[2] * 0.5 * s];
-  const tail = [p[0] - dir[0] * 0.5 * s, p[1], p[2] - dir[2] * 0.5 * s];
-  for (const side of [1, -1]) {
-    const tip = [p[0] + dir[2] * side * 0.95 * s * Math.cos(flap), p[1] + 0.95 * s * Math.sin(flap), p[2] - dir[0] * side * 0.95 * s * Math.cos(flap)];
-    m.tri(nose, tip, tail, col);
-  }
+// A bird's wings, turned up `flap` radians.
+function wings(part, m, x, y, z, yaw, flap, s = 1, col = WHITE, size = 1) {
+  for (const side of [1, -1]) part(() => m.tri([0.5 * s, 0, 0], [0, 0, -side * 0.95 * s], [-0.5 * s, 0, 0], col), x, y, z, yaw, side * flap, 1, 1, size);
 }
 
 // Occasional traffic, once the weather's module brings it.
 let traffic = null;
-export { bird, bridgeAt, BR, hex, norm, WHITE, RED, IRON, K, ZERO, BELOW };
+export { wings, bridgeAt, BR, hex, norm, WHITE, RED, IRON, K, ZERO, BELOW };
 
-// What moves at t seconds; `still` draws only the blades. `skein`: geese south-west 1, back -1, none 0.
-function buildMovers(m, t, night, still, skein) {
-  for (const [x, z, ph] of TURBINES) {
-    for (let k = 0; k < 3; k += 1) {
-      const a = ph + (still ? 0 : t * 1.05) + (k * 2 * Math.PI) / 3;
-      m.line([x - 5.6, HUB, z], [x - 5.6, HUB + Math.sin(a) * BLADE, z + Math.cos(a) * BLADE], WHITE);
+// What moves at t seconds: parts built at rest when `m` is given, posed by `put`. `still` stands the blades;
+// `skein`: geese south-west 1, back -1, none 0.
+function movers(m, t, still, skein, put) {
+  let k = 0;
+  const part = (shape, ...at) => {
+    if (m) {
+      m.seed = -1 - k;
+      shape();
     }
+    put(k++, ...at);
+  };
+  for (const [x, z, ph] of TURBINES) {
+    for (let j = 0; j < 3; j += 1) part(() => m.line(ZERO, [0, 0, BLADE], WHITE), x - 5.6, HUB, z, 0, -ph - (still ? 0 : t * 1.05) - j * 2.0944);
   }
   if (still) return;
-  const lamps = night > 0.2;
   const { LEN, DEPTH, yaw } = BR;
 
   // The train on the lower deck, three cars each way.
@@ -1186,14 +1209,11 @@ function buildMovers(m, t, night, still, skein) {
     const run = ((t * v + ph * lap) % lap) - 200;
     for (let c = 0; c < 3; c += 1) {
       const s = dir > 0 ? run - c * 27 : LEN - run + c * 27;
-      if (s < 0 || s > LEN) continue;
       const [x, z] = bridgeAt(s, off);
-      const y = deckY(s) - DEPTH + 0.8;
-      m.box(x, y, z, 26, 4.4, 3.2, hex('#e4e6e2'), { yaw, kind: K.train, v: [0, 1], roof: hex('#8d9499') });
-      if (c === 0) {
-        const [hx, hz] = bridgeAt(s + dir * 13.4, off);
-        m.light(hx, y + 1.2, hz, 1.3, WHITE, 0.6, 1);
-      }
+      part(() => {
+        m.box(0, 0, 0, 26, 4.4, 3.2, hex('#e4e6e2'), { kind: K.train, v: [0, 1], roof: hex('#8d9499') });
+        if (!c) m.light(dir * 13.4, 1.2, 0, 1.3, WHITE, 0.6, 1);
+      }, x, deckY(s) - DEPTH + 0.8, z, yaw, 0, 1, 1, +(s >= 0 && s <= LEN));
     }
   }
   // Traffic, lit after dark.
@@ -1201,79 +1221,66 @@ function buildMovers(m, t, night, still, skein) {
     const s = (((c.s + c.dir * c.v * t) % LEN) + LEN) % LEN;
     const len = c.long ? 13 : 4.6;
     const [x, z] = bridgeAt(s, c.dir * c.lane);
-    const y = deckY(s) + 0.15;
-    m.box(x, y, z, len, c.long ? 3.5 : 1.5, 2.1, c.col, { yaw });
-    if (lamps) {
-      const [fx, fz] = bridgeAt(s + c.dir * len * 0.5, c.dir * c.lane);
-      const [bx, bz] = bridgeAt(s - c.dir * len * 0.5, c.dir * c.lane);
-      m.light(fx, y + 0.4, fz, 1.1, WHITE, 0, 1);
-      m.light(bx, y + 0.4, bz, 1, RED, 0, 0.9);
-    }
+    part(() => {
+      m.box(0, 0, 0, len, c.long ? 3.5 : 1.5, 2.1, c.col);
+      m.light(c.dir * len * 0.5, 0.4, 0, 1.1, WHITE, 0, 1);
+      m.light(-c.dir * len * 0.5, 0.4, 0, 1, RED, 0, 0.9);
+    }, x, deckY(s) + 0.15, z, yaw);
   }
   // Sailboats.
   for (const [cx, cz, rx, rz, w, ph, sail] of BOATS) {
     const a = ph + t * w;
-    const x = cx + Math.cos(a) * rx;
-    const z = cz + Math.sin(a) * rz;
-    const dir = norm([-Math.sin(a) * rx * Math.sign(w), 0, Math.cos(a) * rz * Math.sign(w)]);
-    const y = 0.5 + 0.2 * Math.sin(t * 1.3 + ph);
-    m.box(x, y - 0.5, z, 8.4, 1.4, 2.5, WHITE, { yaw: Math.atan2(dir[2], dir[0]) });
-    const foot = [x + dir[0] * 0.6, y + 0.9, z + dir[2] * 0.6];
-    const head = [foot[0], y + 12, foot[2]];
-    const side = [dir[2], 0.2, -dir[0]];
-    m.tri(foot, head, [x - dir[0] * 4, y + 1.6, z - dir[2] * 4], hex(sail), side);
-    m.tri([foot[0], y + 10, foot[2]], [x + dir[0] * 4.3, y + 0.9, z + dir[2] * 4.3], [foot[0] + dir[0] * 0.4, y + 1.2, foot[2] + dir[2] * 0.4], hex(sail), side);
-    m.line(foot, head, hex('#5d4a3c'));
-    if (lamps) m.light(head[0], head[1], head[2], 0.7, WHITE, 0, 0.8);
+    part(() => {
+      m.box(0, -0.5, 0, 8.4, 1.4, 2.5, WHITE);
+      const side = [0, 0.2, -1];
+      m.tri([0.6, 0.9, 0], [0.6, 12, 0], [-4, 1.6, 0], hex(sail), side);
+      m.tri([0.6, 10, 0], [4.3, 0.9, 0], [1, 1.2, 0], hex(sail), side);
+      m.line([0.6, 0.9, 0], [0.6, 12, 0], hex('#5d4a3c'));
+      m.light(0.6, 12, 0, 0.7, WHITE, 0, 0.8);
+    }, cx + Math.cos(a) * rx, 0.5 + 0.2 * Math.sin(t * 1.3 + ph), cz + Math.sin(a) * rz, Math.atan2(Math.cos(a) * rz * w, -Math.sin(a) * rx * w));
   }
   // Gulls circling, flapping in bursts.
   for (const g of GULLS) {
     const a = g.ph + t * g.sp;
-    const p = [g.home[0] + Math.cos(a) * g.R, g.home[1] + g.up + Math.sin(a * 1.7 + g.ph) * 4, g.home[2] + Math.sin(a) * g.R * 0.6];
-    const dir = norm([-Math.sin(a) * Math.sign(g.sp), 0, Math.cos(a) * 0.6 * Math.sign(g.sp)]);
-    bird(m, p, dir, Math.sin(t * 9 + g.ph * 5) * (Math.sin(t * 0.5 + g.ph) > 0.2 ? 0.75 : 0.12) + 0.15);
+    wings(part, m, g.home[0] + Math.cos(a) * g.R, g.home[1] + g.up + Math.sin(a * 1.7 + g.ph) * 4, g.home[2] + Math.sin(a) * g.R * 0.6, Math.atan2(Math.cos(a) * 0.6 * g.sp, -Math.sin(a) * g.sp), Math.sin(t * 9 + g.ph * 5) * (Math.sin(t * 0.5 + g.ph) > 0.2 ? 0.75 : 0.12) + 0.15);
   }
   // The harbour light flashes.
-  if (lamps) m.light(LIGHT[0], 13.2, LIGHT[1], 2.1, WHITE, 0, Math.max(0, Math.sin(t * 1.1)) ** 8);
+  part(() => m.light(0, 0, 0, 2.1, WHITE, 0, 1), LIGHT[0], 13.2, LIGHT[1], 0, 0, 1, Math.max(0, Math.sin(t * 1.1)) ** 8);
   // Two gulls on the rail sometimes circle out and land again.
   PERCH.forEach(([x, z], i) => {
     const u = ((t / 17 + i * 0.43) % 1) * 2.6 - 1.6;
-    if (u < 0) {
-      m.box(x, 2.55, z, 0.52, 0.3, 0.26, WHITE);
-      m.box(x + 0.22, 2.8, z, 0.17, 0.17, 0.17, WHITE);
-      return;
-    }
     const a = u * 2 * Math.PI;
     const R = 16 + i * 7;
-    bird(m, [x + Math.sin(a) * R, 2.8 + (1 - Math.cos(a)) * 4, z + (1 - Math.cos(a)) * R * 0.5], norm([Math.cos(a), 0, Math.sin(a) * 0.5]), Math.sin(t * 9 + i) * 0.7 + 0.15);
+    part(() => {
+      m.box(0, 0, 0, 0.52, 0.3, 0.26, WHITE);
+      m.box(0.22, 0.25, 0, 0.17, 0.17, 0.17, WHITE);
+    }, x, 2.55, z, 0, 0, 1, 1, +(u < 0));
+    wings(part, m, x + Math.sin(a) * R, 2.8 + (1 - Math.cos(a)) * 4, z + (1 - Math.cos(a)) * R * 0.5, Math.atan2(Math.sin(a) * 0.5, Math.cos(a)), Math.sin(t * 9 + i) * 0.7 + 0.15, 1, WHITE, +(u >= 0));
   });
-  // The flag, streaming in a west wind.
-  for (let k = 0; k < 4; k += 1) {
-    const at = (j) => [FLAG[0] + j * 0.5, FLAG_TOP - 0.03 * j * j, FLAG[1] + Math.sin(t * 3.4 - j * 1.3) * 0.09 * j];
-    const [x0, y0, z0] = at(k);
-    const [x1, y1, z1] = at(k + 1);
-    [[0, 0.5], [0.5, 0.75], [0.75, 1.25]].forEach(([high, low], band) => {
-      m.quad([x0, y0 - low, z0], [x1, y1 - low, z1], [x1, y1 - high, z1], [x0, y0 - high, z0], k === 1 || band === 1 ? FLAG_GOLD : FLAG_BLUE, K.plain, ZERO, [x0, y0, z0 - 50]);
-    });
+  // The flag, streaming in a west wind: its edges are parts, turned with the cloth.
+  const wave = (i) => Math.sin(t * 3.4 - i * 1.3) * 0.09 * i;
+  for (let j = 0; j < 5; j += 1) {
+    part(() => j < 4 && [[0, 0.5], [0.5, 0.75], [0.75, 1.25]].forEach(([high, low], band) => {
+      const c = [[j, low], [j + 1, low], [j + 1, high], [j, high]];
+      for (const q of [0, 1, 2, 0, 2, 3]) m.t.put([0, FLAG_TOP - 0.03 * c[q][0] ** 2 - c[q][1], 0], [0, 0, 1], j === 1 || band === 1 ? FLAG_GOLD : FLAG_BLUE, 0, 0, K.plain, 1, m.seed + j - c[q][0]);
+    }), FLAG[0] + j * 0.5, 0, FLAG[1] + wave(j), Math.atan2(wave(Math.min(j + 1, 4)) - wave(Math.max(j - 1, 0)), j % 4 ? 1 : 0.5));
   }
   // Two cyclists and two walkers on the promenade.
   const span = QUAY[1] - QUAY[0] - 60;
   for (const [ph, v, off, col] of PEOPLE) {
     const u = (t * v + ph * span * 2) % (span * 2);
-    const way = u < span ? 1 : -1;
-    const x = QUAY[0] + 30 + (way > 0 ? u : span * 2 - u);
-    const z = coastZ(x) - off;
-    const turn = Math.atan2(coastZ(x + 1) - coastZ(x), 1);
-    const y = GROUND + 0.05;
+    const x = QUAY[0] + 30 + (u < span ? u : span * 2 - u);
     const rides = v > 2;
-    if (rides) m.box(x, y, z, 1.8, 0.7, 0.16, IRON, { yaw: turn });
-    m.box(x, y + (rides ? 0.6 : 0), z, 0.5, rides ? 1 : 1.35 + 0.06 * Math.sin(t * 7 + ph * 9), 0.5, col, { yaw: turn });
-    m.box(x + (rides ? way * 0.2 : 0), y + (rides ? 1.6 : 1.4), z, 0.32, 0.32, 0.32, SKIN, { yaw: turn });
-    if (rides && lamps) m.light(x + way, y + 0.9, z, 0.3, WHITE, 0, 1);
+    part(() => {
+      if (rides) m.box(0, 0, 0, 1.8, 0.7, 0.16, IRON);
+      m.box(0, rides ? 0.6 : 0, 0, 0.5, rides ? 1 : 1.35, 0.5, col);
+      m.box(rides ? 0.2 : 0, rides ? 1.6 : 1.4, 0, 0.32, 0.32, 0.32, SKIN);
+      if (rides) m.light(1, 0.9, 0, 0.3, WHITE, 0, 1);
+    }, x, GROUND + 0.05, coastZ(x) - off, Math.atan2(coastZ(x + 1) - coastZ(x), 1) + (u < span ? 0 : Math.PI), 0, rides ? 1 : 1 + (0.06 / 1.35) * Math.sin(t * 7 + ph * 9));
   }
   // The crown's aviation light.
-  if (lamps) m.light(0, 190.5, 0, 1.5, RED, 0, 0.6 + 0.4 * Math.sin(t * 2.2));
-  traffic?.(m, t, lamps, skein);
+  part(() => m.light(0, 0, 0, 1.5, RED, 0, 1), 0, 190.5, 0, 0, 0, 1, 0.6 + 0.4 * Math.sin(t * 2.2));
+  traffic?.(part, m, t, skein);
 }
 
 /* ------------------------------------------------------------ Camera stops */
@@ -1317,8 +1324,8 @@ function pathFor(aspect, ui) {
 
 const newView = () => ({ pos: [0, 0, 0], yaw: 0, fl: 1, shift: 0, f: [0, 0, -1], r: [1, 0, 0] });
 
-// The camera at page `p`; `lean` shifts it a few metres.
-function viewAt(path, p, lean, out) {
+// The camera at page `p`.
+function viewAt(path, p, out) {
   const i = clamp(Math.floor(p), 0, STOPS.length - 2);
   const t = clamp(p - i, 0, 1);
   const u = 1 - t;
@@ -1327,15 +1334,14 @@ function viewAt(path, p, lean, out) {
   const b = (t * t * t - t) / 6;
   const k = i * 4;
   const yaw = knots[k + 3] * u + knots[k + 7] * t + a * bend[k + 3] + b * bend[k + 7];
-  const side = lean[0] * 5;
   out.yaw = yaw;
   out.fl = path.fl;
   out.shift = path.shift;
   out.f[0] = Math.sin(yaw); out.f[2] = -Math.cos(yaw);
   out.r[0] = Math.cos(yaw); out.r[2] = Math.sin(yaw);
-  out.pos[0] = knots[k] * u + knots[k + 4] * t + a * bend[k] + b * bend[k + 4] + out.r[0] * side;
-  out.pos[1] = knots[k + 1] * u + knots[k + 5] * t + a * bend[k + 1] + b * bend[k + 5] - lean[1] * 1.5;
-  out.pos[2] = knots[k + 2] * u + knots[k + 6] * t + a * bend[k + 2] + b * bend[k + 6] + out.r[2] * side;
+  out.pos[0] = knots[k] * u + knots[k + 4] * t + a * bend[k] + b * bend[k + 4];
+  out.pos[1] = knots[k + 1] * u + knots[k + 5] * t + a * bend[k + 1] + b * bend[k + 5];
+  out.pos[2] = knots[k + 2] * u + knots[k + 6] * t + a * bend[k + 2] + b * bend[k + 6];
   return out;
 }
 
@@ -1378,11 +1384,21 @@ function lightMatrix(sun, center, radius) {
 
 /* ------------------------------------------------------------------ Shaders */
 
+// A mover's part (seed -1 - k) is posed, normal unrolled; a lamp dark by day lights only with the town's.
 const SCENE_VS = `#version 300 es
 layout(location=0) in vec3 aP; layout(location=1) in vec3 aN; layout(location=2) in vec3 aC; layout(location=3) in vec3 aF; layout(location=4) in vec2 aA;
-uniform mat4 uVP; uniform float uMirror;
+uniform mat4 uVP; uniform float uMirror,uNight; uniform highp sampler2D uPose;
 out vec3 vP; out vec3 vN; out vec3 vC; out vec3 vF; out vec2 vA;
-void main(){ vP=aP; vN=aN; vC=aC; vF=aF; vA=aA; vec3 p=aP; p.y*=uMirror; gl_Position=uVP*vec4(p,1.); }`;
+void main(){
+  vec3 p=aP,n=aN; vF=aF;
+  if(aA.y<0.){
+    vec4 a=texelFetch(uPose,ivec2(-2.-aA.y*2.,0),0),b=texelFetch(uPose,ivec2(-1.-aA.y*2.,0),0);
+    mat2 w=mat2(cos(a.w),sin(a.w),-sin(a.w),cos(a.w));
+    p.y*=b.y; p.yz=mat2(cos(b.x),sin(b.x),-sin(b.x),cos(b.x))*p.yz; p.xz=w*p.xz; n.xz=w*n.xz;
+    p=p*b.w*float(aF.z!=6.||aF.x>0.||uNight>.2)+a.xyz; vF.y*=b.z;
+  }
+  vP=p; vN=n; vC=aC; vA=aA; p.y*=uMirror; gl_Position=uVP*vec4(p,1.);
+}`;
 
 // Alpha tells the pixel: 0.25 a thin line, 0.5 a surface, up to 1 glowing.
 const SCENE_FS = `#version 300 es
@@ -1411,7 +1427,7 @@ vec3 glass(float hw,float sky){
 void main(){
   // A mirrored airliner would be stray dots on the ripples.
   if(uMirror<0.&&vP.y>400.) discard;
-  vec3 base=vC,lamp=vec3(1.,.8,.5),add=vec3(0.); float glow=0.,wrap=0.,tones=0.;
+  vec3 base=vC,lamp=vec3(1.,.8,.5),add=vec3(0.); float glow=0.,wrap=0.;
   float kind=floor(vF.z+.5),d=distance(vP,uCam),seed=vA.y,px=d*uPix;
   if(kind==1.||kind==2.||kind==3.){
     vec2 size=kind==1.?vec2(2.9,3.748):kind==2.?vec2(2.2,3.748):vec2(3.4,3.1);
@@ -1431,7 +1447,11 @@ void main(){
       if(kind<3.) add=vec3(1.,.78,.5)*uNight*.3*smoothstep(160.,186.,vF.y);
       // Near windows get a pale frame and sill shade.
       if(!pane&&!rail&&!shop&&lod==1.&&px<.7&&kind!=2.&&mat!=1.&&mat!=2.&&f.x>.17&&f.x<.83&&f.y>.2&&f.y<.85) base*=f.y<.3?.88:1.04;
-      if(f.y<.1) base*=kind<3.?.86:.9;
+      // The floor line, filtered to its share of the pixel: thinner than one, it would flicker as the view moves.
+      float fw=fwidth(cell.y),fl=min(abs(f.y-.05),abs(f.y-1.05));
+      base*=1.-(kind<3.?.14:.1)*clamp((.05+fw*.5-fl)/fw,0.,min(.1/fw,1.));
+      // Shade under the eaves.
+      if(kind==3.&&vA.x>.93&&vA.x<.999) base*=.78;
       if(mat==1.&&f.y>.8&&f.x>.3&&f.x<.7) base*=.86;
       if(mat==2.&&fract(vF.x/(.85*lod))<.24) base*=.95;
       if(shop&&f.y>.84) base*=.7;
@@ -1477,12 +1497,13 @@ void main(){
     // A lantern off is dark glass.
     if(vF.x==0.) base*=.3;
   } else if(kind==7.){
-    // Leaves wrap the light.
-    wrap=.4; tones=3.;
+    // Leaves wrap the light softly round the crown. Bare twigs are dense at the core and thin to the sky at the rim.
+    wrap=.5;
+    if(vF.x<0.){ float rim=1.-abs(dot(vN,normalize(uCam-vP))); base=mix(base*.75,mix(base,uHorizon,.5),rim*rim); }
   } else if(kind==9.){
     if(px<.45&&fract(vF.x/1.7)<.13) base*=.84;
     float r=length(vec2(mod(vF.x,38.)-19.,vF.y))/12.;
-    if(r<1.) add=vec3(1.,.7,.36)*(1.-r)*(1.-r)*.6*uNight;
+    if(r<1.) add=vec3(1.,.7,.36)*(1.-r)*(1.-r)*uNight;
   } else if(kind==11.){
     if(vF.y>.45&&vF.y<.8&&fract(vF.x/2.2)>.22){ base=vec3(.15,.2,.28); glow=uNight*.9; lamp=vec3(1.,.93,.75); }
   } else if(kind==12.){
@@ -1504,12 +1525,12 @@ void main(){
   if(up) base=mix(base*(1.-.4*uWet),vec3(.92,.94,.98),smoothstep(.15,.45,uSnow*1.4-hash(floor(vP.xz*.3))*.4));
   // Level ground keeps more of a low sun, so long shadows read.
   float ndl=max(dot(vN,uSun)*(1.-wrap)+wrap,0.);
-  if(tones>0.) ndl=floor(ndl*tones+.5)/tones;
   bool flat_=vN.y>.9;
   if(flat_) ndl=sqrt(ndl);
-  // Shadow keeps a fifth of the key, corners two thirds of their sky; walls take light in three steps.
-  float lit=ndl>0.?mix(.2,1.,shadowAt())*(flat_?.5+.5*ndl:ndl<.28?.6:ndl<.62?.82:1.):0.;
-  float open=1.-pow(1.-vA.x,3.),occ=mix(.66,1.,open);
+  // Shadow keeps an eighth of the key, corners six tenths of their sky; walls take light in three steps: grazed, a
+  // step under, full.
+  float lit=ndl>0.?mix(.12,1.,shadowAt())*(flat_?.5+.5*ndl:ndl<.12?.35:ndl<.7?.8:1.):0.;
+  float open=1.-pow(1.-vA.x,3.),occ=mix(.58,1.,open);
   // Shade is warmed by lit ground; a low sun glows on faces turned its way.
   vec3 col=base*(mix(uGnd,uAmb,vN.y*.4+.6)*occ*(1.25-.25*lit)+uKey*lit*mix(.7,1.,open)+(uRim*max(dot(vN,uRimDir),0.)+uBnc*(1.-lit)*(1.-abs(vN.y)))*occ)+add+uKey*flash*lit*1.3;
   col=mix(col,lamp,glow);
@@ -1536,12 +1557,13 @@ void main(){ vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2)); gl_Pos
 const GLOW_FS = `#version 300 es
 precision highp float;
 out vec4 o;
-uniform sampler2D uTex; uniform vec2 uInv,uDir;
+uniform sampler2D uTex,uSlide; uniform vec2 uInv,uDir,uSway; uniform float uSS;
 void main(){
   vec2 uv=gl_FragCoord.xy*uInv; vec3 s=vec3(0.);
   if(uDir==vec2(0.)){
-    for(int i=0;i<4;i++){ vec4 c=texture(uTex,uv+vec2(float(i&1)-.5,float(i>>1)-.5)*uInv*.5); s+=c.rgb*max(c.a*2.-1.,0.); }
-    s*=.25;
+    // Light from where each plane has slid.
+    for(int i=0;i<16;i++){ ivec2 q=ivec2(gl_FragCoord.xy)*4+ivec2(i&3,i>>2); vec4 c=texelFetch(uTex,ivec2((vec2(q)+.5-uSway*texelFetch(uSlide,q,0).r)*uSS),0); s+=c.rgb*max(c.a*2.-1.,0.); }
+    s/=16.;
   } else {
     s=texture(uTex,uv).rgb*.227;
     s+=(texture(uTex,uv+uDir*1.385).rgb+texture(uTex,uv-uDir*1.385).rgb)*.316;
@@ -1562,12 +1584,12 @@ float shade(vec2 xz){
   return smoothstep(.5,.68,noise(q)*.65+noise(q*2.3+3.7)*.35+uCover.x*.12)*.2*uDay*(1.-uWx.x*uWx.x);
 }`;
 
-// The city at the art pixel's grain, slid and outlined: colour and cover, then its reflection or the tower's flag.
-const CITY_FS = (fringe) => `#version 300 es
+// The city at the art pixel's grain, outlined: colour and cover, then its reflection.
+const CITY_FS = `#version 300 es
 precision highp float;
 layout(location=0) out vec4 o; layout(location=1) out vec4 o2;
 uniform sampler2D uScene,uRefl; uniform highp sampler2D uDepth;
-uniform vec2 uRes,uSeed,uSway,uCover,uDrift; uniform vec3 uCam,uR,uU,uF,uSunDir,uHaze,uLowC,uRimC,uForeC; uniform vec4 uFore,uWx,uWind; uniform float uFl,uAspect,uShift,uT,uNight,uDay,uSS,uForeA,uBase;
+uniform vec2 uRes,uSeed,uCover,uDrift; uniform vec3 uCam,uR,uU,uF,uSunDir,uHaze,uLowC,uRimC; uniform vec4 uWx,uWind; uniform float uFl,uAspect,uShift,uT,uNight,uDay,uSS,uBase;
 ${COMMON}
 // 1 where the scene k pixels up is water.
 float wet(ivec2 ij,vec2 ndc,int k){
@@ -1577,37 +1599,18 @@ float wet(ivec2 ij,vec2 ndc,int k){
   vec3 r=normalize(uF+uR*n.x*uAspect/uFl+uU*(n.y-uShift)/uFl);
   return step(uCam.y+r.y*lin(texelFetch(uDepth,q,0).r)/dot(r,uF),.9);
 }
-// How far a pixel's plane slides, 0 to 1: by depth, open water by distance, sky none.
-float slide(vec2 p){
-  ivec2 q=clamp(ivec2(p*uSS),ivec2(0),ivec2(uRes*uSS)-1);
-  if(texelFetch(uScene,q,0).a>.05) return REACH/(REACH+lin(texelFetch(uDepth,q,0).r));
-  float b=(p.y/uRes.y*2.-1.-uShift)/uFl;
-  return b<-.001?REACH/(REACH-uCam.y/b):0.;
-}
-${fringe || ''}
 void main(){
-  // Plane parallax: each pixel takes the nearest thing slid onto it, else the farthest.
-  vec2 px=gl_FragCoord.xy,src=px;
-  float n=min(ceil(max(abs(uSway.x),abs(uSway.y))*uSS),16.);
-  if(n>0.){
-    float here=slide(px),far=here; vec2 back=px; bool hit=false;
-    for(float k=n;k>0.;k--){
-      vec2 p=px-uSway*(k/n); float w=slide(p);
-      if(w>=(k-.5)/n){ src=p; hit=true; break; }
-      if(w<far){ far=w; back=p; }
-    }
-    if(!hit&&here>1.5/n) src=back;
-  }
-  ivec2 ij=ivec2(src);
-  vec2 ndc=src/uRes*2.-1.;
+  vec2 px=gl_FragCoord.xy;
+  ivec2 ij=ivec2(px);
+  vec2 ndc=px/uRes*2.-1.;
   vec3 ray=normalize(uF+uR*ndc.x*uAspect/uFl+uU*(ndc.y-uShift)/uFl);
   // Drawn finer, an art pixel is the mean of what it covers.
-  int ss=int(uSS); ivec2 m=ivec2(uRes)*ss-1,first=ivec2(floor(src*uSS-.5*uSS+.01)),at=first; vec3 sum=vec3(0.); float cover=0.,kind=0.;
+  int ss=int(uSS); ivec2 m=ivec2(uRes)*ss-1,first=ij*ss,at=first; vec3 sum=vec3(0.); float cover=0.,kind=0.;
   for(int i=0;i<ss*ss;i++){
     ivec2 q=clamp(first+ivec2(i%ss,i/ss),ivec2(0),m); vec4 s=texelFetch(uScene,q,0);
     if(s.a>.05){ float w=s.a<.3?1.7:1.; sum+=s.rgb*w; cover+=w; if(s.a>kind){ kind=s.a; at=q; } }
   }
-  float full=float(ss*ss),cv=min(cover/full,1.),tw=0.;
+  float full=float(ss*ss),cv=min(cover/full,1.);
   vec3 g=vec3(0.); o2=vec4(0.);
   if(cv<1.&&ray.y<-.0008){
     // The city in the water, broken by ripples, still at walls and hulls; near water only sky.
@@ -1638,8 +1641,9 @@ void main(){
         ivec2 d=i==0?ivec2(1,0):i==1?ivec2(-1,0):i==2?ivec2(0,1):ivec2(0,-1);
         if(lin(texelFetch(uDepth,clamp(at+d*ss,ivec2(0),m),0).r)-z>limit) jump+=vec2(d);
       }
-      // Outlines: a lit rim toward sun or moon, shade elsewhere, fading with distance.
-      vec2 way=normalize(vec2(dot(uSunDir,uR),dot(uSunDir,uU))+1e-4); float f=exp(-z*.0007);
+      // Outlines: a lit rim toward where sun or moon stands, more its side than its height, shade elsewhere, fading
+      // with distance.
+      vec2 way=normalize((vec2(dot(uSunDir,uR),uSunDir.y)*uFl/dot(uSunDir,uF)+vec2(0.,uShift)-ndc*vec2(uAspect,1.))*vec2(1.,.35)); float f=exp(-z*.0007);
       if(jump!=vec2(0.)){
         float lit=max(dot(normalize(jump),way),0.);
         c=mix(c*mix(vec3(1.),vec3(.72,.74,.84),f*(1.-lit)),min(c+uRimC,1.),lit*f);
@@ -1648,25 +1652,23 @@ void main(){
     // Cloud shadows lie on ground and low roofs.
     vec3 p=uCam+ray*(z/dot(ray,uF));
     if(kind<.7) c*=1.-shade(p.xz)*(1.-smoothstep(25.,70.,p.y));
-    tw=step(length(p.xz),40.)*step(4.,p.y)*step(p.y,200.);
     // Depth in planes, as on a backdrop: each step back takes more of the horizon's colour; lamps keep theirs.
-    float air=smoothstep(120.,260.,z)*.08+smoothstep(520.,660.,z)*.2+smoothstep(1250.,1450.,z)*.2+smoothstep(2300.,3200.,z)*.16;
+    float air=smoothstep(120.,260.,z)*.03+smoothstep(600.,900.,z)*.2+smoothstep(1250.,1450.,z)*.22+smoothstep(2300.,3200.,z)*.18;
     c=mix(c,mix(vec3(dot(c,LUM)),uHaze,.75),air*(kind<.56?1.:.25));
-    // Fog takes the far skyline first, a lamp last; low cloud swallows the tower's top.
-    c=mix(c,uHaze,uWx.w*(1.-exp(-z*.0025))*(kind<.56?1.:.5));
+    // Fog takes the far skyline first, a lamp last; low cloud swallows the tower's top. Thick, the tower half a
+    // kilometre off is a ghost and the quay still stands clear.
+    c=mix(c,uHaze,uWx.w*(1.-exp(-z*.006))*(kind<.56?1.:.5));
     c=mix(c,uLowC,smoothstep(uBase-30.,uBase+30.,p.y)*(kind<.56?.94:.6));
     g=c;
   }
-  ${fringe ? 'over(g,cv,px);' : ''}
   o=vec4(g,cv);
-  if(ray.y>=0.) o2.r=tw;
 }`;
 
 // Shared at the screen's grain: inputs, the clear sky, the sun's light.
 const HEAD = `precision highp float;
 out vec4 o;
 uniform sampler2D uCity,uWater,uGlow,uHalo,uSteer;
-uniform vec2 uRes,uScale,uSeed,uSway,uCover,uDrift,uLine,uSide,uFlash; uniform vec3 uCam,uR,uU,uF,uSunDir,uSunCol,uDisc,uMoonDir,uMoonCol,uMoonL,uGlitDir,uGlitCol,uSky[4],uCloud[2],uSea[2];
+uniform vec2 uRes,uScale,uSeed,uSway,uKept,uCover,uDrift,uLine,uSide,uFlash; uniform vec3 uCam,uR,uU,uF,uSunDir,uSunCol,uDisc,uMoonDir,uMoonCol,uMoonL,uGlitDir,uGlitCol,uSky[4],uCloud[2],uSea[2];
 uniform vec4 uWx,uWind; uniform float uFl,uAspect,uShift,uT,uStar,uNight,uDay,uLow,uHd,uDot,uGlowAmt,uStat,uIn,uSunUp,uMoonUp,uQ;
 ${COMMON}
 float ppr;
@@ -1696,62 +1698,46 @@ vec3 sky(vec3 r){
 // The picture at the screen's grain round the pixel city; `wx` brings clouds and weather.
 const HD_FS = (wx) => `#version 300 es
 ${HEAD}
-// Stars by magnitude, some coloured, twinkling more low down, lost in the towns' glow.
-vec3 stars(vec3 r){
-  vec2 sp=vec2(atan(r.x,-r.z),asin(r.y))*190.,id=floor(sp); float h=hash(id);
-  if(h<.93) return vec3(0.);
-  float m=fract(h*13.7); m*=m*m;
-  vec2 f=(fract(sp)-.5-(vec2(fract(h*71.),fract(h*37.))-.5)*.5)*ppr/190./uDot;
-  float tw=1.+(.15+.6*exp(-r.y*9.))*sin(uT*(2.+fract(h*91.)*5.)+h*600.)*sin(uT*1.3+h*90.);
-  vec3 k=fract(h*29.)<.7?vec3(1.):mix(vec3(.72,.82,1.),vec3(1.,.78,.55),fract(h*53.));
-  return k*(.14+1.2*m)*tw*exp(-dot(f,f)*(2.2-1.2*m))*uStar*smoothstep(.01,.14,r.y);
-}
-${wx || `vec3 clouds(vec3 r,vec3 c,float f){return c;}
+${wx || `vec3 stars(vec3 r){return vec3(0.);}
+vec3 clouds(vec3 r,vec3 c,float f){return c;}
 vec4 facet(vec3 p,float f,float a){return vec4(0,1,0,0);}
 vec3 glints(vec3 r,vec4 f,vec3 p,float a,float b){return vec3(0.);}
-float veil(vec3 d){return 1.;}
 vec3 rings(vec3 c,vec3 p,float t){return c;}
-vec3 weather(vec3 c,vec2 p,vec3 r,float a,inout float v){return c;}`}
-ivec2 spot(vec3 d){ return ivec2(clamp((vec2(dot(d,uR)*uFl/uAspect,d.y*uFl)/dot(d,uF)+vec2(0.,uShift))*.5+.5,0.,.999)*uRes/uHd); }
+vec3 weather(vec3 c,vec2 p,vec3 r,float a,inout float v){return c;}
+void at(inout vec2 p,out vec4 c,out vec4 r){ivec2 q=ivec2(p/uHd);c=texelFetch(uCity,q,0);r=texelFetch(uWater,q,0);}`}
 // A disc's screen frame, in radii.
 #ifndef SKY
 vec2 disc(vec3 r,vec3 d,float s,float flat_){ vec3 x=normalize(cross(d,vec3(0,1,0))); return vec2(dot(r-d,x),dot(r-d,cross(x,d))/flat_)/s; }
-// Until the module's: the moon in its phase, seas, earthshine, glow.
+// Until the module's, a second or so: the moon in its phase, with its glow.
 vec3 moon(vec3 r,vec3 c,inout float valid){
   if(uMoonUp<=0.||dot(r,uMoonDir)<.998) return c;
   vec2 q=disc(r,uMoonDir,.0095,1.); float l=length(q),aa=uDot/(ppr*.0095);
-  if(l<3.5) valid=0.;
   c+=uMoonCol*(exp(-l*1.1)*.3+exp(-l*.25)*.08)*(1.-c);
-  if(l>1.+aa) return c;
-  vec3 n=vec3(q,sqrt(max(1.-l*l,0.)));
-  float lit=max(smoothstep(-.03,.05,dot(n,uMoonL)),smoothstep(.9,.99,l)*smoothstep(.3,.8,dot(q/max(l,1e-4),normalize(uMoonL.xy+1e-4)))),sea=.9-.24*smoothstep(.42,.62,noise(q*2.1+vec2(4.,1.)))-.1*noise(q*7.+2.);
-  vec3 face=mix(sky(r)+uMoonCol*.2+vec3(.012,.014,.024)*(1.-uMoonL.z),min(mix(vec3(1.,.86,.7),vec3(1.,.98,.94),uMoonUp)*sea*(1.05+.3*n.z),1.),lit);
-  return mix(c,face,smoothstep(1.+aa,1.-aa,l)*uMoonUp*smoothstep(0.,.04,uMoonDir.y));
+  float lit=smoothstep(-.03,.05,dot(vec3(q,sqrt(max(1.-l*l,0.))),uMoonL));
+  return mix(c,mix(sky(r)+uMoonCol*.2,vec3(1.,.97,.9),lit),smoothstep(1.+aa,1.-aa,l)*uMoonUp*smoothstep(0.,.04,uMoonDir.y));
 }
 // Until the module's: a small white-hot sun, flattened and reddened low.
 vec3 sun(vec3 r,vec3 c,inout float valid){
   if(uSunUp<=0.||dot(r,uSunDir)<.998) return c;
   vec2 q=disc(r,uSunDir,.0085,1.-.2*exp(-uSunDir.y*30.)); float l=length(q),aa=uDot/(ppr*.0085);
-  if(l<4.) valid=0.;
   return mix(c,min(uDisc*(1.1+.15*sqrt(max(1.-l*l,0.))),1.),smoothstep(1.+aa,1.-aa,l)*uSunUp);
 }
-// Glare from the share of the sun the city leaves clear.
+// Until the module's: glare round the sun (the page keeps it off the skyline).
 vec3 glare(vec3 r){
   float a=length(r-uSunDir)/.0085;
   if(uSunUp<=0.||a>60.) return vec3(0.);
-  float v=0.,o=.6*ppr*.0085/uHd; ivec2 s=spot(uSunDir),m=ivec2(uRes/uHd)-1;
-  for(int i=0;i<5;i++) v+=texelFetch(uCity,clamp(s+ivec2(vec2(i==1?o:i==2?-o:0.,i==3?o:i==4?-o:0.)),ivec2(0),m),0).a;
-  return mix(vec3(1.),mix(uSunCol,mix(vec3(1.,.82,.48),vec3(1.,.6,.26),smoothstep(3.,12.,a)),uLow),smoothstep(1.,1.2,a))*(1.-v*.2)*(exp(-max(a-1.,0.)*1.6)*.3+exp(-a*.2)*(.12+.45*uLow)+exp(-a*.06)*(.05+.3*uLow))*uSunUp*veil(uSunDir);
+  return mix(vec3(1.),mix(uSunCol,mix(vec3(1.,.82,.48),vec3(1.,.6,.26),smoothstep(3.,12.,a)),uLow),smoothstep(1.,1.2,a))*(exp(-max(a-1.,0.)*1.6)*.3+exp(-a*.2)*(.12+.45*uLow)+exp(-a*.06)*(.05+.3*uLow))*uSunUp;
 }
 #endif
-// The water mirrors sky and city over the sea's colour; under light ink near water hushes its glints, not lamps.
-vec3 water(vec3 r,vec4 wi,vec4 ci){
+// The water mirrors sky and city over the sea's colour, its ripples along s, where its plane has slid from; under
+// light ink near water hushes its glints, not lamps, and under dark ink cloud shadows keep off it.
+vec3 water(vec3 r,vec3 s,vec4 wi,vec4 ci){
   float t=-uCam.y/r.y,fp=t/(ppr*max(-r.y,.004)),A=.05+.12*min(uWind.z,1.8),hush=1.-max(zw.x*(1.-uSide.x),pow(zw.y,4.)*(1.-uSide.y));
-  vec3 p=uCam+r*t; vec4 f=facet(p,fp,A); vec3 rr=reflect(r,f.xyz); rr.y=max(rr.y,.004);
+  vec3 p=uCam-s*uCam.y/min(s.y,-1e-4); vec4 f=facet(p,fp,A); vec3 rr=reflect(r,f.xyz); rr.y=max(rr.y,.004);
   // Facets tip toward the eye; by day the sea still mirrors a share of the sky.
   float fr=.02+.98*pow(1.-max(dot(-r,f.xyz),.04+.2*A),5.); fr+=(1.-fr)*(.08+.44*uDay);
-  vec3 m=clouds(rr,sky(rr),0.)*(1.-wi.a)+wi.rgb,c=mix(mix(uSea[0],uSea[1],clamp(-r.y*6.,0.,1.)),m,fr)+glints(r,f,p,fp,fr)*hush;
-  c=rings(c*(1.-shade(p.xz)*.7),p,t);
+  vec3 m=wi.a<1.?clouds(rr,sky(rr),0.)*(1.-wi.a)+wi.rgb:wi.rgb,c=mix(mix(uSea[0],uSea[1],clamp(-r.y*6.,0.,1.)),m,fr)+glints(r,f,p,fp,fr)*hush;
+  c=rings(c*(1.-shade(p.xz)*.7*(1.-zw.y*uSide.y)),p,t);
   c=mix(c,uSky[3],(1.-exp(-t*.00022))*(.3+.5*uDay)*(.7+.5*uCover.y));
   c=mix(c,uSky[3],uWx.w*(1.-exp(-t*.003)));
   return c+(ci.a>0.?vec3(0.):ci.rgb);
@@ -1759,7 +1745,7 @@ vec3 water(vec3 r,vec4 wi,vec4 ci){
 vec3 lin3(vec3 c){ return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),step(.04045,c)); }
 // The palette sets the side; under the words a residual per row does at most a tenth.
 vec3 steer(vec3 x,float y){
-  vec4 s=texture(uSteer,vec2(.5,y/uRes.y));
+  vec4 s=1.-texture(uSteer,vec2(.5,y/uRes.y));
   for(int i=0;i<2;i++){
     vec2 q=i==0?s.xy:s.zw;
     x=mix(x,mix(x*max(q.x*q.x,.9),min(x*(1.+min(.35-.35*q.y,.1)),1.),uSide[i]),zw[i]);
@@ -1767,14 +1753,15 @@ vec3 steer(vec3 x,float y){
   return x;
 }
 void main(){
-  vec2 px=gl_FragCoord.xy*uScale; ppr=uFl*uRes.y*.5;
+  vec2 px=gl_FragCoord.xy*uScale,sp=px-uKept; ppr=uFl*uRes.y*.5;
   // The foot's steer ramps in from the horizon, as the sea deepening.
   zw=vec2(smoothstep(uLine.x-.18*uRes.y,uLine.x,px.y),smoothstep(uLine.y+max((uShift*.5+.5)*uRes.y-uLine.y,.03*uRes.y),uLine.y,px.y)); zw.y*=zw.y;
-  ivec2 ij=ivec2(px/uHd);
   vec3 r=ray(px),col;
-  vec4 ci=texelFetch(uCity,ij,0),wi=texelFetch(uWater,ij,0);
+  vec4 ci,wi; at(sp,ci,wi);
   float valid=1.;
-  if(r.y<0.) col=water(r,wi,ci);
+  // Behind the town no sky or sea shows.
+  if(ci.a>=1.) col=ci.rgb;
+  else if(r.y<0.) col=water(r,ray(sp+uKept),wi,ci);
   else{
     col=sky(r);
     if(uStat==0.&&uStar>0.) col+=stars(r);
@@ -1782,7 +1769,7 @@ void main(){
     col=mix(col,uSky[3],uWx.w*(.6+.35*smoothstep(.4,0.,r.y)));
   }
   col=mix(col,ci.rgb,ci.a);
-  if(uGlowAmt>0.){ vec2 uv=px/uRes; col+=(texture(uGlow,uv).rgb+texture(uHalo,uv).rgb*.8)*uGlowAmt*(1.-col*.6); }
+  if(uGlowAmt>0.){ vec2 uv=sp/uRes; col+=(texture(uGlow,uv).rgb+texture(uHalo,uv).rgb*.8)*uGlowAmt*(1.-col*.6); }
   col+=glare(r)*(1.-col)*(1.-.6*ci.a);
   // The city, its foreground and their mirror: own exposure, unmeasured.
   if(r.y<0.&&dot(ci.rgb,LUM)>.01||ci.a>.5) valid=0.;
@@ -1845,7 +1832,7 @@ function target(gl, w, h, depth = true, two = false) {
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, t.depth, 0);
   }
   if (two) {
-    t.depth = texture(gl, w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE);
+    t.depth = texture(gl, w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, t.depth, 0);
     gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
   }
@@ -1860,7 +1847,7 @@ function vertexArray(gl, data, usage) {
   if (data) gl.bufferData(gl.ARRAY_BUFFER, data, usage);
   [3, 3, 3, 3, 2].forEach((size, i) => {
     gl.enableVertexAttribArray(i);
-    gl.vertexAttribPointer(i, size, gl.FLOAT, false, FLOATS * 4, i * 12);
+    gl.vertexAttribPointer(i, size, i === 1 ? gl.BYTE : i === 2 ? gl.UNSIGNED_BYTE : gl.FLOAT, i === 1 || i === 2, FLOATS * 4, [0, 12, 16, 20, 32][i]);
   });
   return { vao, buffer };
 }
@@ -1873,41 +1860,61 @@ export function mountCity(canvas, { at, front } = {}) {
   const mesh = new Mesh(1 << 22);
   let skin = null; // The tower's faces, four corners each, for cutting its outline out of a frame.
   let triCount = 0;
-  let lineCount = 0;
-  let fixed = null;
+  const fixed = [];
   let free = null;
   let scene = null;
   let shadow = null;
   let cityP = null;
   let hdP = null;
   let glowP = null;
+  let judgeP = null;
   let ready = false;
+  // Compiling starts with the first part and runs beside the building; asking whether it is done never waits.
+  const ext = gl.getExtension('KHR_parallel_shader_compile');
+  const compiled = (all) => !ext || all.every((x) => gl.getProgramParameter(x.p, ext.COMPLETION_STATUS_KHR));
+  let base = null;
   const parts = [
+    () => { base = [[SCENE_VS, SCENE_FS], [SHADOW_VS, SHADOW_FS], [FULL_VS, CITY_FS], [FULL_VS, GLOW_FS], [FULL_VS, HD_FS()]].map((x) => program(gl, ...x)); },
     () => { skin = buildTorso(mesh); buildLand(mesh); buildBoardwalk(mesh); },
     () => { free = buildHarbour(mesh); },
     () => buildPlanting(mesh, malmoNow(at ? at() : new Date()).doy, free),
     () => { buildPier(mesh); buildKallbadhus(mesh); buildSkyline(mesh); },
     () => { buildBridge(mesh); buildTurbines(mesh); },
-    () => {
+    // Three uploads, a task each: a phone's browser holds the page through each.
+    ...[0, 1, 2].map((k) => () => {
       triCount = mesh.t.n / FLOATS;
-      lineCount = mesh.l.n / FLOATS;
-      const data = new Float32Array(mesh.t.n + mesh.l.n);
-      data.set(mesh.t.a.subarray(0, mesh.t.n), 0);
-      data.set(mesh.l.a.subarray(0, mesh.l.n), mesh.t.n);
-      fixed = vertexArray(gl, data, gl.STATIC_DRAW);
-    },
-    () => { scene = linked(gl, program(gl, SCENE_VS, SCENE_FS)); shadow = linked(gl, program(gl, SHADOW_VS, SHADOW_FS)); },
-    () => { cityP = linked(gl, program(gl, FULL_VS, CITY_FS())); glowP = linked(gl, program(gl, FULL_VS, GLOW_FS)); },
-    () => { hdP = linked(gl, program(gl, FULL_VS, HD_FS())); },
+      const n = Math.ceil(triCount / 9) * 3 * FLOATS;
+      const l = k > 1 ? mesh.l.n : 0;
+      const to = Math.min(mesh.t.n, k * n + n);
+      fixed.push({ ...vertexArray(gl, mesh.data(k * n, to, l), gl.STATIC_DRAW), tris: (to - k * n) / FLOATS, lines: l / FLOATS });
+    }),
+    () => rest(),
+    () => { scene = linked(gl, base[0]); shadow = linked(gl, base[1]); },
+    () => { cityP = linked(gl, base[2]); glowP = linked(gl, base[3]); },
+    () => { hdP = linked(gl, base[4]); },
   ];
 
-  const mov = new Mesh(1 << 17);
-  const moving = vertexArray(gl, null);
-  let movingSize = 0;
+  const moving = vertexArray(gl);
+  let movTris = 0;
+  let movLines = 0;
   let movedAt = -1;
   let movedStill = false;
+  // Per mover part: x, y, z, yaw; roll, height, glow, size.
+  const poses = new Float32Array(4096);
+  const poseT = texture(gl, 1024, 1, gl.RGBA32F, gl.RGBA, gl.FLOAT);
+  const pose = (k, x, y, z, yaw = 0, roll = 0, tall = 1, glow = 1, size = 1) => poses.set([x, y, z, yaw, roll, tall, glow, size], k * 8);
+  // The movers at rest, again with the traffic.
+  const rest = () => {
+    const m = new Mesh(1 << 16);
+    movers(m, 0, false, 1, pose);
+    [movTris, movLines] = [m.t.n / FLOATS, m.l.n / FLOATS];
+    gl.bindBuffer(gl.ARRAY_BUFFER, moving.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, m.data(), gl.STATIC_DRAW);
+    movedAt = -1;
+  };
 
-  const SHADOW_SIZE = 2048;
+  // 1024 a side: a phone writes it back each relight; the taps keep their spacing in metres.
+  const SHADOW_SIZE = 1024;
   const shadowDepth = texture(gl, SHADOW_SIZE, SHADOW_SIZE, gl.DEPTH_COMPONENT24, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.LEQUAL);
@@ -1920,8 +1927,14 @@ export function mountCity(canvas, { at, front } = {}) {
   let H = 0;
   let px = 2;
   let hd = 1; // Screen pixels to an art pixel in the drawn picture.
-  // The quality ladder: 0 city at twice its grain, 1 its own, 2 half the screen's, 3 art pixels, then larger ones.
-  let rung = 0;
+  // The quality ladder: 0 everything, 1 lighter clouds, 2 the town drawn at its grain, not twice as fine, 3 half the
+  // screen's grain and a slower resting beat, 4 art pixels, then larger ones; past 2 device pixels to the CSS pixel,
+  // art pixels. Phones start on 1 and never climb to 0, whose clouds cost a phone more than a frame.
+  const start = +(devicePixelRatio > 2);
+  let rung = start;
+  // How much finer than the grain the kept town is now: twice at rest, once while it moves (see `renderStill`).
+  let sso = 1;
+  let cut = false;
   let forced = null;
   let still = null; // The city without movers, right way up and mirrored: drawn only when the view or the light changes.
   let stillR = null;
@@ -1931,6 +1944,7 @@ export function mountCity(canvas, { at, front } = {}) {
   let glowB = null;
   let halo = null;
   let cityT = null; // The city and its reflection at the art pixel's grain.
+  let slideT = null; // Per art pixel, the slide of what lands on it.
   let statT = null; // A small copy of the picture to measure its light under the words.
   let resized = true;
   let dirtyView = true;
@@ -1942,20 +1956,24 @@ export function mountCity(canvas, { at, front } = {}) {
   let sunSpot = null;
   const discAt = [];
   let moonSpot = null;
-  const view = newView();
-  const level = newView(); // The view without the lean: the stops and the tower's box are measured in it.
+  const view = newView(); // The kept city's camera, and this frame's for sky and water.
+  const seen = newView();
+  let keyYaw = 0;
+  let shift = 0; // Art pixels from where the city is kept to where it stands this frame.
+  const level = newView(); // A view of its own for the stops and the tower's box, asked between frames.
   const vp = new Float32Array(16);
   const flat = new Float32Array(16);
-  const lean = [0, 0];
   const leanTo = [0, 0];
-  // Plane slide, -1 to 1, and speed.
-  const sway = [0, 0, 0, 0];
+  // Plane slide, -1 to 1, and in art pixels for the nearest plane.
+  const sway = [0, 0];
   const reach = new Float32Array(2);
   let beat = 0;
   let stirred = -1e9;
   let fresh = false;
   let skein = 0;
   let hourOverride = null;
+  let hourAt = null; // The hour drawn while it eases.
+  let hourBack = 0;
   let pal = null;
   let shade = null; // The key light's own view of the city, for the shadows.
   const key = [0, 1, 0];
@@ -1986,18 +2004,16 @@ export function mountCity(canvas, { at, front } = {}) {
   let snowed = 0;
   // Per zone: ink side (1 dark, 0 light) and how far there, both from the key.
   const zones = [0, 1].map(() => ({ side: 1, at: -1 }));
-  // Per row and zone: residual exposure and lift and their aims, in a texture.
-  let rowsTo = null;
-  let rowsAt = null;
-  const steerTex = texture(gl, 1, 1, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
-  const pbo = gl.createBuffer();
-  let stat = null;
-  let fence = null;
-  let measured = false;
+  // Per row and zone: the needs, and the residual exposure and lift eased toward them, last frame's and now.
+  let needT = null;
+  let steer = [];
+  let third = 0;
   let rich = null; // Clouds and weather, once their module has loaded and compiled; then how far they have come in.
   let cloudP = null;
-  let richCity = null;
+  let slideP = null;
   let cloudT = null;
+  let cloudH = null; // The clouds' last picture.
+  let afresh = true; // Size changed.
   let richIn = 0;
   const flash = [0, 0];
   const wx = new Float32Array(8);
@@ -2005,13 +2021,16 @@ export function mountCity(canvas, { at, front } = {}) {
   const wu = new Float32Array(4); // What the shaders take: deck, rain, snow and fog, 0 to 1.
   const drift = new Float32Array(2);
   let deckDrawn = 0;
+  let relits = 0;
+  const queue = [];
+  let relitAt = -1e9;
   let cost = 0;
   let listener = null;
   const info = { light: null, tint: null };
   // The hour's colours, flat for the shaders.
   const tone = {
     amb: new Float32Array(3), lit: new Float32Array(3), gnd: new Float32Array(3), bnc: new Float32Array(3), rim: new Float32Array(3), rimC: new Float32Array(3),
-    fore: new Float32Array(3), low: new Float32Array(3), sky: new Float32Array(12), cloud: new Float32Array(6), sea: new Float32Array(6),
+    low: new Float32Array(3), sky: new Float32Array(12), cloud: new Float32Array(6), sea: new Float32Array(6),
   };
   // Sun and moon: glows, disc, glitter colour and direction, how much shows.
   const sky = { sun: new Float32Array(3), moon: new Float32Array(3), disc: new Float32Array(3), glit: new Float32Array(3), glitDir: new Float32Array(3), sunUp: 0, moonUp: 0 };
@@ -2021,7 +2040,7 @@ export function mountCity(canvas, { at, front } = {}) {
 
   // Sun and moon stand where the page draws them, clear of the skyline, or on the city's arcs.
   const aim = () => {
-    viewAt(path, 0, ZERO, level);
+    viewAt(path, 0, level);
     const arc = 0.5 - 0.5 * level.shift;
     for (const [spot, across, out, k] of [[sunSpot, sunAt, glow, 0], [moonSpot, moonAt, moonDir, 1]]) {
       const x = spot ? spot[0] / (W * px) : 0.1 + 0.8 * across;
@@ -2046,16 +2065,18 @@ export function mountCity(canvas, { at, front } = {}) {
     resized = false;
     const dpr = devicePixelRatio || 1;
     // Art pixels are whole device and picture pixels.
-    let device = (dpr >= 2.5 ? 2 : dpr >= 1.5 ? 2 : 1) + Math.max(rung - 3, 0);
+    let device = (dpr >= 2.5 ? 2 : dpr >= 1.5 ? 2 : 1) + Math.max(rung - 4, 0);
     while ((box.clientWidth * dpr * box.clientHeight * dpr) / (device * device) > 1.4e6) device += 1;
     const nW = Math.max(40, Math.ceil((box.clientWidth * dpr) / device));
     const nH = Math.max(40, Math.ceil((box.clientHeight * dpr) / device));
-    const ss = rung < 1 && nW * nH < 6e5 ? 2 : 1;
-    const grain = rung > 2 ? 1 : rung > 1 ? Math.ceil(device / 2) : device;
+    // The town twice as fine, each picture pixel the mean of four, so its edges and thin parts are smooth; up to a
+    // tall phone's picture, as the fine town and its copy with the movers each hold four times its pixels.
+    const ss = rung < 2 && nW * nH < 1e6 ? 2 : 1;
+    const grain = rung > 3 || dpr > 2 ? 1 : rung > 2 ? Math.ceil(device / 2) : device;
     ui = covered();
     path = pathFor(nW / nH, ui);
     dirtyView = true;
-    if (nW === W && nH === H && px === device / dpr && still.w === W * ss && hd === grain) {
+    if (nW === W && nH === H && px === device / dpr && still.w === W * ss && hd === grain && cut === rung > 0) {
       aim();
       return;
     }
@@ -2070,7 +2091,7 @@ export function mountCity(canvas, { at, front } = {}) {
       layer.style.width = `${W * px}px`;
       layer.style.height = `${H * px}px`;
     }
-    for (const t of [still, stillR, main, refl, glowA, glowB, halo, cityT, statT, cloudT]) {
+    for (const t of [still, stillR, main, refl, glowA, glowB, halo, cityT, slideT, statT, cloudT, cloudH, needT, ...steer]) {
       if (t) {
         gl.deleteTexture(t.color);
         gl.deleteTexture(t.depth);
@@ -2085,23 +2106,17 @@ export function mountCity(canvas, { at, front } = {}) {
     glowB = target(gl, Math.ceil(W / 4), Math.ceil(H / 4), false);
     halo = target(gl, Math.ceil(W / 4), Math.ceil(H / 4), false);
     cityT = target(gl, W, H, false, true);
+    slideT = target(gl, W, H, false);
     // Soft clouds need a third of a million pixels, fewer down the ladder.
-    const cs = Math.max(1, Math.sqrt((W * H * hd * hd) / (rung > 1 ? 1.5e5 : 3e5)));
-    cloudT = target(gl, Math.ceil((W * hd) / cs), Math.ceil((H * hd) / cs), false);
+    cut = rung > 0;
+    const cs = Math.max(1, Math.sqrt((W * H * hd * hd) / (cut ? 1.5e5 : 3e5)));
+    [cloudT, cloudH] = [0, 1].map(() => target(gl, Math.ceil((W * hd) / cs), Math.ceil((H * hd) / cs), false));
+    afresh = true;
     // Some two hundred pixels across.
     const sw = Math.round(Math.min(256, (320 * W) / H));
     statT = target(gl, sw, Math.round((sw * H) / W), false);
-    stat = new Uint8Array(sw * statT.h * 4);
-    rowsTo = new Float32Array(statT.h * 4).fill(1);
-    rowsAt = rowsTo.slice();
-    gl.bindTexture(gl.TEXTURE_2D, steerTex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 1, statT.h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
-    // A copy usage, not a read one: Chrome then keeps no shadow copy to warn about, and the fence still says when.
-    gl.bufferData(gl.PIXEL_PACK_BUFFER, stat.length, gl.STREAM_COPY);
-    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
-    fence = null;
-    measured = false;
+    needT = target(gl, 1, statT.h, false);
+    steer = [0, 1].map(() => target(gl, 1, statT.h, false));
     if (front) {
       front.width = W * hd;
       front.height = H * hd;
@@ -2112,7 +2127,7 @@ export function mountCity(canvas, { at, front } = {}) {
   const clock = () => {
     const now = at ? at() : new Date();
     const c = malmoNow(now);
-    if (hourOverride !== null) c.hour = hourOverride;
+    if (hourAt !== null) c.hour = hourAt;
     [c.rise, c.set] = sunTimes(c.doy, c.offset);
     c.moon = moonPhase(now);
     return c;
@@ -2136,10 +2151,11 @@ export function mountCity(canvas, { at, front } = {}) {
     sunUp = c.hour >= c.rise && c.hour < c.set;
     moonAt = ((((c.hour - c.set) % 24) + 24) % 24) / (24 - c.set + c.rise);
     sunAt = sunUp ? (c.hour - c.rise) / (c.set - c.rise) : moonAt < 0.5 ? 1 : 0;
-    // The light: upper left, drifting right through the day at the sun's height (or a moon's).
+    // The light: by day from the sun's side, so fronts stand a step under the sides it meets and shadows fall along
+    // the quay, coming round to the fronts by evening; the moon's from upper left, drifting right; at their height.
     const tall = Math.max(height, 0.05) * (1 - night) + 0.45 * night;
     const flatness = Math.sqrt(1 - tall * tall);
-    const turn = rad(-60 + 42 * (sunUp ? sunAt : 1 - moonAt));
+    const turn = rad((-72 + 30 * sunAt) * (1 - night) + (-60 + 42 * (1 - moonAt)) * night);
     key[0] = Math.sin(turn) * flatness;
     key[1] = tall;
     key[2] = Math.cos(turn) * flatness;
@@ -2149,6 +2165,7 @@ export function mountCity(canvas, { at, front } = {}) {
     weather = [rng() * 40, rng() * 40, 0.35 + 0.5 * rng(), rng()];
     skein = c.doy > 250 && c.doy < 335 ? 1 : c.doy > 60 && c.doy < 130 ? -1 : 0;
     info.hour = c.hour;
+    info.sun = [c.rise, c.set];
     aimWeather();
     toneUp();
     aim();
@@ -2156,7 +2173,7 @@ export function mountCity(canvas, { at, front } = {}) {
   };
 
   // One key per frame: storms dark; overcast, rain, snow, fog bright 6 degrees up, the rest with the sun up (0.3 of
-  // hysteresis). A change eases 1.2 s, town lights too.
+  // hysteresis). A change eases 3.5 s, town lights too; the ink turns halfway.
   const keyUp = () => {
     const w = wxTo;
     const side = +(w[6] < 0.3 && height > (w[0] > 0.8 || w[1] > 0.3 || w[2] > 0.1 || w[3] > 0.4 ? 0.105 : 0) + 0.005 - 0.01 * zones[0].side);
@@ -2187,15 +2204,15 @@ export function mountCity(canvas, { at, front } = {}) {
     sky.sunUp = smooth(clamp((height + 0.012) / 0.024, 0, 1)) * veil * (1 - dk);
     sky.moonUp = smooth(clamp(-height / 0.05, 0, 1)) * veil;
     for (let i = 0; i < 3; i += 1) {
-      // A low sun's sky colours walls turned away.
-      tone.amb[i] = (p.amb[i] * 0.56 + p.sky[1][i] * low * 0.2) * (1 + 0.25 * deck);
-      tone.lit[i] = p.key[i] * power * 0.74 * (1 - 0.45 * deck) * (1 - 0.7 * dk);
+      // Shade takes the high sky's blue by day; a low sun's sky colours walls turned away, and its key warms more.
+      // Under a deck most of the key comes from all of it instead.
+      tone.amb[i] = (p.amb[i] * (0.56 - 0.1 * day * (1 - deck)) + p.sky[0][i] * day * 0.12 * (1 - deck) + p.sky[1][i] * low * 0.2) * (1 + 0.25 * deck) + p.key[i] * power * 0.2 * deck * (1 - dk);
+      tone.lit[i] = p.key[i] * power * (0.74 + 0.12 * low) * (1 - 0.75 * deck) * (1 - 0.7 * dk);
       // Ground bounce: ambient warmed by the key.
       tone.gnd[i] = (tone.amb[i] + (tone.lit[i] - tone.amb[i]) * 0.3) * 0.8;
       tone.bnc[i] = tone.lit[i] * BOUNCE[i];
       tone.rim[i] = p.sun[i] * low * sunlit * 0.5 * (1 - deck);
-      tone.rimC[i] = p.key[i] * power * 0.55 * (1 - 0.5 * deck);
-      tone.fore[i] = (p.sky[0][i] + (p.amb[i] - p.sky[0][i]) * 0.3) * 0.42;
+      tone.rimC[i] = p.key[i] * power * (0.55 + 0.7 * low * (1 - dk)) * (1 - 0.5 * deck);
       // The sun's glow fades as it sinks or the key darkens; the moon's is cooler, fainter when thin.
       sky.sun[i] = p.sun[i] * sunlit * dim * (1 - dk);
       sky.moon[i] = MOON[i] * (0.3 + 0.5 * fullness) * smooth(clamp((DARK - height) / 0.08, 0, 1)) * dim;
@@ -2248,7 +2265,8 @@ export function mountCity(canvas, { at, front } = {}) {
     gl.uniform1f(u.uMirror, mirror);
     gl.uniform1f(u.uTag, 0);
     gl.drawArrays(gl.TRIANGLES, 0, tris);
-    if (lines) {
+    // Lines stay out of the mirror: ripples would bend a line a pixel wide into a stray squiggle on the water.
+    if (lines && mirror > 0) {
       gl.uniform1f(u.uTag, 0.25);
       gl.drawArrays(gl.LINES, firstLine, lines);
     }
@@ -2264,23 +2282,28 @@ export function mountCity(canvas, { at, front } = {}) {
     gl.clear(gl.DEPTH_BUFFER_BIT);
     gl.useProgram(shadow.p);
     gl.uniformMatrix4fv(shadow.u.uLight, false, shade);
-    gl.bindVertexArray(fixed.vao);
     // The offset grows with slope against self-shadowing at a low sun.
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.polygonOffset(3, 6);
-    gl.drawArrays(gl.TRIANGLES, 0, triCount);
+    for (const f of fixed) {
+      gl.bindVertexArray(f.vao);
+      gl.drawArrays(gl.TRIANGLES, 0, f.tris);
+    }
     gl.disable(gl.POLYGON_OFFSET_FILL);
     gl.disable(gl.DEPTH_TEST);
   };
 
-  const drawStill = (t, mirror) => {
-    gl.viewport(0, 0, t.w, t.h);
+  const drawStill = (t, mirror, k = 1) => {
+    gl.viewport(0, 0, W * k, H * k);
     gl.bindFramebuffer(gl.FRAMEBUFFER, t.fb);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    drawGeometry(fixed, triCount, lineCount, triCount, mirror);
+    for (const f of fixed) drawGeometry(f, f.tris, f.lines, f.tris, mirror);
   };
 
-  const renderStill = () => {
+  // Moving, the town is drawn at its grain, a quarter of the work; the first relight at rest draws it fine again.
+  const renderStill = (moving) => {
+    relits += 1;
+    sso = moving ? 1 : still.w / W;
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
     gl.useProgram(scene.p);
@@ -2288,56 +2311,50 @@ export function mountCity(canvas, { at, front } = {}) {
     put(scene.u, {
       uSun: key, uKey: tone.lit, uAmb: tone.amb, uGnd: tone.gnd, uBnc: tone.bnc, uRim: tone.rim, uRimDir: [glow[0] / flatGlow, 0.12, glow[2] / flatGlow],
       uZen: tone.sky.subarray(3, 6), uSkyC: tone.sky.subarray(6, 9), uHorizon: tone.sky.subarray(9), uCam: view.pos, uWin: Math.max(win, dk * (0.22 + 0.4 * night), 0.1 * wu[1]), uNight: lamp,
-      uFog: (0.00021 + 0.00012 * day) * (0.75 + 0.6 * weather[3]), uPix: 2 / (view.fl * H), uSnow: snowed, uWet: wet,
+      uFog: (0.00021 - 0.00007 * day * (1 - low)) * (0.75 + 0.6 * weather[3]), uPix: 2 / (view.fl * H), uSnow: snowed, uWet: wet,
     });
     gl.uniformMatrix4fv(scene.u.uLight, false, shade);
     gl.activeTexture(gl.TEXTURE4);
     gl.bindTexture(gl.TEXTURE_2D, shadowDepth);
     gl.uniform1i(scene.u.uShadow, 4);
     gl.clearColor(0, 0, 0, 0);
-    drawStill(still, 1);
+    drawStill(still, 1, sso);
     drawStill(stillR, -1);
     gl.disable(gl.DEPTH_TEST);
   };
 
-  const overlay = (from, to, mirror, tris) => {
-    gl.viewport(0, 0, to.w, to.h);
+  const overlay = (from, to, mirror, k = 1) => {
+    const w = W * k;
+    const h = H * k;
+    gl.viewport(0, 0, w, h);
     gl.bindFramebuffer(gl.READ_FRAMEBUFFER, from.fb);
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, to.fb);
-    gl.blitFramebuffer(0, 0, to.w, to.h, 0, 0, to.w, to.h, gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT, gl.NEAREST);
+    gl.blitFramebuffer(0, 0, w, h, 0, 0, w, h, gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT, gl.NEAREST);
     gl.bindFramebuffer(gl.FRAMEBUFFER, to.fb);
-    drawGeometry(moving, tris, mov.l.n / FLOATS, tris, mirror);
+    drawGeometry(moving, movTris, movLines, movTris, mirror);
   };
 
-  // The kept city with the movers over it and its reflection, at most at the idle pace.
-  const drawMovers = (seconds, rest) => {
-    if (movedAt < 0 || rest !== movedStill || Math.abs(seconds - movedAt) > 1 / FPS - 0.004) {
-      movedAt = seconds;
-      movedStill = rest;
-      mov.t.n = 0;
-      mov.l.n = 0;
-      buildMovers(mov, seconds, lamp, rest, skein);
-      gl.bindBuffer(gl.ARRAY_BUFFER, moving.buffer);
-      if (mov.t.n + mov.l.n > movingSize) {
-        movingSize = (mov.t.n + mov.l.n) * 2;
-        gl.bufferData(gl.ARRAY_BUFFER, movingSize * 4, gl.DYNAMIC_DRAW);
-      }
-      // A length of zero means the whole rest, so empty parts are skipped.
-      if (mov.t.n) gl.bufferSubData(gl.ARRAY_BUFFER, 0, mov.t.a, 0, mov.t.n);
-      if (mov.l.n) gl.bufferSubData(gl.ARRAY_BUFFER, mov.t.n * 4, mov.l.a, 0, mov.l.n);
-    }
-    const tris = mov.t.n / FLOATS;
+  // The kept city with the movers over it and its reflection, posed at most at the idle pace.
+  const drawMovers = (seconds, calm) => {
     gl.useProgram(scene.p);
+    bind(scene.u, 3, poseT, 'uPose');
+    if (movedAt < 0 || calm !== movedStill || Math.abs(seconds - movedAt) > 1 / FPS - 0.004) {
+      movedAt = seconds;
+      movedStill = calm;
+      poses.fill(0);
+      movers(null, seconds, calm, skein, pose);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 1024, 1, gl.RGBA, gl.FLOAT, poses);
+    }
     gl.enable(gl.DEPTH_TEST);
-    overlay(still, main, 1, tris);
-    overlay(stillR, refl, -1, tris);
+    overlay(still, main, 1, sso);
+    overlay(stillR, refl, -1);
     gl.disable(gl.DEPTH_TEST);
   };
 
   const bind = (u, unit, tex, name) => {
     gl.activeTexture(gl.TEXTURE0 + unit);
     gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.uniform1i(u[name], unit);
+    if (u[name] && u[name].v !== unit) gl.uniform1i(u[name], (u[name].v = unit));
   };
 
   const blur = (to, from, dx, dy) => {
@@ -2351,6 +2368,8 @@ export function mountCity(canvas, { at, front } = {}) {
     gl.useProgram(glowP.p);
     gl.viewport(0, 0, glowA.w, glowA.h);
     gl.uniform2f(glowP.u.uInv, 1 / glowA.w, 1 / glowA.h);
+    put(glowP.u, { uSway: reach, uSS: sso });
+    bind(glowP.u, 1, slideT.color, 'uSlide');
     blur(glowA, main, 0, 0);
     blur(glowB, glowA, 1 / glowA.w, 0);
     blur(glowA, glowB, 0, 1 / glowA.h);
@@ -2358,12 +2377,16 @@ export function mountCity(canvas, { at, front } = {}) {
     blur(halo, glowB, 0, 3 / glowA.h);
   };
 
-  // Uniforms from an object: number float, array vector, longer vec3s.
+  // Uniforms from an object: number float, array vector, longer vec3s; none unused or unchanged.
   const put = (u, o) => {
     for (const k in o) {
       const v = o[k];
-      if (typeof v === 'number') gl.uniform1f(u[k], v);
-      else gl[`uniform${v.length > 4 ? 3 : v.length}fv`](u[k], v);
+      const at = u[k];
+      const was = v.length ? v.join() : v;
+      if (!at || at.v === was) continue;
+      at.v = was;
+      if (v.length) gl[`uniform${v.length > 4 ? 3 : v.length}fv`](at, v);
+      else gl.uniform1f(at, v);
     }
   };
   // A pass over a target; textures on units from 5, clear of the shadow's.
@@ -2379,19 +2402,15 @@ export function mountCity(canvas, { at, front } = {}) {
 
   // Every pass takes camera, hour, weather; ripples follow the wind.
   const shared = (seconds) => ({
-    uSeed: [weather[0], weather[1]], uCam: view.pos, uR: view.r, uU: UP, uF: view.f, uFl: view.fl, uAspect: W / H, uShift: view.shift, uT: seconds,
+    uSeed: [weather[0], weather[1]], uCam: view.pos, uR: view.r, uU: UP, uF: view.f, uFl: view.fl, uAspect: W / H, uShift: view.shift, uT: seconds, uSS: sso,
     uNight: lamp, uDay: day * (1 - dk), uCover: [(wx[0] * 0.7 - 0.2) / 0.22, weather[3]], uWx: wu, uDrift: drift, uSunDir: glow,
     uWind: [wx[4], wx[5], wx[7] * 0.6 + (1 - wx[7]) * Math.min(0.06 + 0.13 * Math.hypot(wx[4], wx[5]), 1.8), reduce.matches ? 0 : wx[6]],
   });
 
-  // The fringe goes with the nearest stop, leaving twice as fast; cloud lowers in overcast and rain, to the tower's
-  // top in fog and storm.
+  // Cloud lowers in overcast and rain, to the tower's top in fog and storm.
   const cityPass = (seconds) => {
-    const stop = clamp(Math.round(progress), 0, STOPS.length - 1);
-    pass(richCity || cityP, cityT, W, H, {
-      ...shared(seconds), uRes: [W, H], uSway: reach, uSS: main.w / W,
-      uFore: [reach[0] * 2.4 - (progress - stop) * 2 * W, reach[1] * 2.4, ui * 100, stop], uForeA: 0.96 * richIn * (1 - smooth(clamp(Math.abs(progress - stop) * 4, 0, 1))),
-      uForeC: tone.fore, uRimC: tone.rimC, uHaze: tone.sky.subarray(9), uLowC: tone.low,
+    pass(cityP, cityT, W, H, {
+      ...shared(seconds), uRes: [W, H], uRimC: tone.rimC, uHaze: tone.sky.subarray(9), uLowC: tone.low,
       uBase: 2600 - 2450 * clamp(Math.max(0.75 * wu[0] * wu[0] + 0.25 * wu[1], wu[3], wx[6]), 0, 1),
     }, [['uScene', main.color], ['uRefl', refl.color], ['uDepth', main.depth]]);
   };
@@ -2404,73 +2423,26 @@ export function mountCity(canvas, { at, front } = {}) {
   };
 
   // Or a smaller `t`: the copy to measure, or clouds.
-  const hdPass = (seconds, t, prog = rich || hdP) => {
+  const hdPass = (seconds, t, prog = rich || hdP, more) => {
     const cw = W * hd;
     const ch = H * hd;
     pass(prog, t, t ? t.w : cw, t ? t.h : ch, {
-      ...shared(seconds), uRes: [cw, ch], uScale: [t ? cw / t.w : 1, t ? ch / t.h : 1], uSway: [reach[0] * hd, reach[1] * hd],
-      uHd: hd, uDot: hd / px, uStat: +(t === statT), uIn: richIn, uQ: +(rung > 1), uLine: edges(false), uSide: zones.map((z) => smooth(z.at)),
+      ...shared(seconds), uRes: [cw, ch], uScale: [t ? cw / t.w : 1, t ? ch / t.h : 1], uSway: [reach[0] * hd, reach[1] * hd], uCam: seen.pos, uR: seen.r, uF: seen.f, uKept: [shift * hd, 0],
+      uHd: hd, uDot: hd / px, uStat: +(t === statT), uIn: richIn, uQ: +cut, uLine: edges(false), uSide: zones.map((z) => smooth(z.at)),
       uStar: pal.star * (1 - wu[0] * wu[0]) * (1 - wu[3]), uGlowAmt: lamp * 2.2 * (1 + 0.6 * wu[3]), uLow: low * sunlit * (1 - dk) * (1 - 0.5 * wu[0] * wu[0]),
       uSky: tone.sky, uCloud: tone.cloud, uSea: tone.sea, uSunCol: sky.sun, uMoonCol: sky.moon, uDisc: sky.disc, uMoonDir: moonDir, uMoonL: moonLit,
-      uGlitDir: sky.glitDir, uGlitCol: sky.glit, uSunUp: sky.sunUp, uMoonUp: sky.moonUp, uFlash: flash,
-    }, [['uCity', cityT.color], ['uWater', cityT.depth], ['uGlow', glowA.color], ['uHalo', halo.color], ['uSteer', steerTex], ['uClouds', t === cloudT ? null : cloudT.color]]);
+      uGlitDir: sky.glitDir, uGlitCol: sky.glit, uSunUp: sky.sunUp, uMoonUp: sky.moonUp, uFlash: flash, ...more,
+    }, [['uCity', cityT.color], ['uWater', cityT.depth], ['uGlow', glowA.color], ['uHalo', halo.color], ['uSteer', steer[0].color], ['uClouds', t === cloudT ? cloudH.color : cloudT.color], ['uSlide', slideT.color], ['uDepth', main.depth]]);
   };
 
-  // Each row's extremes (unread in a flash) set the residual per zone, spread to neighbours.
-  const judge = () => {
-    const [top, foot] = edges(true);
-    const { w, h } = statT;
-    const need = new Float32Array(h * 4).fill(1);
-    const rows = [[], []];
-    for (let j = 0; j < h; j += 1) {
-      let a = 1;
-      let b = 0;
-      for (let i = j * w * 4; i < (j + 1) * w * 4; i += 4) {
-        if (stat[i + 1] > 127) {
-          a = Math.min(a, (stat[i] / 255) ** 2);
-          b = Math.max(b, (stat[i] / 255) ** 2);
-        }
-      }
-      const y = ((j + 0.5) * H * hd) / h;
-      [y > top, y < foot].forEach((inside, z) => {
-        if (!inside || !rows[z].push(j) || a > b) return;
-        need[j * 4 + z * 2] = Math.sqrt(Math.min(1, 0.1 / Math.max(b, 1e-4)));
-        need[j * 4 + z * 2 + 1] = 1 - clamp((0.34 / Math.max(a, 1e-3) - 1) / 0.35, 0, 1);
-      });
-    }
-    // Beyond its zone a row takes the nearest zone row's need.
-    for (let c = 0; c < 4; c += 1) {
-      const z = rows[c >> 1];
-      const at = (j) => need[clamp(j, z[0] ?? 0, z[z.length - 1] ?? h - 1) * 4 + c];
-      const least = Array.from({ length: h + 24 }, (_, j) => Math.min(...Array.from({ length: 25 }, (_, d) => at(j - d))));
-      for (let j = 0; j < h; j += 1) rowsTo[j * 4 + c] = least.slice(j, j + 25).reduce((m, v) => m + v, 0) / 25;
-    }
-    if (!measured || reduce.matches) rowsAt.set(rowsTo);
-    measured = true;
-  };
-
-  // Read back once the GPU is done; no frame waits.
-  const measure = (seconds, now) => {
+  // The light under the words, judged on a small copy where it is drawn, so nothing is read back: each row's
+  // extremes set its zone's residual, eased by the module's JUDGE.
+  const judge = (seconds, dt) => {
+    const line = edges(true).map((y) => y / (H * hd));
     hdPass(seconds, statT);
-    if (now) {
-      gl.readPixels(0, 0, statT.w, statT.h, gl.RGBA, gl.UNSIGNED_BYTE, stat);
-      judge();
-      return;
-    }
-    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
-    gl.readPixels(0, 0, statT.w, statT.h, gl.RGBA, gl.UNSIGNED_BYTE, 0);
-    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
-    fence = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
-    gl.flush();
-  };
-  const collect = () => {
-    if (!fence || gl.getSyncParameter(fence, gl.SYNC_STATUS) !== gl.SIGNALED) return;
-    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
-    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, stat);
-    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
-    gl.deleteSync(fence);
-    fence = null;
-    judge();
+    pass(judgeP, needT, 1, statT.h, { uLine: line, uK: [-1, 0] }, [['uTex', statT.color]]);
+    steer.reverse();
+    pass(judgeP, steer[0], 1, statT.h, { uLine: line, uK: reduce.matches ? [1, 1] : [1 - Math.exp(-dt * 20), 1 - Math.exp(-dt * 3)] }, [['uTex', needT.color], ['uPrev', steer[1].color]]);
   };
 
   // The tower again on the front layer, so what the page sets between passes behind it.
@@ -2482,9 +2454,9 @@ export function mountCity(canvas, { at, front } = {}) {
     frontCtx.clearRect(0, 0, cw, ch);
     if (progress >= 0.8) return;
     // The outline slides with the tower.
-    const by = REACH / (REACH + view.f[0] * -view.pos[0] + view.f[2] * -view.pos[2]);
-    const dx = Math.round(reach[0] * by) * hd;
-    const dy = -Math.round(reach[1] * by) * hd;
+    const by = (240 * hd) / (REACH + view.f[0] * -view.pos[0] + view.f[2] * -view.pos[2]);
+    const dx = Math.round(reach[0] * by + shift * hd);
+    const dy = -Math.round(reach[1] * by);
     frontCtx.save();
     frontCtx.beginPath();
     for (let q = 0; q < skin.length; q += 12) {
@@ -2522,23 +2494,26 @@ export function mountCity(canvas, { at, front } = {}) {
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
-  const frame = (now) => {
+  const frame = (now, busy) => {
     if (!ready) return;
     const began = performance.now();
     if (resized) fit();
+    // What rest left waits while moving, as this frame relights or marches already.
+    if (!busy) while (queue.length) queue.shift()();
     const dt = clamp((now - beat) / 1000, 0, 0.1);
     const s = now / 1000;
     beat = now;
-    collect();
-    // Weather eases in the sky's order: rain, snow and thunder wait for cloud, which stays till they stop.
+    // Weather and an asked hour ease in by the module's spring.
     const calm = reduce.matches;
-    const k = calm ? 1 : 1 - Math.exp(-dt * 1.6);
-    const come = wxTo[0] > 0.02 ? sstep(0.6, 0.95, wx[0] / wxTo[0]) : 1;
-    let moved = 0;
-    for (let i = 0; i < 8; i += 1) {
-      const to = i === 1 || i === 2 || i === 6 ? wxTo[i] * come : i ? wxTo[i] : wx[1] + wx[2] > 0.05 ? Math.max(wxTo[0], wx[0]) : wxTo[0];
-      moved += Math.abs(to - wx[i]);
-      wx[i] += (to - wx[i]) * k;
+    let moved = sky.ease ? sky.ease(wx, wxTo, dt, calm) : wx.some((v, i) => v !== wxTo[i]) && (wx.set(wxTo), 1);
+    if (hourAt !== null || hourOverride !== null) {
+      const h = sky.hour ? sky.hour(hourAt ?? info.hour, hourOverride ?? hourBack, hourOverride === null, dt, calm, info.sun) : hourOverride;
+      if (h !== hourAt) {
+        // Turning while short of the hour asked; a step that lands at once relights once.
+        moved += h !== null && h !== hourOverride;
+        hourAt = h;
+        updateClock();
+      }
     }
     wet = calm ? +(wx[1] > 0.1) : clamp(wet + (wx[1] > 0.1 ? dt / 4 : -dt / 40), 0, 1);
     snowed = calm ? +(wx[2] > 0.1) : clamp(snowed + (wx[2] > 0.1 ? dt * 0.06 * Math.min(wx[2], 3) : -dt / 60), 0, 1);
@@ -2546,46 +2521,61 @@ export function mountCity(canvas, { at, front } = {}) {
     drift[1] += wx[5] * dt;
     // A side changes in one eased move.
     const keying = zones[0].at !== zones[0].side;
-    for (const z of zones) z.at = calm ? z.side : clamp(z.at + Math.sign(z.side - z.at) * (dt / 1.2), 0, 1);
-    if (moved > 1e-4 || keying) toneUp();
-    // Deck, fog, wet, snow and the key relight the city in steps.
+    for (const z of zones) z.at = calm ? z.side : clamp(z.at + Math.sign(z.side - z.at) * (dt / 3.5), 0, 1);
+    if (moved > 1e-4 || keying) {
+      toneUp();
+      stirred = Math.max(stirred, now - 2700);
+    }
+    // Deck, fog, wet, snow and the key relight the city at most 12 times a second, slow wet and snow in steps.
     const drawn = wu[0] + wu[3] + snowed + wet + dk;
-    const settling = moved > 1e-4 || keying || (wet > 0 && wet < 1) || (snowed > 0 && snowed < 1);
-    if (Math.abs(drawn - deckDrawn) > (settling ? 0.05 : 0)) dirtyView = true;
-    // Needs tighten fast, let go slowly.
-    for (let i = 0; i < rowsAt.length; i += 1) rowsAt[i] += (rowsTo[i] - rowsAt[i]) * (calm ? 1 : 1 - Math.exp(-dt * (rowsTo[i] < rowsAt[i] ? 20 : 3)));
-    gl.bindTexture(gl.TEXTURE_2D, steerTex);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 1, statT.h, gl.RGBA, gl.UNSIGNED_BYTE, Uint8Array.from(rowsAt, (v) => v * 255 + 0.5));
+    const settling = (wet > 0 && wet < 1) || (snowed > 0 && snowed < 1);
+    const due = calm || now - relitAt > 80;
+    if (due && Math.abs(drawn - deckDrawn) > (moved > 1e-4 || keying ? 0.004 : settling ? 0.05 : 0)) {
+      dirtyView = true;
+      relitAt = now;
+    }
     richIn = rich ? (calm ? 1 : Math.min(1, richIn + dt / 0.6)) : 0;
     if (sky.thunder) sky.thunder(flash, s, calm ? 0 : wx[6]);
-    viewAt(path, progress, lean, view);
+    // The module keeps the city at a key frame, the tower on a whole art pixel, and says how far the screen's pass
+    // shifts it: a slow swipe moves it by screen pixels.
+    viewAt(path, progress, seen);
+    shift = sky.key ? sky.key((p) => viewAt(path, p, view), progress, STOPS.length - 1, H, dirtyView, busy) : viewAt(path, progress, view) && 0;
+    if (view.yaw !== keyYaw) dirtyView = true;
+    keyYaw = view.yaw;
     cameraMatrix(view, W / H, vp);
-    if (dirtyLight) renderShadow();
-    if (dirtyView || dirtyLight) {
-      renderStill();
+    // At rest the heavy passes wait for frames between beats.
+    const defer = (f) => (busy || calm ? f() : queue.push(f));
+    if (dirtyLight && due) {
+      defer(renderShadow);
+      relitAt = now;
+    }
+    const relit = dirtyView || (dirtyLight && due) || (!busy && sso < still.w / W && !queue.length);
+    if (relit) {
+      defer(() => renderStill(busy));
       deckDrawn = drawn;
     }
     dirtyView = false;
-    dirtyLight = false;
-    // A critically damped spring, stepped exactly.
-    for (let i = 0; i < 2; i += 1) {
-      const goal = leanTo[i] + (i ? 0.4 * Math.sin(s * 0.17 + 0.6) : 0.5 * Math.sin(s * 0.23) + 0.25 * Math.sin(s * 0.61 + 1.3));
-      const d = sway[i] - goal;
-      const k = (sway[i + 2] + 6 * d) * dt;
-      const e = Math.exp(-6 * dt);
-      sway[i] = goal + (d + k) * e;
-      sway[i + 2] = (sway[i + 2] - 6 * k) * e;
-    }
-    if (reduce.matches) sway.fill(0);
-    reach[0] = -sway[0] * W * 0.024;
-    reach[1] = sway[1] * H * 0.007;
+    if (due) dirtyLight = false;
+    // The planes slide as for a camera stepping aside (`slip` in the module): the page's lean, up to 5.6 m, over a
+    // slow drift of about one; a plane 150 m off or nearer slides `reach`.
+    sway[0] = calm ? 0 : (leanTo[0] * 5.6 + 0.7 * Math.sin(s * 0.23) + 0.35 * Math.sin(s * 0.61 + 1.3)) / 6.65;
+    sway[1] = calm ? 0 : (leanTo[1] * 1.6 + 0.3 * Math.sin(s * 0.17 + 0.6)) / 1.9;
+    reach[0] = (-sway[0] * 6.65 * richIn * view.fl * H) / 480;
+    reach[1] = (sway[1] * 1.9 * richIn * view.fl * H) / 480;
     drawMovers(s, calm);
-    if (lamp > 0) blurGlow();
+    if (slideP) pass(slideP, slideT, W, H, { ...shared(s), uRes: [W, H], uSway: reach }, [['uDepth', main.depth], ['uDepthR', refl.depth], ['uScene', main.color]]);
+    if (lamp > 0 && (relit || !busy)) blurGlow();
     cityPass(s);
-    if (cloudP) hdPass(s, cloudT, cloudP);
-    if (!measured || calm) measure(s, true);
+    // The clouds, kept over frames by the module.
+    const keep = afresh || flash[0] > 0.01 ? 0 : moved > 0.02 || keying ? 4 : 16;
+    defer(() => sky.clouds?.((uHop, uKeep) => {
+      [cloudT, cloudH] = [cloudH, cloudT];
+      hdPass(s, cloudT, cloudP, { uHop, uKeep });
+    }, progress, keep, calm));
+    afresh = false;
+    // Every third frame: the light under the words moves slowly. Never in a flash, whose light is not the picture's.
+    if (judgeP && flash[0] < 0.01 && (calm || (third = (third + 1) % 3) === 0)) judge(s, dt * 3);
     hdPass(s, null);
-    if (!fence && !calm && flash[0] < 0.01) measure(s, false);
     paintFront();
     cost += (performance.now() - began - cost) * 0.1;
     if (listener) listener();
@@ -2600,43 +2590,39 @@ export function mountCity(canvas, { at, front } = {}) {
   let lastDraw = -1e9;
   let ranAt = -1;
   let lastClock = performance.now();
-  // Over budget, step down the ladder.
-  let lag = 0;
-  let frames = -24;
   const stir = () => { fresh = true; };
   const loop = (now) => {
     raf = requestAnimationFrame(loop);
     ranAt = now;
     const gap = now - lastDraw;
-    // While anything moves, and a moment after, every frame is drawn; at rest the city keeps its beat.
+    // While anything moves, and a moment after, every frame is drawn; at rest the city keeps its beat, after three
+    // seconds half (from rung 3 a third), unless rain, snow, a storm or a turn. Between beats, one deferred task.
     if (fresh) stirred = now;
     fresh = false;
-    const busy = now - stirred < 300 || Math.hypot(sway[2], sway[3]) > 0.3;
-    if (!busy && gap < 1000 / FPS - 2) return;
+    const busy = now - stirred < 300;
+    const pace = now - stirred < 3000 || wu[1] + wu[2] > 0 || wx[6] > 0.3 ? FPS : rung > 2 ? FPS / 3 : FPS / 2;
+    const drew = busy || gap >= 1000 / pace - 2;
+    // The governor: 1 sheds a rung, -1 restores one.
+    const step = sky.ladder?.(now, drew + busy, cost, rung, relits);
+    if (step && forced === null && rung + step >= 0 && rung + step < 7) {
+      rung += step;
+      fit();
+    }
+    if (!drew) {
+      queue.shift()?.();
+      return;
+    }
     lastDraw = now;
-    if (now - lastClock > 30000 && hourOverride === null) {
+    if (now - lastClock > 30000 && hourAt === null) {
       lastClock = now;
       updateClock();
     }
-    frame(now);
-    frames += 1;
-    // Late against 25 fps moving, 15 at rest.
-    if (frames > 0) lag += Math.min(gap, 250) / (busy ? 40 : (1000 / FPS) * 1.6);
-    if (frames >= 48) {
-      if ((cost > BUDGET || lag > frames) && forced === null && rung < 5) {
-        rung += 1;
-        fit();
-      }
-      lag = 0;
-      frames = -24;
-    }
+    frame(now, busy);
   };
   const run = () => {
     cancelAnimationFrame(raf);
     if (!ready || !visible || paused || document.hidden) return;
     lastDraw = -1e9;
-    lag = 0;
-    frames = -24;
     if (reduce.matches) requestAnimationFrame(() => frame(0));
     else raf = requestAnimationFrame(loop);
   };
@@ -2649,6 +2635,11 @@ export function mountCity(canvas, { at, front } = {}) {
   addEventListener('resize', resize);
   new ResizeObserver(resize).observe(box);
   const build = () => {
+    // The last three parts link.
+    if (parts.length < 4 && !compiled(base)) {
+      setTimeout(build, 20);
+      return;
+    }
     parts.shift()();
     if (parts.length) setTimeout(build);
     else {
@@ -2665,17 +2656,22 @@ export function mountCity(canvas, { at, front } = {}) {
   setTimeout(build);
 
   // Clouds, weather and the fringe: a module after load, compiled beside the city, eased in.
-  const later = () => import('./city-sky.js').then(({ WX, CLOUDS, FRINGE, thunder, ...more }) => {
+  const later = () => import('./city-sky.js').then(({ WX, CLOUDS, SLIDE, JUDGE, thunder, ...more }) => {
     traffic = more.traffic;
-    const ext = gl.getExtension('KHR_parallel_shader_compile');
-    const all = [HD_FS(WX), `#version 300 es\n${HEAD}${CLOUDS}`, CITY_FS(FRINGE)].map((fs) => program(gl, FULL_VS, fs));
+    rest();
+    sky.key = more.key;
+    sky.ladder = more.ladder(start);
+    sky.ease = more.ease;
+    sky.hour = more.hour;
+    const all = [HD_FS(WX), JUDGE, ...[CLOUDS, SLIDE].map((x) => `#version 300 es\n${HEAD}${x}`)].map((fs) => program(gl, FULL_VS, fs));
     const poll = () => {
-      if (ext && !all.every((x) => gl.getProgramParameter(x.p, ext.COMPLETION_STATUS_KHR))) {
+      if (!compiled(all)) {
         setTimeout(poll, 50);
         return;
       }
-      [rich, cloudP, richCity] = all.map((x) => linked(gl, x));
+      [rich, judgeP, cloudP, slideP] = all.map((x) => linked(gl, x));
       sky.thunder = thunder;
+      sky.clouds = more.clouds;
       stir();
       again();
     };
@@ -2711,21 +2707,21 @@ export function mountCity(canvas, { at, front } = {}) {
     get phase() { return phase; },
     get light() { return info.light; },
     // The camera's heading at the stop, radians.
-    get yaw() { return viewAt(path, progress, ZERO, level).yaw; },
+    get yaw() { return viewAt(path, progress, level).yaw; },
     get tint() { return info.tint; },
-    get stats() { return { frameMs: cost, px, tris: triCount / 3 }; },
+    get stats() { return { frameMs: cost, px, tris: triCount / 3, ...sky.ladder?.state }; },
     // How far the planes have slid, -1 to 1.
     get drift() { return { x: sway[0], y: sway[1] }; },
-    // An hour 0-24 replaces the clock; null restores.
+    // An hour 0-24 replaces the clock, eased in; null restores.
     setHour(h) {
       hourOverride = h === null || h === undefined ? null : ((Number(h) % 24) + 24) % 24;
-      updateClock();
+      if (hourOverride === null) hourBack = malmoNow(at ? at() : new Date()).hour;
       stir();
       again();
     },
     // The tower's box in CSS pixels; empty when behind.
     towerRect() {
-      const m = cameraMatrix(viewAt(path, progress, ZERO, level), W / H, flat);
+      const m = cameraMatrix(viewAt(path, progress, level), W / H, flat);
       let [x0, x1, y0, y1] = [1e9, -1e9, 1e9, -1e9];
       for (let y = 0; y <= 196; y += 28) {
         // Body and spine.
@@ -2749,22 +2745,15 @@ export function mountCity(canvas, { at, front } = {}) {
       paused = on;
       run();
     },
-    // Lean the camera, -1 to 1; near planes slide farthest.
+    // Lean the view, -1 to 1; near planes slide farthest.
     setLean(x, y) {
       leanTo[0] = clamp(x, -1, 1);
       leanTo[1] = clamp(y, -1, 1);
-      const nx = Math.round(x * 50) / 50;
-      const ny = Math.round(y * 50) / 50;
-      if (nx === lean[0] && ny === lean[1]) return;
-      lean[0] = nx;
-      lean[1] = ny;
-      dirtyView = true;
       stir();
     },
     setProgress(p) {
       if (p === progress) return;
       progress = p;
-      dirtyView = true;
       stir();
       again();
       // A page moving this from its own frame after the city's would lead by one: the city then goes last.
@@ -2829,17 +2818,16 @@ export function mountCity(canvas, { at, front } = {}) {
     // The ladder's step; a number holds it (for tests), null frees it.
     get quality() { return rung; },
     setQuality(n) {
-      forced = Number.isFinite(n) ? clamp(Math.round(n), 0, 6) : null;
-      rung = forced ?? 0;
+      forced = Number.isFinite(n) ? clamp(Math.round(n), 0, 7) : null;
+      rung = forced ?? start;
       resize();
     },
     // Where the page draws sun or moon, CSS pixels; `day` says whose (default the sun's by day). Null: the city's
-    // arc.
+    // arc. A resting frame shows it.
     setSun(x, y, day = sunUp) {
       const spot = x === null || x === undefined ? null : [Number(x), Number(y)];
       if (day) sunSpot = spot; else moonSpot = spot;
       aim();
-      stir();
       again();
     },
   };

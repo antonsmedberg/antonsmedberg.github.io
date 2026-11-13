@@ -103,19 +103,20 @@
   --line: light-dark(oklch(0.19 0.02 var(--hn) / 0.1), oklch(1 0 0 / 0.1));
   --line-strong: light-dark(oklch(0.19 0.02 var(--hn) / 0.2), oklch(1 0 0 / 0.2));
   --accent: light-dark(oklch(0.49 0.2 var(--h)), oklch(0.8 0.115 var(--h)));
-  --accent-fill: light-dark(oklch(0.52 0.2 var(--h)), oklch(0.7 0.15 var(--h)));
-  --on-accent: light-dark(oklch(0.99 0.01 var(--h)), oklch(0.16 0.04 var(--h)));
+  --accent-fill: oklch(0.52 0.2 var(--h));
+  --on-accent: oklch(0.99 0.01 var(--h));
   --accent-soft: light-dark(oklch(0.49 0.2 var(--h) / 0.09), oklch(0.8 0.115 var(--h) / 0.14));
   --ok: light-dark(oklch(0.49 0.13 155), oklch(0.82 0.17 155));
   --shadow: light-dark(0 1px 2px oklch(0.19 0.02 262 / 0.06), 0 1px 2px oklch(0 0 0 / 0.4)), light-dark(0 12px 32px -12px oklch(0.19 0.02 262 / 0.22), 0 14px 34px -14px oklch(0 0 0 / 0.75));
 
   /* The live sky. main.js overwrites these from the city; the values per
-     `data-sky` are what shows before it has drawn, and without WebGL. `--dim`
-     is how much glass must hold a sky of that hour back for white text. */
+     `data-sky` are what shows before it has drawn, and without WebGL.
+     `--pane` is how much the small glass shapes hold back whatever is under
+     them, sky or page, in every key. */
   --sky-top: #131c5c;
   --sky-horizon: #f78e5e;
   --sky-accent: #ff9c6c;
-  --dim: 0.52;
+  --pane: 0.8;
 
   /* One radius scale. A nested shape takes its parent's radius less the gap
      between them, which for the usual gaps is the step below. */
@@ -150,6 +151,7 @@
 
   --spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 17.2%, 1.017 20.3%, 1.077 24.2%, 1.097 28.1%, 1.094 33.3%, 1.04 44.5%, 1.015 51.7%, 0.995 64.1%, 1);
   --press: linear(0, 0.36 9%, 0.72 20%, 0.93 32%, 1.02 44%, 1.04 54%, 1.02 68%, 1);
+  --fold: cubic-bezier(0.25, 1, 0.5, 1);
 
   --gutter: 16px;
   --section: clamp(2.5rem, 8cqw, 4.5rem);
@@ -161,13 +163,18 @@
 /* On dense screens the rim is two device pixels, not three. */
 @media (min-resolution: 2.5dppx) { :root { --g-edge: 0.67px; } }
 
+/* Left to itself, the page takes its light from Malmö's sky, which the home screen shows: paper by day and at
+   dawn, dark at dusk and by night, so a card never glares on the night city. A page that has not seen the sky
+   follows the system, and the toggle overrides both. */
+:root:not([data-theme]):is([data-sky="night"], [data-sky="dusk"]) { color-scheme: dark; }
+:root:not([data-theme]):is([data-sky="day"], [data-sky="dawn"]) { color-scheme: light; }
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }
 
-[data-sky="night"] { --sky-top: #0a1436; --sky-horizon: #2c4678; --sky-accent: #9db4ff; --dim: 0.36; }
-[data-sky="dawn"] { --sky-top: #1c2a7a; --sky-horizon: #f7bc8e; --sky-accent: #ffb98c; --dim: 0.56; }
-[data-sky="day"] { --sky-top: #1a4cc2; --sky-horizon: #c9e5fb; --sky-accent: #ffd772; --dim: 0.64; }
-[data-sky="dusk"] { --sky-top: #131c5c; --sky-horizon: #f78e5e; --sky-accent: #ff9c6c; --dim: 0.52; }
+[data-sky="night"] { --sky-top: #0a1436; --sky-horizon: #2c4678; --sky-accent: #9db4ff; }
+[data-sky="dawn"] { --sky-top: #1c2a7a; --sky-horizon: #f7bc8e; --sky-accent: #ffb98c; }
+[data-sky="day"] { --sky-top: #1a4cc2; --sky-horizon: #c9e5fb; --sky-accent: #ffd772; }
+[data-sky="dusk"] { --sky-top: #131c5c; --sky-horizon: #f78e5e; --sky-accent: #ff9c6c; }
 
 /* Each project brings its own hue to its card, its page and its window. */
 [data-project="subtl"] { --h: 258; }
@@ -177,8 +184,8 @@
 
 /* The pixel face sets small labels on the pages after the first. The home
    screen shows none at first, so it names the face only once main.js has let
-   it in (`.px`), with the first page or window that uses it; until then the
-   file is not fetched. */
+   it in (`.px`), once the home page has loaded and gone quiet, or with the
+   first page or window that uses it; until then the file is not fetched. */
 body.os:not(.px) { --font-pixel: var(--font); }
 
 /* Base */
@@ -222,7 +229,7 @@ main:focus { outline: none; }
 :focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 
 h1, h2, h3, h4 { font-weight: 640; letter-spacing: var(--tr-lg); line-height: 1.1; text-wrap: balance; }
-h1, h2 { font-family: var(--font-display); font-weight: 720; letter-spacing: var(--tr-xl); line-height: 1; }
+h1, h2 { font-family: var(--font-display); font-weight: 640; letter-spacing: var(--tr-xl); line-height: 1; }
 p, li, dd, figcaption { text-wrap: pretty; }
 /* Clocks, dates and counts keep their columns when a digit changes. */
 time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; }
@@ -266,11 +273,11 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
   position: relative; isolation: isolate;
   color: var(--g-ink);
   background: color-mix(in oklab, var(--g-fill) calc(var(--g-dim) * 100%), transparent);
-  -webkit-backdrop-filter: blur(var(--g-blur, 10px)) saturate(150%);
-  backdrop-filter: blur(var(--g-blur, 10px)) saturate(150%);
-  box-shadow: inset 0 10px 14px -12px oklch(1 0 0 / 0.2), var(--g-shadow);
+  -webkit-backdrop-filter: blur(var(--g-blur, 10px)) saturate(var(--g-sat, 130%));
+  backdrop-filter: blur(var(--g-blur, 10px)) saturate(var(--g-sat, 130%));
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.22), var(--g-shadow);
 }
-:is(.glass, .glass-card) :is(.glass, .glass-card, .btn--quiet) {
+:is(.glass, .glass-card) :is(.glass, .glass-card, .btn--quiet), .island__more .btn--quiet {
   background: oklch(from currentColor l c h / 0.14); color: inherit;
   -webkit-backdrop-filter: none; backdrop-filter: none;
   box-shadow: inset 0 0 0 var(--g-edge) oklch(from currentColor l c h / 0.2);
@@ -285,24 +292,30 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  transition: --sink 0.45s var(--press);
+  transition: --sink 0.4s var(--press);
 }
 :is(.glass, .glass-card, .btn):active::after { --sink: 1; transition-duration: 0.12s; }
 /* The scene drawn by glass.js sits under the element's content. */
-.glass__fx { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; border-radius: inherit; pointer-events: none; }
+.glass__fx { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; border-radius: inherit; pointer-events: none; transition: opacity 0.2s ease; }
+@starting-style { .glass__fx { opacity: 0; } }
 .is-lensed { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: var(--g-shadow); }
 /* A quiet button that stands on the city is a piece of the same glass. */
 .btn.is-lensed { isolation: isolate; color: var(--g-ink); background: none; box-shadow: var(--g-shadow); }
 
 /* On the city: dark neutral glass with white ink. This fill is what shows
-   without the shader, dimmed by `--dim`, the sky's own guess; the shader
-   tints the scene itself and needs no fill. */
-.os .screen .glass, .os .screen .glass-card, .os .screen .btn.is-lensed, :root:not([data-app]) .os .tabbar__body {
-  --g-fill: oklch(0.2 0.018 262); --g-dim: var(--dim); --g-ink: #fff;
+   without the shader; the shader tints the scene itself and needs no fill.
+   It holds a fixed share of what is under it in every key, so the pane has a
+   body at night too, and the blur takes most of the colour out of what lies
+   under it, so a bright button or picture scrolling by does not tint it. */
+.os .screen .glass, .os .screen .glass-card, .os .screen .btn.is-lensed, :root:not([data-app]) .os .tabbar__body, .os .screen .masthead :is(.brand, .island) {
+  --g-fill: oklch(0.28 0.025 262); --g-dim: var(--pane); --g-ink: #fff; --g-sat: 40%; --g-blur: 16px;
   --g-rim: oklch(1 0 0 / 0.7); --g-rim-low: oklch(1 0 0 / 0.2);
-  --g-shadow: 0 10px 26px -14px oklch(0.1 0.03 262 / 0.5);
+  --g-shadow: 0 4px 12px -6px oklch(0.1 0.03 262 / 0.35);
 }
-.glass-card { --g-blur: 14px; border-radius: var(--r-lg); }
+.glass-card { border-radius: var(--r-lg); }
+/* The cards on the pages are not glass: a nearly opaque fill with the glass's rim and depth, and no blur, so the
+   live city behind them costs nothing to show through. */
+.os .screen .glass-card { --g-fill: oklch(0.2 0.018 262); --g-dim: 0.94; -webkit-backdrop-filter: none; backdrop-filter: none; }
 
 /* Paper: what long text is read on. */
 .panel { background: var(--surface); border-radius: var(--r-lg); box-shadow: 0 0 0 0.5px var(--line), var(--shadow); }
@@ -328,25 +341,45 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 
 /* The mark is one colour, the ink of whatever it stands on. */
 .mark { width: 1.75rem; height: 1.75rem; flex: none; }
+.brand, .island { position: relative; isolation: isolate; color: var(--g-ink); }
 .brand, .island summary {
   display: flex; align-items: center; gap: 8px; min-height: var(--h-md); padding: 0 1rem 0 0.5rem;
-  white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: padding 0.3s var(--press);
+  white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: translate 0.35s var(--fold);
 }
-.brand { border-radius: var(--r-full); transition: transform 0.4s var(--press); }
-.brand:active { transform: scale(0.96); }
+.brand { border-radius: var(--r-full); }
+/* A press shows on the mark, never on the glass: Safari draws a blurred
+   backdrop in the wrong place under a scaled box. */
+.mark { transition: scale 0.4s var(--press); }
+:is(.brand, .island summary):active .mark { scale: 0.9; }
 /* The rim of the header's glass takes some of the sky's colour. */
 .masthead .glass, .os .screen .masthead .glass { --g-rim: color-mix(in oklab, var(--sky-accent) 56%, oklch(1 0 0 / 0.86)); }
-/* The words lie in a column that closes to nothing when the header condenses. */
-.island__text { display: grid; grid-template-columns: 1fr; transition: grid-template-columns 0.5s var(--spring), opacity 0.2s ease, margin 0.5s var(--spring); }
-.island__text > * { min-width: 0; overflow: hidden; }
+/* Its glass is one pill under the words. Folding is one number, `--hp`,
+   0 open to 1 folded, that eases on its own: the pill narrows to a circle
+   round the mark and the words are gone before it is halfway there. Nothing
+   is scaled or crossfaded. Folded, only the circle takes a tap; opened from
+   there, the status unfolds again. */
+@property --hp { syntax: "<number>"; inherits: true; initial-value: 0; }
+.masthead :is(.brand, .island) { transition: --hp 0.35s var(--fold), color 0.4s ease; }
+.is-folded :is(.brand, .island) { --hp: 1; }
+.is-folded .island:has(> details[open]) { --hp: 0; }
+.island__pill {
+  position: absolute; z-index: -1; top: 0; left: 0; pointer-events: none;
+  width: calc(var(--h-md) + (100% - var(--h-md)) * (1 - var(--hp))); height: 100%; border-radius: inherit;
+  transition: opacity 0.2s ease;
+}
+:is(.brand, .island summary)::before { content: ""; position: absolute; top: 0; left: 0; width: var(--h-md); height: var(--h-md); }
+.is-folded :is(.brand, .island details:not([open])) { pointer-events: none; }
+.is-folded :is(.brand, .island summary)::before { pointer-events: auto; }
+.island__text { display: grid; opacity: calc(1 - min(1, var(--hp) * 2.5)); }
+.island__text > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .island__text b { font-size: var(--fs-sub); font-weight: 600; letter-spacing: var(--tr-md); line-height: var(--lh-xs); }
 .island__text small { font-size: var(--fs-2xs); letter-spacing: var(--tr-xs); line-height: 0.875rem; opacity: 0.92; }
 .island__dot { display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 50%; background: oklch(0.82 0.19 150); vertical-align: 0.1em; }
-.masthead.is-condensed .island__text { grid-template-columns: 0fr; opacity: 0; margin-inline: -4px; }
-.masthead.is-condensed :is(.brand, .island summary) { padding-right: 0.5rem; }
-.masthead.is-bare .island { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; color: var(--sky-ink); }
-.masthead.is-bare .island::after { content: none; }
-.masthead.is-bare .island summary { padding-left: 0; }
+/* On the home screen at rest the status stands bare on the sky, its mark on the text's edge. */
+.masthead.is-bare .island { color: var(--sky-ink); }
+.masthead.is-bare .island__pill { opacity: 0; }
+/* The shift gives its room back too, so a narrow phone does not cut the status short. */
+.masthead.is-bare .island summary { translate: -0.5rem 0; margin-right: -0.5rem; }
 
 /* Language and theme: one capsule, two segments, a hairline between them. */
 .tools { --seg: 3.75rem; display: flex; align-items: center; margin-inline-start: auto; border-radius: var(--r-full); }
@@ -375,46 +408,47 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .tool:focus-visible { outline-offset: -3px; border-radius: var(--r-full); }
 
 /* The three theme icons share one place and turn into each other. */
-.theme svg { grid-area: 1 / 1; transition: opacity 0.2s ease, rotate 0.55s var(--spring), scale 0.55s var(--spring); }
+.theme svg { grid-area: 1 / 1; transition: opacity 0.2s ease, rotate 0.5s var(--spring), scale 0.5s var(--spring); }
 .theme .i-sun, .theme .i-moon, [data-theme="light"] .theme .i-auto, [data-theme="dark"] .theme .i-auto { opacity: 0; rotate: -100deg; scale: 0.4; }
 [data-theme="light"] .theme .i-sun, [data-theme="dark"] .theme .i-moon { opacity: 1; rotate: none; scale: 1; }
 
-/* Buttons: one capsule, three kinds. Primary is filled with the accent and
-   lit from above; quiet is a tinted fill with a hairline; icon is a circle. */
+/* Buttons: one capsule, three kinds. Primary is a flat accent fill; quiet is a tinted fill with a hairline;
+   icon is a circle. All share one 1 px highlight and one small shadow, and a press that shrinks and darkens. */
 
 .btn {
   --b-bg: var(--accent-fill); --b-ink: var(--on-accent);
   position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   min-height: var(--h-lg); padding: 0 20px; border-radius: var(--r-full);
-  background: linear-gradient(color-mix(in oklab, var(--b-bg), #fff 14%), var(--b-bg) 60%, color-mix(in oklab, var(--b-bg), #000 8%));
+  background: var(--b-bg);
   color: var(--b-ink);
   font-size: var(--fs-body); font-weight: 640; letter-spacing: -0.008em; line-height: 1.2; white-space: nowrap;
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.36), inset 0 -1px 0 oklch(0 0 0 / 0.16), 0 1px 2px oklch(0 0 0 / 0.18), 0 10px 18px -10px color-mix(in oklab, var(--b-bg) 80%, transparent);
-  transition: transform 0.4s var(--press), box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.2), 0 1px 2px oklch(0 0 0 / 0.16);
+  transition: transform 0.4s var(--press), background-color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.btn:active { transform: scale(0.96); box-shadow: inset 0 2px 5px oklch(0 0 0 / 0.26), 0 0 0 oklch(0 0 0 / 0); filter: brightness(0.94); }
+.btn:active { transform: scale(0.97); background-color: color-mix(in oklab, var(--b-bg), #000 12%); transition-duration: 0.08s; }
 .btn:focus-visible { outline-offset: 3px; border-radius: var(--r-full); }
 .btn--quiet {
-  background: color-mix(in oklab, var(--ink) 7%, transparent); color: var(--ink);
+  --b-bg: color-mix(in oklab, var(--ink) 7%, transparent); color: var(--ink);
   box-shadow: inset 0 0 0 1px var(--line), inset 0 1px 0 oklch(1 0 0 / 0.14);
 }
-.btn--quiet:active { box-shadow: inset 0 0 0 1px var(--line-strong), inset 0 2px 5px oklch(0 0 0 / 0.14); }
 .btn--icon { width: var(--h-lg); padding: 0; }
 .btn--sm { min-height: var(--h-md); padding-inline: 16px; font-size: var(--fs-sub); }
 .btn svg { width: 20px; height: 20px; }
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.45; filter: saturate(0.4); box-shadow: none; pointer-events: none; }
 
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Buttons that belong together wrap as one, so none is left alone on a line. */
+.actions__pair { display: flex; gap: 8px; }
 
 .text-link {
   display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
   color: var(--accent); font-weight: 600;
 }
-.text-link svg { width: 18px; height: 18px; transition: transform 0.3s var(--press); }
+.text-link svg { width: 18px; height: 18px; transition: transform 0.4s var(--press); }
 
 /* Chips: small names in a row, for a stack or a set of skills. */
-.chips, .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: var(--fs-note); font-weight: 560; line-height: 1.3; }
+.chips, .tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: var(--fs-note); font-weight: 500; line-height: 1.3; }
 .chips li, .tags li { padding: 4px 12px; border-radius: var(--r-full); background: color-mix(in oklab, var(--accent) 9%, var(--surface-2)); color: var(--ink); box-shadow: inset 0 0 0 0.5px var(--line); }
 
 /* Sections */
@@ -422,7 +456,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .section { padding-top: var(--section); }
 
 .head { max-width: 44rem; margin-bottom: 20px; }
-.kicker { color: var(--accent); font-family: var(--font-pixel); font-size: var(--fs-sub); font-weight: 500; }
+.kicker { color: var(--accent); font-family: var(--font-pixel); font-size: var(--fs-sub); font-weight: 500; letter-spacing: 0.02em; }
 .head h2 { margin-top: 4px; font-size: var(--fs-2xl); letter-spacing: var(--tr-2xl); }
 
 /* The arc under a page title: the dial's sun path as a rule. The dot rides it
@@ -458,7 +492,8 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .project__body { padding: 16px 20px 20px; }
 .project__top { display: flex; align-items: center; gap: 12px; }
 .project__icon { width: 52px; height: 52px; border-radius: var(--r-icon); box-shadow: 0 8px 16px -8px oklch(0 0 0 / 0.5); }
-.project h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 720; letter-spacing: var(--tr-xl); }
+.project h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 640; letter-spacing: var(--tr-xl); }
+.project h3 a { display: inline-block; padding-block: 10px; margin-block: -10px; }
 .status { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; color: var(--ink-2); font-size: var(--fs-note); font-weight: 500; letter-spacing: var(--tr-sm); line-height: var(--lh-sm); }
 .status i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
 .status--ok i { background: var(--ok); }
@@ -467,7 +502,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .project__line { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-sub); line-height: var(--lh-md); }
 .project__facts { display: grid; gap: 8px; margin-top: 12px; }
 .project__facts dt, .case-facts dt { color: var(--accent); font-family: var(--font-pixel); font-size: var(--fs-note); font-weight: 500; }
-.project__facts dd { margin-top: 4px; font-size: var(--fs-sub); font-weight: 560; line-height: var(--lh-sm); }
+.project__facts dd { margin-top: 4px; font-size: var(--fs-sub); font-weight: 500; line-height: var(--lh-sm); }
 .project__links { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin-top: 16px; }
 
 /* The screens come first: large, fanned, standing on a ledge in the card's
@@ -514,7 +549,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .timeline::before { content: ""; position: absolute; left: 5px; top: 10px; bottom: 10px; width: 2px; border-radius: 1px; background: linear-gradient(var(--accent), color-mix(in oklab, var(--accent) 20%, transparent)); }
 .job { position: relative; }
 .job::before { content: ""; position: absolute; left: -22px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); box-shadow: 0 0 0 3px var(--accent); }
-.job__when { display: inline-block; margin-bottom: 8px; padding: 4px 12px; border-radius: var(--r-full); background: var(--surface); color: var(--ink); font-family: var(--font-pixel); font-size: var(--fs-note); box-shadow: 0 0 0 0.5px var(--line-strong); }
+.job__when { display: inline-block; margin-bottom: 8px; padding: 4px 12px; border-radius: var(--r-full); background: var(--surface); color: var(--ink); font-size: var(--fs-note); font-weight: 600; box-shadow: 0 0 0 0.5px var(--line-strong); }
 .job__card { padding: 20px; }
 .job h3 { font-size: var(--fs-lg); letter-spacing: var(--tr-lg); line-height: var(--lh-md); }
 .job__org { margin-top: 4px; color: var(--ink-2); font-weight: 500; }
@@ -536,9 +571,9 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 
 .tracks { display: grid; gap: 12px; }
 .track { padding: 20px; }
-.track h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 720; letter-spacing: var(--tr-xl); }
+.track h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 640; letter-spacing: var(--tr-xl); }
 .track dl { display: grid; gap: 12px; margin-top: 12px; }
-.track dt { margin-bottom: 6px; color: var(--ink-3); font-size: var(--fs-note); font-weight: 560; }
+.track dt { margin-bottom: 6px; color: var(--ink-3); font-size: var(--fs-note); font-weight: 500; }
 .track dl > div:only-child dt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 [data-track="android"] { --h: 150; }
 [data-track="java"] { --h: 40; }
@@ -559,14 +594,14 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 /* Contact */
 
 .cta {
-  --cta-bg: light-dark(oklch(0.2 0.03 262), oklch(0.965 0.004 262)); --cta-ink: light-dark(oklch(0.97 0.005 262), oklch(0.19 0.02 262)); --cta-ink-2: light-dark(oklch(0.8 0.015 262), oklch(0.38 0.022 262));
-  padding: 32px 24px; border-radius: var(--r-xl); background: var(--cta-bg); color: var(--cta-ink);
+  padding: 32px 24px; border-radius: var(--r-xl); background: var(--surface); color: var(--ink);
   box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.16), var(--shadow);
 }
-.cta h2 { font-size: var(--fs-3xl); font-weight: 780; letter-spacing: var(--tr-3xl); line-height: 0.98; }
-.cta p { margin-top: 12px; max-width: 32em; color: var(--cta-ink-2); font-size: var(--fs-lg); line-height: var(--lh-body); }
+.cta h2 { font-size: var(--fs-2xl); font-weight: 640; letter-spacing: var(--tr-2xl); line-height: 1; }
+.cta p { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); line-height: var(--lh-md); }
 .cta .actions { margin-top: 24px; }
-.cta .btn--quiet { background: color-mix(in oklab, var(--cta-ink) 13%, transparent); color: var(--cta-ink); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--cta-ink) 18%, transparent); }
+/* The other ways to reach me are tinted in the accent, as a secondary button is on iOS, so they read as live. */
+.cta .btn--quiet { --b-bg: var(--accent-soft); color: var(--accent); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.12), 0 1px 2px oklch(0 0 0 / 0.12); }
 
 /* Footer */
 
@@ -581,53 +616,64 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 @container (min-width: 80rem) { .footer { margin-inline: auto; } }
 
 /* The bar: a floating glass dock along the bottom. The mascot stands on
-   `.tabbar`, which never scales; `.tabbar__body` is the glass and takes the
-   press and the shrink. In short windows it stands on its end as a rail. */
+   `.tabbar`, so he rides its top edge; `.tabbar__body` is the glass. In short
+   windows it stands on its end as a rail.
 
+   Folding is one number, `--fp`, from 0 open to 1 folded, that eases on its
+   own. Every size is drawn from it, so the bar changes shape and is never
+   scaled: it narrows and lowers to a pill, its corner stays half its height,
+   the names give up their room and fade by halfway, and the icons close in
+   on the middle. The selection keeps the same gap on every side throughout,
+   and a tab stays 44 px tall and wider than that when folded. */
+@property --fp { syntax: "<number>"; inherits: true; initial-value: 0; }
 .tabbar {
+  --bw: min(100vw - 2 * max(16px, env(safe-area-inset-left), env(safe-area-inset-right)), 400px);
+  --bh: calc(var(--h-lg) + 2 * var(--bar-inset));
+  --fw: 240px; --fh: 48px;
+  --br: calc(var(--bar-r) + (var(--fh) / 2 - var(--bar-r)) * var(--fp));
+  --lf: min(1, var(--fp) * 2);
   position: fixed; z-index: 45;
-  left: 50%; bottom: calc(16px + env(safe-area-inset-bottom));
-  width: min(100vw - 2 * max(16px, env(safe-area-inset-left), env(safe-area-inset-right)), 400px); height: calc(var(--h-lg) + 2 * var(--bar-inset));
-  transform: translateX(-50%);
+  /* Centred by its margins, not a transform: nothing that carries the glass is ever transformed. */
+  inset: auto 0 calc(16px + env(safe-area-inset-bottom)); margin-inline: auto;
+  width: calc(var(--bw) + (var(--fw) - var(--bw)) * var(--fp)); height: calc(var(--bh) + (var(--fh) - var(--bh)) * var(--fp));
+  contain: layout style;
+  transition: --fp 0.35s var(--fold);
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
 }
+.is-folded .tabbar { --fp: 1; }
 .tabbar__body {
   --g-blur: 12px;
-  width: 100%; height: 100%; padding: var(--bar-inset); display: flex; border-radius: var(--bar-r);
-  transform-origin: 50% 0; transform: scale(var(--bs, 1));
-  transition: transform 0.5s var(--spring);
+  width: 100%; height: 100%; padding: var(--bar-inset); display: flex; border-radius: var(--br);
 }
-.tabbar.is-small { --bs: 0.9; }
-.tabbar.is-pressed { --bs: 0.975; }
-.tabbar.is-small.is-pressed { --bs: 0.88; }
 
 /* The selection lies inside the bar with the same gap on every side, and its
    corner is the bar's less that gap, so the two outlines run parallel. It is
    a brighter tint, with no rim, shadow or glass of its own, that stretches
-   toward where it is going and settles on a spring. */
+   toward where it is going and settles on a spring. `--l` is the tab it
+   covers, counted from 0, so it follows the bar's size by itself. */
 .tabbar__lens {
   position: absolute; top: var(--bar-inset); left: var(--bar-inset); z-index: 0;
-  width: calc((100% - 2 * var(--bar-inset)) / 4); height: calc(100% - 2 * var(--bar-inset)); border-radius: calc(var(--bar-r) - var(--bar-inset));
+  width: calc((100% - 2 * var(--bar-inset)) / 4); height: calc(100% - 2 * var(--bar-inset)); border-radius: calc(var(--br) - var(--bar-inset));
   background: color-mix(in oklab, var(--accent) 14%, transparent);
   opacity: 0; transform-origin: 0 0;
-  transform: translate(var(--lx, 0), var(--ly, 0)) scale(var(--lsx, 1), var(--lsy, 1));
+  transform: translateX(calc(var(--l, 0) * 100%)) scaleX(var(--ls, 1));
   transition: opacity 0.2s ease;
 }
 .tabbar.has-lens .tabbar__lens { opacity: 1; }
-:root:not([data-app]) .os .tabbar__lens { background: oklch(1 0 0 / 0.12); }
+:root:not([data-app]) .os .tabbar__lens { background: oklch(1 0 0 / 0.16); }
 
 .tabbar a {
-  position: relative; z-index: 2; flex: 1 1 0; min-width: 0; min-height: var(--h-md);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  border-radius: calc(var(--bar-r) - var(--bar-inset));
+  position: relative; z-index: 2; flex: 1 1 0; min-width: 0; margin-block: calc(var(--bar-inset) * -1 * var(--fp));
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(4px * (1 - var(--lf)));
+  border-radius: calc(var(--br) - var(--bar-inset));
   color: inherit; font-size: var(--fs-2xs); font-weight: 600; letter-spacing: var(--tr-xs); line-height: var(--lh-xs);
   -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
 }
-.tabbar a:focus-visible { outline-offset: -3px; border-radius: calc(var(--bar-r) - var(--bar-inset)); }
+.tabbar a:focus-visible { outline-offset: -3px; border-radius: calc(var(--br) - var(--bar-inset)); }
 /* `--near` runs from 0 to 1 as the selection covers the tab. */
 .tabbar a i { display: block; transform: scale(calc(1 + var(--near, 0) * 0.08 - var(--down, 0) * 0.14)); transition: transform 0.4s var(--press); }
-.tabbar a span { opacity: calc(0.84 + var(--near, 0) * 0.16); transition: transform 0.4s var(--press); transform: scale(calc(1 - var(--down, 0) * 0.06)); }
+.tabbar a span { height: calc(var(--lh-xs) * (1 - var(--lf))); overflow: hidden; opacity: calc((0.84 + var(--near, 0) * 0.16) * max(0, 1 - var(--lf) * 2.5)); transition: transform 0.4s var(--press); transform: scale(calc(1 - var(--down, 0) * 0.06)); }
 .tabbar a[aria-current] { --near: 1; }
 .tabbar a:active { --down: 1; }
 .tabbar svg { width: 24px; height: 24px; }
@@ -638,27 +684,30 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 :root:not([data-app]) .os .tabbar a[aria-current] { color: inherit; }
 
 /* Mascot: stands on the bar's top edge, in a lane the pages keep clear. The
-   live 3D figure sizes and places its own box and moves it with `transform`,
+   live 3D figure sizes and places its own box and moves it with `translate`,
    so leaving and coming back use `scale` and `opacity`. Until main.js has
    picked the live figure or the still there is nothing to show. */
 .smed {
   position: absolute; z-index: 2; left: 0; bottom: 100%;
   width: 64px; height: 96px;
   transform-origin: 50% 100%;
-  transition: opacity 0.2s ease, scale 0.32s var(--spring);
+  transition: opacity 0.2s ease, scale 0.5s var(--spring);
   -webkit-tap-highlight-color: transparent;
 }
 .smed:not(.smed--live, .smed--still), .smed.is-away { display: none; }
+.smed.is-seated { scale: 0.8; }
 .smed.is-parked { opacity: 0; scale: 0.6; pointer-events: none; }
+.smed.is-parked .smed__say { visibility: hidden; }
 /* Without WebGL 2: one picture of the mascot, standing still. */
 .smed--still { left: 16px; background: url("/assets/art/mascot-still.webp") 50% 100% / contain no-repeat; }
 .smed__say {
-  position: absolute; left: 50%; bottom: 100%; white-space: nowrap; padding: 6px 10px; border-radius: var(--r-sm);
-  transform: translateX(-50%) scale(0.9); opacity: 0;
+  position: absolute; left: 100%; bottom: 55%; white-space: nowrap; padding: 6px 10px; border-radius: var(--r-sm);
+  transform: scale(0.9); transform-origin: 0 100%; opacity: 0;
   background: var(--surface); color: var(--ink); font-size: var(--fs-note); font-weight: 600; box-shadow: var(--shadow);
-  transition: opacity 0.18s ease, transform 0.3s var(--spring); pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.5s var(--spring); pointer-events: none;
 }
-.smed.is-saying .smed__say { opacity: 1; transform: translateX(-50%); }
+/* Beside his head, in the lane he keeps clear, so it never lands on the icons above it. */
+.smed.is-saying .smed__say { opacity: 1; transform: none; }
 
 /* The app window: a project, a section or the CV opens in it, growing out of
    what was tapped. main.js drives its box on springs; the content inside keeps
@@ -666,32 +715,39 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 .scrim { position: fixed; inset: 0; z-index: 41; display: none; background: oklch(0.12 0.03 262 / 0.5); opacity: 0; }
 .scrim.is-open { display: block; }
 .appview {
-  position: fixed; inset: 0; z-index: 42; display: none;
+  position: fixed; inset: 0; z-index: 42; visibility: hidden; contain: layout paint style;
   background: var(--bg); color: var(--ink);
-  transform-origin: 0 0; overflow: hidden; will-change: transform;
+  transform-origin: 0 0; overflow: hidden;
   border-radius: var(--view-r, 0px);
   box-shadow: 0 30px 80px -30px oklch(0.1 0.03 262 / 0.7);
 }
 .appview:focus { outline: none; }
-.appview.is-open { display: block; }
+/* Hidden, it is still laid out, so a page laid into it ahead is ready to show and opening it lays out
+   nothing. */
+.appview.is-open { visibility: visible; }
 .appview__inner { position: absolute; inset: 0; display: flex; flex-direction: column; transform-origin: 0 0; }
-.appview__ghost { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; }
+/* The bar is a band of the window's own paper above the page, not controls floating on it: nothing scrolls
+   under the back button or the title. */
 .appview__bar {
-  position: absolute; inset: 0 0 auto; z-index: 3; display: flex; align-items: center; gap: 8px;
+  position: relative; z-index: 3; flex: none; display: flex; align-items: center; gap: 8px; background: var(--bg);
   padding: calc(12px + env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right)) 12px max(var(--gutter), env(safe-area-inset-left));
   touch-action: none; cursor: grab;
 }
 .appview__title { min-height: var(--h-md); max-width: calc(100% - 120px); margin-inline: auto; padding: 0 16px; border-radius: var(--r-full); font-weight: 640; font-size: var(--fs-sub); letter-spacing: var(--tr-md); line-height: var(--h-md); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.appview__title { opacity: 0; transform: translateY(-8px) scale(0.94); transition: opacity 0.2s ease, transform 0.45s var(--spring); }
+.appview__title { opacity: 0; transform: translateY(-8px) scale(0.94); transition: opacity 0.2s ease, transform 0.5s var(--spring); }
 .appview__title.is-shown { opacity: 1; transform: none; }
 .appview__title .sec { display: inline-block; width: 24px; height: 24px; margin-right: 8px; vertical-align: -6px; box-shadow: none; }
 /* The title sits in the middle whatever stands beside it. */
 .appview__bar::after { content: ""; width: var(--h-md); flex: none; }
 .appview__grab { position: absolute; left: 50%; top: calc(4px + env(safe-area-inset-top)); width: 36px; height: 5px; margin-left: -18px; border-radius: 3px; background: var(--ink-3); opacity: 0.5; }
-.appview__body { flex: 1; container-type: inline-size; overflow: hidden auto; overscroll-behavior: contain; padding-top: calc(68px + env(safe-area-inset-top)); padding-bottom: var(--bar-clear); -webkit-overflow-scrolling: touch; }
+.appview__body { flex: 1; container-type: inline-size; overflow: hidden auto; overscroll-behavior: contain; padding-bottom: var(--bar-clear); -webkit-overflow-scrolling: touch; }
 .appview__body .reveal { opacity: 1 !important; transform: none !important; }
 .appview__body .head, .appview__body .back { display: none; }
 .appview__body > .shell { padding-top: 6px; }
+/* The window grows and shrinks by a scale, and Safari draws a blurred backdrop in the wrong place under one, so
+   the glass in it is a plain opaque pane. */
+.appview .glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: light-dark(oklch(0.995 0.002 262), oklch(0.24 0.014 262)); }
+.appview.is-moving { will-change: transform; }
 .appview.is-moving .appview__body { overflow: hidden; }
 
 /* Tablets and computers: the window is a sheet over the city. */
@@ -712,15 +768,17 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 @media (max-height: 540px) and (min-width: 600px) {
   :root { --bar-clear: 16px; --rail-clear: calc(88px + env(safe-area-inset-left)); }
   .tabbar {
-    left: calc(16px + env(safe-area-inset-left)); bottom: calc(16px + env(safe-area-inset-bottom));
-    width: calc(var(--h-lg) + 2 * var(--bar-inset)); height: 240px; transform: none;
+    left: calc(16px + env(safe-area-inset-left)); right: auto; bottom: calc(16px + env(safe-area-inset-bottom)); margin: 0;
+    width: calc(var(--h-lg) + 2 * var(--bar-inset)); height: 240px;
     touch-action: pan-x;
   }
-  .tabbar__body { flex-direction: column; transform-origin: 0 50%; }
-  .tabbar.is-small { --bs: 1; }
-  .tabbar__lens { width: calc(100% - 2 * var(--bar-inset)); height: calc((100% - 2 * var(--bar-inset)) / 4); }
-  /* The live figure keeps 4 px from the bar's end, so this centres it on the rail. */
+  .tabbar__body { flex-direction: column; }
+  .is-folded .tabbar { --fp: 0; }
+  .tabbar__lens { width: calc(100% - 2 * var(--bar-inset)); height: calc((100% - 2 * var(--bar-inset)) / 4); transform: translateY(calc(var(--l, 0) * 100%)) scaleY(var(--ls, 1)); }
+  /* The live figure keeps 4 px from the bar's end, so this centres it on the rail. Beside the rail
+     there is no room for his words. */
   .smed--live { left: -4px; }
+  .smed__say { display: none; }
   .smed--still { left: 0; }
   .appview { left: var(--rail-clear); }
 }
@@ -730,7 +788,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 
 /* Reveal: the hiding class is added by main.js, so no script means no hiding. */
 
-.io .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.55s ease, transform 0.7s var(--spring); }
+.io .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.4s ease, transform 0.5s var(--spring); }
 .io .reveal.is-visible { opacity: 1; transform: none; }
 
 @view-transition { navigation: auto; }
@@ -740,16 +798,15 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
    its radius on the curve, so the scale steps up to look the same size. */
 @supports (corner-shape: squircle) {
   :root { --r-xs: 13px; --r-sm: 20px; --r-md: 26px; --r-lg: 36px; --r-xl: 48px; --r-icon: 30%; }
-  .panel, .glass-card, .glass-card::after, .glass-card > .glass__fx, .stage, .project, .quote, .pull, .cta, .facts > div, .project__icon, .app__tile, .app__tile::after, .me, .sec, .island, .island::after, .island > .glass__fx, .appview, .case-wide img, .smed__say, .skip-link { corner-shape: squircle; }
-  .tabbar__body, .tabbar__body::after, .tabbar__body > .glass__fx, .tabbar__lens, .tabbar a { corner-shape: squircle; }
+  .panel, .glass-card, .glass-card::after, .glass-card > .glass__fx, .stage, .project, .quote, .pull, .cta, .facts > div, .project__icon, .me, .sec, .island__pill, .island__pill::after, .island__pill > .glass__fx, .appview, .case-wide img, .smed__say, .skip-link { corner-shape: squircle; }
+  .app__tile, .tabbar__body, .tabbar__body::after, .tabbar__body > .glass__fx, .tabbar__lens, .tabbar a { corner-shape: squircle; }
   .peek__shot img, .shot img { corner-shape: squircle; border-radius: 16% / 7.4%; }
   .project--wide .peek__shot img, .shots--wide .shot img { border-radius: 7.4% / 16%; }
 }
 
 @media (hover: hover) {
-  .btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
-  .btn:active { transform: scale(0.96); filter: brightness(0.94); }
-  .btn--quiet:hover { background: color-mix(in oklab, var(--ink) 11%, transparent); filter: none; }
+  .btn:hover { background-color: color-mix(in oklab, var(--b-bg), #fff 8%); }
+  .btn:active { background-color: color-mix(in oklab, var(--b-bg), #000 12%); }
   .tool:hover { background: color-mix(in oklab, currentColor 12%, transparent); }
   .tools .tool:hover { background: none; }
   .tools:has(.tool:nth-child(2):hover)::before { translate: var(--seg) 0; width: var(--h-sm); }
@@ -763,7 +820,7 @@ time, .job__when, .cv__when, [data-stamp] { font-variant-numeric: tabular-nums; 
 }
 
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  :root:not(#x) { --g-dim: 1; --dim: 0.94; }
+  :root:not(#x) { --g-dim: 1; --pane: 0.94; }
   .glass, .glass-card { -webkit-backdrop-filter: none; backdrop-filter: none; }
   .glass__fx { display: none; }
 }
