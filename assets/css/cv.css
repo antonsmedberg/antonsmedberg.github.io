@@ -21,7 +21,7 @@
    with no tap highlight of the system's own, so there is never a second shape
    beside the one selected. */
 .cv__index {
-  position: sticky; top: calc(var(--head-h) + env(safe-area-inset-top)); z-index: 5;
+  position: sticky; top: 8px; z-index: 5;
   background: light-dark(rgb(246 247 252), rgb(18 23 40)); -webkit-backdrop-filter: none; backdrop-filter: none;
   display: flex; gap: 2px; width: fit-content; max-width: 100%; margin-top: 24px; padding: 4px; border-radius: var(--r-full);
   overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
@@ -33,7 +33,7 @@
 .cv__index a[aria-current] { background: color-mix(in oklab, var(--accent) 16%, transparent); color: var(--ink); }
 .cv__index a:focus-visible { outline-offset: -3px; border-radius: var(--r-full); }
 
-.cv__section { padding: var(--card-pad); scroll-margin-top: calc(var(--head-h) + 70px); }
+.cv__section { padding: var(--card-pad); scroll-margin-top: 70px; }
 /* Three steps under the name: the section, the post or project, its text. */
 .cv__section > h2 { font-size: var(--fs-xl); letter-spacing: var(--tr-xl); line-height: 1.1; }
 .cv__profile { margin-top: 12px; max-width: var(--measure); color: var(--ink-2); font-size: var(--fs-body); }

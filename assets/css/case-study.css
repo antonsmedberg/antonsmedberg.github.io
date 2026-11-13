@@ -95,7 +95,7 @@
   .case { padding-top: 28px; }
   .case-head .project__icon { width: 76px; height: 76px; }
   .case-grid { grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem); gap: 48px; align-items: start; margin-top: 48px; }
-  .case-aside { position: sticky; top: calc(var(--head-h) + 16px); }
+  .case-aside { position: sticky; top: 16px; }
   .case-wide img, .case-wide figcaption { max-width: 38rem; }
   .nf { padding-top: 16vh; }
 }

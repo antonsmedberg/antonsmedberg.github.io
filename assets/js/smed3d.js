@@ -582,7 +582,6 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
   let visible = true;
   let x = 40;
   let v = 0; // His speed along the lane, CSS px/s.
-  let target = null;
   let dir = 1;
   let phase = 0; // The stroke: 0 the catch, DRIVE the finish.
   let surge = 0; // How hard the blades push now, 0 to 1.
@@ -602,16 +601,14 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
   let encore = null; // Asked of him while busy, done when he next drifts.
   let sun = DAY.sun;
   let night = 0;
-  let placed = null;
   let squash;
   let squashV;
-  let bob = 0;
   let roll = 0;
   let pitch = 0;
   let cs;
   let sn;
-  let drawnAt = -1e9;
-  let owed = false; // A pose not yet drawn: he is drawn on until it is, even when fine.js would skip.
+  let run = null; // The crossing under way: where he is and how far into his stroke, every 1/60 s, and its animation.
+  let bob = 0;
 
   const [cur, vel, goal, aim] = [0, 1, 2, 3].map(() => new Float32Array(N + 2));
   const out = new Float32Array(N);
@@ -627,7 +624,9 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
   // box stands with no translate.
   let laneW = innerWidth;
   let home = [0, 0];
-  const measure = (r = el.getBoundingClientRect()) => { laneW = el.offsetParent?.clientWidth || innerWidth; home = [r.left - (placed || 0), r.top]; };
+  const measure = (r = el.getBoundingClientRect()) => { laneW = el.offsetParent?.clientWidth || innerWidth; home = [r.left - x, r.top]; };
+  // At rest his box stands on a whole device pixel, so the pixels stay crisp.
+  const place = () => { el.style.translate = `${round(x * dpr) / dpr}px`; };
   // His box's offset along the lane, the boat and its lantern clear of the window's sides.
   const fit = (to) => {
     const lo = REACH - BOX_W / 2 + 12;
@@ -660,12 +659,32 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
       d.size = rand(0.4, 0.7);
     }
   };
-  // Rows across to the other half of the lane, turning the boat first if it points the other way.
+  // Rows across to the other half of the lane. The whole crossing is worked out at once, every 1/60 s: a turn first
+  // if the bow points the other way, then strokes while the glide would fall short, each push a surge, then the
+  // glide, never past the lane's end. His box rides it as one animation on the compositor, at the display's rate;
+  // his poses inside follow it at FPS a second. When he is not crossing his box stands on a whole device pixel.
   const travel = (to) => {
     to = fit(to);
     if (abs(to - x) < 20) return;
-    target = to;
-    dir = to > x ? 1 : -1;
+    const d = to > x ? 1 : -1;
+    const turn = d === dir ? 0 : 66;
+    dir = d;
+    const xs = [];
+    const ph = [];
+    let [px, pv, pp, more] = [x, 0, 0, true];
+    for (let k = 0; k < 1800 && (k < turn || more || pp || pv > 4); k += 1) {
+      if (k >= turn) {
+        more = (to - px) * d > pv / DRAG + 3;
+        if (more || pp) { pp += STROKE / 60; if (pp >= 1) pp = more ? pp - 1 : 0; }
+        pv += (THRUST * (more && pp < DRIVE ? sin((PI * pp) / DRIVE) : 0) - DRAG * pv) / 60;
+        px = d > 0 ? min(px + pv / 60, fit(1e4)) : max(px - pv / 60, fit(-1e4));
+      }
+      xs.push(px);
+      ph.push(pp);
+    }
+    run?.a.cancel();
+    const a = el.animate(xs.filter((_, k) => k % 2 === 0).map((v) => ({ translate: `${v}px` })), { duration: ((xs.length - 1) * 1000) / 60, fill: 'forwards' });
+    run = { xs, ph, a };
     set('row');
   };
   const stroll = () => { const a = fit(-1e4); const b = fit(1e4); travel(x < (a + b) / 2 ? rand((a + b) / 2, b) : rand(a, (a + b) / 2)); };
@@ -688,26 +707,26 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
         mood = asleep ? 'asleep' : quiet > 20 ? 'sleepy' : calm;
         break;
       case 'row': {
-        const d = target - x;
-        // Strokes while the glide would fall short and the bow points his way; the last stretch is a glide.
-        const turned = abs(cur[TURN] - goal[TURN]) < 40;
-        const more = d * dir > v / DRAG + 3 && turned;
-        if (more || phase > 0) {
-          const was = phase;
-          phase += dt * STROKE;
-          if (phase >= 1) phase = more ? phase - 1 : 0;
-          if (phase < was && phase) { puff(3, me.blades[0], 10); puff(3, me.blades[1], 10); }
-        }
-        // Only a stroke he means pushes: one he is finishing as he stops does not, so the glide ends at the mark.
-        surge = more && phase < DRIVE ? sin((PI * phase) / DRIVE) : 0;
-        v += (THRUST * surge * (turned ? 1 : 0.3) - DRAG * v) * dt;
-        // Never past the lane's end he rows toward.
-        x = dir > 0 ? min(x + v * dt, fit(1e4)) : max(x - v * dt, fit(-1e4));
+        // Where the crossing's animation is now: his place and his stroke, read from what was worked out.
+        const n = run.xs.length - 1;
+        const k = min(n, floor(((run.a.currentTime || 0) * 60) / 1000));
+        const was = phase;
+        x = run.xs[k];
+        v = k ? abs(x - run.xs[k - 1]) * 60 : 0;
+        phase = run.ph[k];
+        if (phase < was && phase) { puff(3, me.blades[0], 10); puff(3, me.blades[1], 10); }
+        surge = phase < DRIVE ? sin((PI * phase) / DRIVE) : 0;
         // The push, from the catch to the finish, then the hands come back over the water.
-        const k = phase < DRIVE ? ease(phase / DRIVE) : 1 - ease((phase - DRIVE) / (1 - DRIVE));
-        for (let i = 0; i < N; i += 1) row[i] = mix(P.catch[i], P.finish[i], k);
-        want = phase || more ? row : P.rest; hz = 5;
-        if ((abs(d) < 2 || d * dir < 0) && v < 4) { target = null; v = 0; rest(); }
+        const e = phase < DRIVE ? ease(phase / DRIVE) : 1 - ease((phase - DRIVE) / (1 - DRIVE));
+        for (let i = 0; i < N; i += 1) row[i] = mix(P.catch[i], P.finish[i], e);
+        want = phase ? row : P.rest; hz = 5;
+        if (k === n) {
+          run.a.cancel();
+          run = null;
+          v = 0;
+          place();
+          rest();
+        }
         break;
       }
       case 'act': {
@@ -720,7 +739,7 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
         break;
       }
     }
-    if (state !== 'row') { v *= exp(-dt * DRAG); x = fit(x + dir * v * dt); surge = 0; }
+    if (state !== 'row') surge = 0;
     goal.set(want);
     // Drifting, the boat swings slowly about.
     goal[TURN] = 90 - dir * (90 - look) + (state === 'drift' ? 8 * sin(time * 0.21) : 0);
@@ -736,7 +755,7 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
     gaze = [0, 0];
     if (asleep) turn = 0;
     else if (pointer && time - pointer.at < 3) {
-      const g = [(pointer.x - home[0] - placed - BOX_W / 2) / 72, (home[1] + 20 - pointer.y) / 72, 1.4];
+      const g = [(pointer.x - home[0] - x - BOX_W / 2) / 72, (home[1] + 20 - pointer.y) / 72, 1.4];
       const w = face + 90 - atan2(g[2], g[0]) / RAD;
       turn = clamp(w - 360 * round(w / 360), -58, 58);
       pitch = clamp((-asin(g[1] / len(g)) / RAD) * 0.5, -16, 14);
@@ -776,9 +795,10 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
   // A point trailing `to` on a soft spring; returns how far, nearing `max` but never jamming.
   const trail = (s, to, stiff, damp, max, dt) => {
     s.p = s.p || [...to];
-    for (let a = 0; a < 3; a += 1) {
-      s.v[a] += (-stiff * (s.p[a] - to[a]) - damp * s.v[a]) * dt;
-      s.p[a] = to[a] + max * Math.tanh((s.p[a] + s.v[a] * dt - to[a]) / max);
+    const n = ceil(dt * 120);
+    for (let k = 0; k < n; k += 1) for (let a = 0; a < 3; a += 1) {
+      s.v[a] += (-stiff * (s.p[a] - to[a]) - damp * s.v[a]) * (dt / n);
+      s.p[a] = to[a] + max * Math.tanh((s.p[a] + s.v[a] * (dt / n) - to[a]) / max);
     }
     return sub(s.p, to);
   };
@@ -882,11 +902,14 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
     blink -= dt;
     lid += ((blink > 0 ? 0.1 : 1) - lid) * (1 - exp(-dt * (blink > 0 ? 32 : 11)));
 
-    squashV += (-800 * (squash - 1) - 26 * squashV) * dt;
-    squash = clamp(squash + squashV * dt, 0.8, 1.2);
-    // The swell: a slow bob of a few art pixels and a roll of a few degrees; each push lifts the bow, and the
-    // blades go in for the push and come out over the water for the way back.
-    bob = 0.42 * sin(time * 1.3) + 0.16 * sin(time * 2.9 + 1);
+    for (let k = 0, n = ceil(dt * 240); k < n; k += 1) {
+      squashV += (-800 * (squash - 1) - 26 * squashV) * (dt / n);
+      squash = clamp(squash + squashV * (dt / n), 0.8, 1.2);
+    }
+    // The swell: a bob of two art pixels, which the snap of his middle steps by whole pixels while the water stays
+    // put, and a roll of a few degrees; each push lifts the bow, and the blades go in for the push and come out over
+    // the water for the way back.
+    bob = (0.42 * sin(time * 1.3) + 0.16 * sin(time * 2.9 + 1)) * 1.4;
     roll = 2.5 * sin(time * 0.9 + 1);
     pitch = 1.5 * sin(time * 1.1) - 4 * surge;
     blade += ((state === 'row' && phase ? (phase < DRIVE ? -0.5 : 1) : 0.35) - blade) * (1 - exp(-dt * 14));
@@ -899,14 +922,6 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
     if (![rows, fc].every((a) => a.every((n) => abs(n) < 1e4))) return settle(P.rest, -18);
     Object.assign(me, { v: v * dir, phase, x: x / VOX, near: dir > 0 ? 1 : 0 });
 
-    // He moves along the lane by whole art pixels every frame, and is drawn FPS times a second.
-    const snapped = round(x * res) / res;
-    if (snapped !== placed) el.style.translate = `${snapped}px`; // A scale scales a transform.
-    placed = snapped;
-    const now = performance.now();
-    owed = dt && now - drawnAt < 1000 / FPS - 4;
-    if (owed) return;
-    drawnAt = now;
     const view = [VOX * res, OX, G, TILT];
     const fine = [ease(clamp((time - fineAt) / 0.5, 0, 1)), night, time % 100, me.lamp];
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -961,8 +976,9 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
 
   const tick = (now) => {
     raf = visible ? requestAnimationFrame(tick) : 0;
-    if (!owed && me.nap?.(now - last)) return; // fine.js skips still frames.
-    const dt = clamp((now - last) / 1000, 0, 0.05);
+    // A pose FPS times a second, and none while fine.js finds him still; between them there is nothing to do.
+    if (now - last < 1000 / FPS - 4 || me.nap?.(now - last)) return;
+    const dt = clamp((now - last) / 1000, 0, 0.1);
     last = now;
     time += dt;
     st += dt;
@@ -984,13 +1000,15 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
     wake();
     const text = taps++ ? lines[floor(rng() * lines.length)] : el.dataset.hello;
     if (reduce || state === 'act') speak(text);
-    else { target = null; perform('wave', text); }
+    else if (state === 'row') { speak(text); encore = () => perform('wave'); }
+    else perform('wave', text);
   };
   let onScreen = true;
   let parked = false;
   // Off screen, under a window, in a hidden tab: no frames at all.
   const show = () => {
     visible = !document.hidden && onScreen && !parked;
+    run?.a[visible ? 'play' : 'pause']();
     if (visible) resume();
     else { cancelAnimationFrame(raf); raf = 0; }
   };
@@ -1006,7 +1024,7 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
   const wires = [
     [el, 'click', tap], [window, 'pointermove', (e) => { pointer = { x: e.clientX, y: e.clientY, at: time }; }, { passive: true }],
     [window, 'pointerdown', wake, hear], [window, 'keydown', wake, hear], [window, 'scroll', wake, hear],
-    [document, 'visibilitychange', show], [window, 'resize', () => { measure(); x = fit(x); }], [canvas, 'webglcontextlost', lost], [canvas, 'webglcontextrestored', restored],
+    [document, 'visibilitychange', show], [window, 'resize', () => { measure(); if (!run) { x = fit(x); place(); } }], [canvas, 'webglcontextlost', lost], [canvas, 'webglcontextrestored', restored],
   ];
   for (const [to, ...wire] of wires) to.addEventListener(...wire);
   watcher.observe(el);
@@ -1024,10 +1042,13 @@ export async function mountSmed3D(el, { light, seed = 7 } = {}) {
   measure();
   x = fit(x);
   settle(P.rest, -18);
-  if (reduce) draw(0);
-  else {
+  if (reduce) {
+    place();
+    draw(0);
+  } else {
     // He rows in from the lane's left end, then waves hello.
     x = -BOX_W * 0.6;
+    place();
     travel(rand(fit(0), fit(1e4)));
     encore = () => perform('wave', el.dataset.hello);
     resume();

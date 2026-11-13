@@ -146,17 +146,17 @@ $jsonld
 </script>
 </head>
 <body>
-<div class="screen">
 <a class="skip-link" href="#main">$skip</a>
 <header class="masthead">
   <div class="shell masthead__inner">
-    <a class="brand" href="$home" aria-label="$brand"><span class="island__pill glass" aria-hidden="true"></span>$mark<span class="island__text"><b>Anton Smedberg</b><small>$status<i class="island__dot" aria-hidden="true"></i></small></span></a>
+    <a class="brand" href="$home" aria-label="$brand">$mark<span class="island__text"><b>Anton Smedberg</b><small>$status<i class="island__dot" aria-hidden="true"></i></small></span></a>
     <div class="tools glass" role="group" aria-label="$tools">
       <a class="tool tool--lang" href="$other" hreflang="$other_lang" lang="$other_lang" aria-label="$lang_name"><svg aria-hidden="true"><use href="$sprite#i-globe"/></svg>$lang_label</a>
       <button class="tool theme" type="button" data-theme-toggle aria-label="$theme"><svg class="i-auto" aria-hidden="true"><use href="$sprite#i-auto"/></svg><svg class="i-sun" aria-hidden="true"><use href="$sprite#i-sun"/></svg><svg class="i-moon" aria-hidden="true"><use href="$sprite#i-moon"/></svg></button>
     </div>
   </div>
 </header>
+<div class="screen">
 
 <main id="main" tabindex="-1">
 <article class="cv shell" aria-labelledby="cv-name">

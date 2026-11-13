@@ -340,7 +340,7 @@ function buildTorso(m) {
   const band = 1.1;
   const floor = (h - band) / 5;
   const white = hex('#ece9df');
-  // The joints are dark glass in shade, not voids: grey enough to read as a seam.
+  // The joints: dark glass in shade, grey enough to read as a seam.
   const dark = hex('#59606c');
   const steel = hex('#f7f7f1');
   const angle = (y) => rad(-42 + (90 * y) / H);
@@ -603,8 +603,7 @@ function buildHarbour(m) {
       taken.push([x, z, 1]);
     }
   }
-  // Two cranes: still being built. Flat-topped, of beams a picture pixel thick or more, so far off nothing of them
-  // thins away and leaves a part hanging in the air.
+  // Two cranes, of beams a pixel thick or more, so far off no part of them is left hanging in the air.
   const crane = (x, z, tall, reach, yaw) => {
     const orange = hex('#e8863a');
     m.post(x, Y, z, 3, 3, tall, 2.4, 2.4, orange);
@@ -680,9 +679,8 @@ function buildPlanting(m, doy, free) {
       for (const [off, up, r, tall] of crown) m.lobe(x + Math.cos(a0) * off * h, fork + (top - fork) * up, z + Math.sin(a0) * off * h, r * h, tall, leaf);
       return;
     }
-    // Bare: the trunk forks into a leader and one or two limbs, each carrying a loose mass of twigs; the masses
-    // overlap into one lumpy crown, and the limbs, a picture pixel thick or more, tie it to the trunk at any distance.
-    // The kind sets the limbs' lean and the crown's shape; neighbours take turns in limbs and spread.
+    // Bare: a leader and one or two limbs, each with a loose mass of twigs, overlapping into one crown; the limbs,
+    // a pixel thick or more, tie it to the trunk at any distance. Neighbours take turns in limbs and spread.
     const v = (row += 1) % 3;
     const lean = { poplar: 0.1, birch: 0.25, lime: 0.4, maple: 0.6, oak: 0.85 }[kind];
     const R = Math.max(...crown.map((c) => c[2])) * h * (0.9 + 0.1 * v);
@@ -1447,7 +1445,7 @@ void main(){
       if(kind<3.) add=vec3(1.,.78,.5)*uNight*.3*smoothstep(160.,186.,vF.y);
       // Near windows get a pale frame and sill shade.
       if(!pane&&!rail&&!shop&&lod==1.&&px<.7&&kind!=2.&&mat!=1.&&mat!=2.&&f.x>.17&&f.x<.83&&f.y>.2&&f.y<.85) base*=f.y<.3?.88:1.04;
-      // The floor line, filtered to its share of the pixel: thinner than one, it would flicker as the view moves.
+      // The floor line, filtered to its share of the pixel, so it does not flicker as the view moves.
       float fw=fwidth(cell.y),fl=min(abs(f.y-.05),abs(f.y-1.05));
       base*=1.-(kind<3.?.14:.1)*clamp((.05+fw*.5-fl)/fw,0.,min(.1/fw,1.));
       // Shade under the eaves.
@@ -1933,7 +1931,7 @@ export function mountCity(canvas, { at, front } = {}) {
   // art pixels. Phones start on 1 and never climb to 0, whose clouds cost a phone more than a frame.
   const start = +(devicePixelRatio > 2);
   let rung = start;
-  // How much finer than the grain the kept town is now: twice at rest, once while it moves (see `renderStill`).
+  // How much finer than its grain the kept town is: twice at rest, once moving (`renderStill`).
   let sso = 1;
   let cut = false;
   let forced = null;
@@ -2023,6 +2021,7 @@ export function mountCity(canvas, { at, front } = {}) {
   const drift = new Float32Array(2);
   let deckDrawn = 0;
   let relits = 0;
+  let shown = -1; // Relights at the movers' last copy.
   const queue = [];
   let relitAt = -1e9;
   let cost = 0;
@@ -2070,8 +2069,8 @@ export function mountCity(canvas, { at, front } = {}) {
     while ((box.clientWidth * dpr * box.clientHeight * dpr) / (device * device) > 1.4e6) device += 1;
     const nW = Math.max(40, Math.ceil((box.clientWidth * dpr) / device));
     const nH = Math.max(40, Math.ceil((box.clientHeight * dpr) / device));
-    // The town twice as fine, each picture pixel the mean of four, so its edges and thin parts are smooth; up to a
-    // tall phone's picture, as the fine town and its copy with the movers each hold four times its pixels.
+    // The town twice as fine, each pixel the mean of four, so thin parts are smooth; up to a tall phone's picture,
+    // as it and its copy with the movers each hold four times its pixels.
     const ss = rung < 2 && nW * nH < 1e6 ? 2 : 1;
     const grain = rung > 3 || dpr > 2 ? 1 : rung > 2 ? Math.ceil(device / 2) : device;
     ui = covered();
@@ -2266,7 +2265,7 @@ export function mountCity(canvas, { at, front } = {}) {
     gl.uniform1f(u.uMirror, mirror);
     gl.uniform1f(u.uTag, 0);
     gl.drawArrays(gl.TRIANGLES, 0, tris);
-    // Lines stay out of the mirror: ripples would bend a line a pixel wide into a stray squiggle on the water.
+    // Lines stay out of the mirror: ripples would bend them into stray squiggles.
     if (lines && mirror > 0) {
       gl.uniform1f(u.uTag, 0.25);
       gl.drawArrays(gl.LINES, firstLine, lines);
@@ -2301,7 +2300,7 @@ export function mountCity(canvas, { at, front } = {}) {
     for (const f of fixed) drawGeometry(f, f.tris, f.lines, f.tris, mirror);
   };
 
-  // Moving, the town is drawn at its grain, a quarter of the work; the first relight at rest draws it fine again.
+  // Moving, the town is drawn at its grain, a quarter of the work; the first relight at rest, fine again.
   const renderStill = (moving) => {
     relits += 1;
     sso = moving ? 1 : still.w / W;
@@ -2335,11 +2334,11 @@ export function mountCity(canvas, { at, front } = {}) {
     drawGeometry(moving, movTris, movLines, movTris, mirror);
   };
 
-  // The kept city with the movers over it and its reflection, posed at most at the idle pace.
+  // The kept city with the movers over it and its reflection.
   const drawMovers = (seconds, calm) => {
     gl.useProgram(scene.p);
     bind(scene.u, 3, poseT, 'uPose');
-    if (movedAt < 0 || calm !== movedStill || Math.abs(seconds - movedAt) > 1 / FPS - 0.004) {
+    if (movedAt < 0 || calm !== movedStill || Math.abs(seconds - movedAt) > (idle === 'old') / FPS - 0.004) {
       movedAt = seconds;
       movedStill = calm;
       poses.fill(0);
@@ -2495,11 +2494,11 @@ export function mountCity(canvas, { at, front } = {}) {
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
-  const frame = (now, busy) => {
+  const frame = (now, busy, half) => {
     if (!ready) return;
     const began = performance.now();
     if (resized) fit();
-    // What rest left waits while moving, as this frame relights or marches already.
+    // Rest's deferred work waits while moving: this frame relights or marches.
     if (!busy) while (queue.length) queue.shift()();
     const dt = clamp((now - beat) / 1000, 0, 0.1);
     const s = now / 1000;
@@ -2563,9 +2562,11 @@ export function mountCity(canvas, { at, front } = {}) {
     sway[1] = calm ? 0 : (leanTo[1] * 1.6 + 0.3 * Math.sin(s * 0.17 + 0.6)) / 1.9;
     reach[0] = (-sway[0] * 6.65 * richIn * view.fl * H) / 480;
     reach[1] = (sway[1] * 1.9 * richIn * view.fl * H) / 480;
-    drawMovers(s, calm);
+    // At 60, every second frame the movers and glow stand: they read at 30, the water at 60.
+    if (!half || relits !== shown) drawMovers(s, calm);
+    shown = relits;
     if (slideP) pass(slideP, slideT, W, H, { ...shared(s), uRes: [W, H], uSway: reach }, [['uDepth', main.depth], ['uDepthR', refl.depth], ['uScene', main.color]]);
-    if (lamp > 0 && (relit || !busy)) blurGlow();
+    if (lamp > 0 && (relit || !busy) && !half) blurGlow();
     cityPass(s);
     // The clouds, kept over frames by the module.
     const keep = afresh || flash[0] > 0.01 ? 0 : moved > 0.02 || keying ? 4 : 16;
@@ -2592,17 +2593,24 @@ export function mountCity(canvas, { at, front } = {}) {
   let ranAt = -1;
   let lastClock = performance.now();
   const stir = () => { fresh = true; };
+  // Frames a second at rest (`setPace`); the display's frame.
+  let idle = 60;
+  let odd = false;
+  let tick = 1000 / 60;
   const loop = (now) => {
     raf = requestAnimationFrame(loop);
+    tick += (clamp(now - ranAt, 4, 40) - tick) * 0.05;
     ranAt = now;
     const gap = now - lastDraw;
-    // While anything moves, and a moment after, every frame is drawn; at rest the city keeps its beat, after three
-    // seconds half (from rung 3 a third), unless rain, snow, a storm or a turn. Between beats, one deferred task.
+    // Moving and most of a second after, every frame; at rest every n-th, n whole, so the cadence is even and steps
+    // once, after the motion; from rung 3 half as often. 'old': 24, after 3 s 12 (rung 3 on, 8) unless rain, snow,
+    // a storm or a turn. Between drawn frames, one deferred task.
     if (fresh) stirred = now;
     fresh = false;
     const busy = now - stirred < 300;
-    const pace = now - stirred < 3000 || wu[1] + wu[2] > 0 || wx[6] > 0.3 ? FPS : rung > 2 ? FPS / 3 : FPS / 2;
-    const drew = busy || gap >= 1000 / pace - 2;
+    const old = idle === 'old';
+    const pace = old ? (now - stirred < 3000 || wu[1] + wu[2] > 0 || wx[6] > 0.3 ? FPS : rung > 2 ? FPS / 3 : FPS / 2) : rung > 2 ? idle / 2 : idle;
+    const drew = busy || (old ? gap >= 1000 / pace - 2 : now - stirred < 800 || gap >= ((Math.round(1e3 / pace / tick) || 1) - 0.5) * tick);
     // The governor: 1 sheds a rung, -1 restores one.
     const step = sky.ladder?.(now, drew + busy, cost, rung, relits);
     if (step && forced === null && rung + step >= 0 && rung + step < 7) {
@@ -2618,7 +2626,7 @@ export function mountCity(canvas, { at, front } = {}) {
       lastClock = now;
       updateClock();
     }
-    frame(now, busy);
+    frame(now, busy, !busy && idle === 60 && (odd = !odd));
   };
   const run = () => {
     cancelAnimationFrame(raf);
@@ -2823,6 +2831,10 @@ export function mountCity(canvas, { at, front } = {}) {
       forced = Number.isFinite(n) ? clamp(Math.round(n), 0, 7) : null;
       rung = forced ?? start;
       resize();
+    },
+    // Frames a second at rest: 60, 30 or 'old'.
+    setPace(n) {
+      idle = n === 30 || n === 'old' ? n : 60;
     },
     // Where the page draws sun or moon, CSS pixels; `day` says whose (default the sun's by day). Null: the city's
     // arc. A resting frame shows it.

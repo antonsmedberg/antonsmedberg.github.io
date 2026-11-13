@@ -26,52 +26,47 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 @media (max-aspect-ratio: 2/3) { .no-gl .os .screen { background-size: auto 150%; background-position: 40% 0; } }
 .wall-front { z-index: 2; pointer-events: none; }
 
-/* The pages lie side by side; main.js moves them under a finger and on springs, and leaves up and down to each page. */
-.pager { position: absolute; inset: 0; display: flex; overflow: hidden; touch-action: pan-y; }
+/* The pages lie side by side in one scroller that snaps to a page: a finger's swipe and a tab's trip are the
+   browser's own scrolling, which it draws at the screen's full rate. Up and down belong to each page. */
+.pager { position: absolute; inset: 0; display: flex; overflow: auto hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+.pager::-webkit-scrollbar { display: none; }
 /* A sideways drag that starts on a link or a picture is a swipe, never a drag of the link or its long-press preview. */
 .pager :is(a, img) { -webkit-user-drag: none; -webkit-touch-callout: none; }
 
 .pg {
-  flex: 0 0 100%; width: 100%; height: 100%;
-  overflow: hidden auto; overscroll-behavior-y: contain; scrollbar-width: none; touch-action: pan-y;
-  --pg-top: calc(64px + env(safe-area-inset-top)); --pg-foot: calc(var(--bar-clear) + 28px);
+  flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; scroll-snap-stop: always;
+  overflow: hidden auto; overscroll-behavior-y: contain; scrollbar-width: none;
+  --pg-top: calc(64px + env(safe-area-inset-top)); --pg-foot: calc(var(--bar-clear) - 8px);
   padding-top: var(--pg-top);
-  padding-bottom: var(--pg-foot);
   padding-left: var(--rail-clear);
 }
 .pg::-webkit-scrollbar { display: none; }
 .pg .shell { position: relative; z-index: 3; }
+/* Travel: on the way between two pages the far layers of each lag and the near ones run ahead, as if the pages
+   were one space seen from a moving camera. Each layer moves with the pager's own scroll (main.js gives it its
+   depth, --k), so the browser runs it with the scroll; where it cannot, the layers simply stay put. Zero at
+   both ends of the trip and in the middle, so a layer neither starts nor lands with a step. */
+@supports (animation-timeline: view()) {
+  .pg { view-timeline: --page inline; }
+  .pg .layer { animation: travel linear both; animation-timeline: --page; }
+}
+@keyframes travel {
+  0%, 50%, 100% { transform: none; }
+  12.5% { transform: translateX(calc(var(--k) * 18.75vw)); }
+  25% { transform: translateX(calc(var(--k) * 25vw)); }
+  37.5% { transform: translateX(calc(var(--k) * 18.75vw)); }
+  62.5% { transform: translateX(calc(var(--k) * -18.75vw)); }
+  75% { transform: translateX(calc(var(--k) * -25vw)); }
+  87.5% { transform: translateX(calc(var(--k) * -18.75vw)); }
+}
 /* The lane above the bar belongs to the mascot. */
 #home.pg { padding-bottom: calc(var(--bar-clear) + var(--lane)); }
-/* Scroll edges: a page's text never runs readable under the header's pills
-   or the bar. On its way to them it passes into a band of soft blur that
-   deepens toward the edge, held by two sticky ends of the page itself that
-   take the room its padding took. Each band gathers the frost as it nears
-   the edge, so what passes under it is muted as well as blurred, even where
-   an engine draws a picture over the blur: the top one under the pills, the
-   bottom one into the frost made solid by the bar's lower edge, so nothing
-   of the page shows under or below the bar. The top one comes in as the page
-   leaves its top, so at rest the sky behind the header stays sharp. Home is
-   the scene and has none. */
-.pg:not(#home) { padding-block: 0; display: flex; flex-direction: column; }
-/* The page is a column, so the foot band stands at the window's foot however short the page is. */
-.pg:not(#home) > *, .pg:not(#home)::before, .pg:not(#home)::after { flex: none; }
-.pg:not(#home)::before, .pg:not(#home)::after {
-  content: ""; position: sticky; z-index: 4; display: block; pointer-events: none;
-  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-}
-.pg:not(#home)::before {
-  top: 0; height: var(--pg-top); background: linear-gradient(var(--frost), transparent);
-  -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent);
-}
-.pg:not(#home)::after {
-  bottom: 0; height: var(--pg-foot); margin-top: auto; background: linear-gradient(transparent 20%, var(--frost) 50%, var(--frost-solid) 85%);
-  -webkit-mask-image: linear-gradient(transparent, #000 44%); mask-image: linear-gradient(transparent, #000 44%);
-}
-@supports (animation-timeline: scroll()) {
-  .pg:not(#home)::before { animation: edge-in linear both; animation-timeline: scroll(nearest); animation-range: 0 48px; }
-  @keyframes edge-in { from { opacity: 0; } to { opacity: 1; } }
-}
+/* The other pages scroll in the room between the header and the bar and are cut off clean at both: no line of
+   them ever runs behind the header or the bar, and above and below that room the city shows sharp, as on Home.
+   The edge is a clip, not a fade: a fade needs a mask on the page, and a mask cuts every frosted card in it off
+   from the city behind it, since a backdrop is drawn only from inside the nearest masked box. Home is the scene
+   and keeps the whole screen. */
+.pg:not(#home) { height: auto; margin-block: var(--pg-top) var(--pg-foot); padding-block: 12px 24px; }
 
 /* Name: one line from 360 px wide, two below that, small enough to leave the sky its room. */
 #home .shell { position: static; }
@@ -190,7 +185,7 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 .island summary { list-style: none; cursor: pointer; }
 .island summary::-webkit-details-marker { display: none; }
 .island summary:focus-visible { outline-offset: -3px; border-radius: calc(var(--h-md) / 2); }
-.island__more { padding: 0 12px 12px; }
+.island__more { padding: 0 12px 12px 0; }
 .island__more p { max-width: 17rem; padding: 4px 0 12px; font-size: var(--fs-sub); line-height: var(--lh-sm); white-space: normal; }
 .island__links { display: flex; gap: 8px; }
 .island__links .btn { flex: 1 1 auto; min-height: var(--h-md); padding-inline: 16px; font-size: var(--fs-sub); }
@@ -207,7 +202,7 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 /* On a wide screen the city's camera turns as the pages move, so on Work the tower can stand anywhere behind the
    title: there the title stands on the frost like every other page's. */
 @media (min-width: 720px) and (min-height: 541px) {
-  #work > .shell > .head { padding: 24px var(--card-pad); background: var(--frost); color: var(--ink); -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(150%); backdrop-filter: blur(var(--frost-blur)) saturate(150%); box-shadow: inset 0 1px 0 var(--frost-rim), inset 0 0 0 0.5px var(--frost-line), var(--frost-shadow); }
+  #work > .shell > .head { padding: 24px var(--card-pad); background: var(--frost-sheen), var(--frost); color: var(--ink); -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(var(--frost-sat)); backdrop-filter: blur(var(--frost-blur)) saturate(var(--frost-sat)); box-shadow: inset 0 1px 0 var(--frost-rim), inset 0 0 0 0.5px var(--frost-line), var(--frost-shadow); }
   #work > .shell > .head p:not(.kicker) { color: var(--ink-2); }
 }
 
@@ -218,7 +213,8 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 /* A page that has not been swiped to keeps its screens unrendered, so the
    first load fetches only what the home screen shows; its cards and panels
    are neither laid out nor painted until they come into view. */
-.pg .peek { content-visibility: auto; contain-intrinsic-size: auto 16rem; }
+/* Never one skipped box inside another: a card whose screens are skipped too settles its height in two steps
+   as it comes into view, and the deck's ResizeObserver then sees it change twice in one frame. */
 .pg .project, .pg .panel { content-visibility: auto; contain-intrinsic-block-size: auto 24rem; }
 .pg .head { content-visibility: auto; contain-intrinsic-block-size: auto 7rem; }
 
@@ -320,8 +316,6 @@ body.os { padding: 0; height: 100dvh; overflow: hidden; }
 @media (max-height: 540px) and (min-width: 600px) {
   .os .screen { --orb: 80px; }
   .pg { --pg-top: calc(56px + env(safe-area-inset-top)); --pg-foot: 16px; }
-  /* No bar stands at the foot of the rail layout, so the page's foot is only its margin. */
-  .pg:not(#home)::after { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   #home.pg { padding-bottom: 8px; }
   .hero {
     --side: max(var(--gutter), env(safe-area-inset-left)); --clear: 16px;
